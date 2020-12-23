@@ -1,26 +1,8 @@
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package eu.menzani.benchmark;
 
 import eu.menzani.lang.Check;
-import eu.menzani.lang.Lang;
 import eu.menzani.lang.UncaughtException;
-import eu.menzani.system.SystemProperty;
-import eu.menzani.system.ThreadManipulation;
-import eu.menzani.system.ThreadManipulationSpread;
-import eu.menzani.system.Threads;
+import eu.menzani.system.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -75,46 +57,54 @@ public abstract class Benchmark {
         return Path.of("java");
     }
 
-    public void runBenchmark(BenchmarkListener listener) {
-        Class<?> clazz = getClass();
-        List<String> command = List.of(
-                getJavaRuntime().toString(),
-                "-Xms8g",
-                "-Xmx8g",
-                "-XX:+UseLargePages",
-                "-XX:+AlwaysPreTouch",
-                "-XX:+UnlockExperimentalVMOptions",
-                "-XX:+UseEpsilonGC",
-                "-XX:-RestrictContended",
-                "-XX:-UseBiasedLocking",
-                "--add-opens",
-                "java.base/jdk.internal.misc=" + Lang.EU_MENZANI_MODULE.getName(),
-                "-p",
-                new SystemProperty("jdk.module.path").get(),
-                "-m",
-                clazz.getModule().getName() + '/' + clazz.getName()
-        );
+    public void launchBenchmark() {
+        launchBenchmark(ConsoleBenchmarkListener.INSTANCE);
+    }
 
-        ProcessBuilder builder = new ProcessBuilder(command);
-        builder.redirectErrorStream(true);
-        try {
-            listener.beginProcessCreate();
-            Process process = builder.start();
-            listener.onProcessCreated(process);
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.ISO_8859_1))) {
-                StringBuilder output = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    output.append(line);
-                    output.append('\n');
+    public void launchBenchmark(BenchmarkListener listener) {
+        ApplicationProperty launched = new ApplicationProperty(Benchmark.class, "launched");
+        if (launched.getAsBoolean()) {
+            runBenchmark();
+        } else {
+            Class<?> clazz = getClass();
+            List<String> command = List.of(
+                    getJavaRuntime().toString(),
+                    launched.toString(),
+                    "-Xms8g",
+                    "-Xmx8g",
+                    "-XX:+UseLargePages",
+                    "-XX:+AlwaysPreTouch",
+                    "-XX:+UnlockExperimentalVMOptions",
+                    "-XX:+UseEpsilonGC",
+                    "-XX:-RestrictContended",
+                    "-XX:-UseBiasedLocking",
+                    "-p",
+                    new SystemProperty("jdk.module.path").get(),
+                    "-m",
+                    clazz.getModule().getName() + '/' + clazz.getName()
+            );
 
-                    listener.onOutputLineAdded(line);
-                    listener.updateOutput(output.toString());
+            ProcessBuilder builder = new ProcessBuilder(command);
+            builder.redirectErrorStream(true);
+            try {
+                listener.beginProcessCreate();
+                Process process = builder.start();
+                listener.onProcessCreated(process);
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.ISO_8859_1))) {
+                    StringBuilder output = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        output.append(line);
+                        output.append('\n');
+
+                        listener.onOutputLineAdded(line);
+                        listener.updateOutput(output.toString());
+                    }
+                    listener.onEnd();
                 }
-                listener.onEnd();
+            } catch (IOException e) {
+                throw new UncaughtException(e);
             }
-        } catch (IOException e) {
-            throw new UncaughtException(e);
         }
     }
 

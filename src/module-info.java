@@ -10,7 +10,8 @@ module eu.menzani {
     exports eu.menzani.benchmark;
     exports eu.menzani.concurrent;
     exports eu.menzani.lang;
+    exports eu.menzani.lang.mutable;
     exports eu.menzani.swing;
     exports eu.menzani.system;
-    exports eu.menzani.util;
+    exports eu.menzani.misc;
 }

@@ -1,4 +1,4 @@
-package eu.menzani.misc;
+package eu.menzani.struct;
 
 import eu.menzani.lang.Optional;
 import eu.menzani.lang.UncaughtException;

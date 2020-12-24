@@ -1,13 +1,15 @@
 package eu.menzani.system;
 
+import eu.menzani.lang.Assume;
 import eu.menzani.lang.Check;
 import eu.menzani.lang.Optional;
 
 import java.nio.file.Path;
 import java.util.function.Supplier;
 
-abstract class RuntimeProperty {
+public abstract class RuntimeProperty {
     final String key;
+    private String value;
 
     RuntimeProperty(@Optional String initialValue, String first, String[] more) {
         StringBuilder builder = new StringBuilder();
@@ -57,5 +59,41 @@ abstract class RuntimeProperty {
         return Path.of(value);
     }
 
-    public abstract String toString();
+    public void set(String value) {
+        Assume.notNull(value);
+        this.value = value;
+    }
+
+    public void setOrRemove(String value) {
+        this.value = value;
+    }
+
+    public void setAsBoolean(boolean value) {
+        if (value) {
+            set("");
+        } else {
+            remove();
+        }
+    }
+
+    public void remove() {
+        value = null;
+    }
+
+    public void update() {
+        if (value == null) {
+            System.clearProperty(key);
+        } else {
+            System.setProperty(key, value);
+        }
+    }
+
+    @Override
+    public String toString() {
+        String result = "-D" + key;
+        if (!value.equals("")) {
+            result += '=' + value;
+        }
+        return result;
+    }
 }

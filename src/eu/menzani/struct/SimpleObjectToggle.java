@@ -1,4 +1,4 @@
-package eu.menzani.misc;
+package eu.menzani.struct;
 
 public class SimpleObjectToggle<T> extends ObjectToggle<T> {
     private T value;

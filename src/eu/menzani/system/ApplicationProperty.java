@@ -12,9 +12,4 @@ public class ApplicationProperty extends RuntimeProperty {
     public ApplicationProperty resolve(String first, String... more) {
         return new ApplicationProperty(key, first, more);
     }
-
-    @Override
-    public String toString() {
-        return "-D" + key;
-    }
 }

@@ -2,56 +2,52 @@ package eu.menzani.lang;
 
 import eu.menzani.lang.mutable.BooleanRef;
 
-public class ArrayBuilder<E> {
-    private E[] array;
-    private int index;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ListIterator;
 
-    public ArrayBuilder() {
-        this(10);
+public class ArrayBuilder<T> {
+    private final List<T> list;
+    private final Class<?> elementType;
+
+    public ArrayBuilder(Class<T> elementType) {
+        list = new ArrayList<>();
+        this.elementType = elementType;
     }
 
-    public ArrayBuilder(int capacity) {
-        extendArray(capacity, null);
+    public ArrayBuilder(int capacity, Class<T> elementType) {
+        list = new ArrayList<>(capacity);
+        this.elementType = elementType;
     }
 
-    public ArrayBuilder(E[] array) {
-        index = array.length;
-        extendArray(index + 10, array);
+    public ArrayBuilder(T[] array) {
+        list = new ArrayList<>(Arrays.asList(array));
+        elementType = array.getClass().getComponentType();
     }
 
-    public void add(E element) {
-        if (index == array.length) {
-            extendArray(array.length * 2, array);
-        }
-        array[index++] = element;
+    public void add(T element) {
+        list.add(element);
     }
 
-    @SuppressWarnings("unchecked")
-    private void extendArray(int length, @Optional E[] currentArray) {
-        array = (E[]) new Object[length];
-        if (currentArray != null) {
-            System.arraycopy(currentArray, 0, this.array, 0, currentArray.length);
-        }
-    }
-
-    public void map(Mapper<E> mapper) {
+    public void map(Mapper<T> mapper) {
+        ListIterator<T> iterator = list.listIterator();
         BooleanRef shouldRemove = new BooleanRef();
-        for (int i = 0; i < index; i++) {
+        while (iterator.hasNext()) {
             shouldRemove.value = false;
-            E newElement = mapper.map(array[i], shouldRemove);
+            T newElement = mapper.map(iterator.next(), shouldRemove);
             if (shouldRemove.value) {
-                if (i != index - 1) {
-                    System.arraycopy(array, i + 1, array, i, index - (i + 1));
-                }
-                index--;
+                iterator.remove();
             } else {
-                array[i] = newElement;
+                iterator.set(newElement);
             }
         }
     }
 
-    public E[] build() {
-        return array;
+    public T[] build() {
+        @SuppressWarnings("unchecked") T[] dummy = (T[]) Array.newInstance(elementType, 0);
+        return list.toArray(dummy);
     }
 
     public interface Mapper<E> {

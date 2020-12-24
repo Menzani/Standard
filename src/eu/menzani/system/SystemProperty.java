@@ -12,9 +12,4 @@ public class SystemProperty extends RuntimeProperty {
     public SystemProperty resolve(String first, String... more) {
         return new SystemProperty(key, first, more);
     }
-
-    @Override
-    public String toString() {
-        return key;
-    }
 }

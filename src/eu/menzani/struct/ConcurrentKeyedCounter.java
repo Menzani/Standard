@@ -1,4 +1,4 @@
-package eu.menzani.misc;
+package eu.menzani.struct;
 
 import eu.menzani.atomic.AtomicInt;
 import eu.menzani.lang.Lang;

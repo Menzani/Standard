@@ -1,4 +1,4 @@
-package eu.menzani.misc;
+package eu.menzani.struct;
 
 public interface KeyedCounter<K> {
     int increment(K key);

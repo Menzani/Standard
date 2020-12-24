@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="Standard">
-    <output-path>$PROJECT_DIR$</output-path>
+    <output-path>C:/Libs</output-path>
     <root id="archive" name="Standard.jar">
       <element id="module-output" name="Standard" />
     </root>

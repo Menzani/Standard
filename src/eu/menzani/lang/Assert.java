@@ -144,4 +144,20 @@ public class Assert {
     public static void notNegative(long value) {
         assert value >= 0L : value;
     }
+
+    public static void between(int value, int lowerBound, int upperBound) {
+        assert value >= lowerBound && value <= upperBound : value;
+    }
+
+    public static void between(long value, long lowerBound, long upperBound) {
+        assert value >= lowerBound && value <= upperBound : value;
+    }
+
+    public static void between(float value, float lowerBound, float upperBound) {
+        assert value >= lowerBound && value <= upperBound : value;
+    }
+
+    public static void between(double value, double lowerBound, double upperBound) {
+        assert value >= lowerBound && value <= upperBound : value;
+    }
 }

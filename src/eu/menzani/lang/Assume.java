@@ -181,6 +181,30 @@ public class Assume {
         }
     }
 
+    public static void between(int value, int lowerBound, int upperBound) {
+        if (value < lowerBound || value > upperBound) {
+            throw new IllegalIntArgumentException(value);
+        }
+    }
+
+    public static void between(long value, long lowerBound, long upperBound) {
+        if (value < lowerBound || value > upperBound) {
+            throw new IllegalLongArgumentException(value);
+        }
+    }
+
+    public static void between(float value, float lowerBound, float upperBound) {
+        if (value < lowerBound || value > upperBound) {
+            throw new IllegalFloatArgumentException(value);
+        }
+    }
+
+    public static void between(double value, double lowerBound, double upperBound) {
+        if (value < lowerBound || value > upperBound) {
+            throw new IllegalDoubleArgumentException(value);
+        }
+    }
+
     public static void notZero(int value) {
         if (value == 0) {
             throw new IllegalArgumentException();
@@ -227,6 +251,32 @@ public class Assume {
 
         IllegalLongArgumentException(long value, long cap) {
             super(exceptionClassName + value + " " + cap);
+        }
+
+        @Override
+        public String toString() {
+            return getMessage();
+        }
+    }
+
+    private static class IllegalFloatArgumentException extends IllegalArgumentException {
+        private static final long serialVersionUID = 0L;
+
+        IllegalFloatArgumentException(float value) {
+            super(exceptionClassName + value);
+        }
+
+        @Override
+        public String toString() {
+            return getMessage();
+        }
+    }
+
+    private static class IllegalDoubleArgumentException extends IllegalArgumentException {
+        private static final long serialVersionUID = 0L;
+
+        IllegalDoubleArgumentException(double value) {
+            super(exceptionClassName + value);
         }
 
         @Override

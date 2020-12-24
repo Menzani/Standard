@@ -1,4 +1,4 @@
-package eu.menzani.misc;
+package eu.menzani.struct;
 
 public abstract class BooleanToggle {
     public abstract boolean toggleTrue();

@@ -217,6 +217,42 @@ public class Check {
         }
     }
 
+    public static void between(int value, int lowerBound, int upperBound) {
+        if (value < lowerBound || value > upperBound) {
+            throw new AssertionError(value);
+        }
+    }
+
+    public static void between(long value, long lowerBound, long upperBound) {
+        if (value < lowerBound || value > upperBound) {
+            throw new AssertionError(value);
+        }
+    }
+
+    public static void between(float value, float lowerBound, float upperBound) {
+        if (value < lowerBound || value > upperBound) {
+            throw new AssertionError(value);
+        }
+    }
+
+    public static void between(double value, double lowerBound, double upperBound) {
+        if (value < lowerBound || value > upperBound) {
+            throw new AssertionError(value);
+        }
+    }
+
+    public static void notZero(int value) {
+        if (value == 0) {
+            throw new AssertionError();
+        }
+    }
+
+    public static void notZero(long value) {
+        if (value == 0L) {
+            throw new AssertionError();
+        }
+    }
+
     public static void notNull(Object value) {
         if (value == null) {
             throw new AssertionError();

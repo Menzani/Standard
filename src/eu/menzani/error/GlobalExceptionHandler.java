@@ -1,5 +1,6 @@
-package eu.menzani.misc;
+package eu.menzani.error;
 
+import eu.menzani.misc.Patterns;
 import eu.menzani.swing.Swing;
 
 import java.io.PrintWriter;
@@ -12,6 +13,10 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
         instance.actions.add(action);
     }
 
+    public static void addErrorReport() {
+        addAction(new ErrorReport());
+    }
+
     public static void addSwingAction(SwingAction swingAction) {
         instance.swingActions.add(swingAction);
     }
@@ -19,7 +24,11 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
     private static final GlobalExceptionHandler instance = new GlobalExceptionHandler();
 
     static {
-        instance.register();
+        try {
+            instance.register();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     private final List<Action> actions = new CopyOnWriteArrayList<>();
@@ -49,26 +58,28 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
             if (!swingActions.isEmpty()) {
                 String stackTraceForLabel = "<html>" + stackTrace.replace("\n", "<br>").replace("\t", "&emsp;") + "</html>";
                 Swing.run(() -> {
-                    for (SwingAction swingAction : swingActions) {
-                        swingAction.run(stackTrace, stackTraceForLabel);
+                    try {
+                        for (SwingAction swingAction : swingActions) {
+                            swingAction.run(stackTrace, stackTraceForLabel);
+                        }
+                    } catch (Throwable e) {
+                        e.printStackTrace();
                     }
                 });
             }
+            String stackTraceForFile = Patterns.normalizeLineSeparators(stackTrace);
+            FinalAction finalAction = NoFinalAction.INSTANCE;
             for (Action action : actions) {
-                action.run(stackTrace);
+                FinalAction desiredFinalAction = action.run(stackTrace, stackTraceForFile);
+                if (desiredFinalAction.getSeverity() > finalAction.getSeverity()) {
+                    finalAction = desiredFinalAction;
+                }
             }
 
-            System.err.println(stackTrace);
+            System.err.print(stackTrace);
+            finalAction.run();
         } catch (Throwable e) {
             e.printStackTrace();
         }
-    }
-
-    public interface Action {
-        void run(String stackTrace);
-    }
-
-    public interface SwingAction {
-        void run(String stackTrace, String stackTraceForLabel);
     }
 }

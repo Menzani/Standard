@@ -4,8 +4,8 @@ import com.sun.management.GarbageCollectionNotificationInfo;
 import com.sun.management.GcInfo;
 import eu.menzani.InternalUnsafe;
 import eu.menzani.lang.StreamBuffer;
-import eu.menzani.misc.ConcurrentObjectToggle;
-import eu.menzani.misc.ObjectToggle;
+import eu.menzani.struct.ConcurrentObjectToggle;
+import eu.menzani.struct.ObjectToggle;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;

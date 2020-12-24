@@ -51,8 +51,8 @@ public enum Platform {
     }
 
     static {
-        String osName = System.getProperty("os.name");
-        boolean is32Bit = System.getProperty("sun.arch.data.model").equals("32");
+        String osName = new SystemProperty("os.name").get();
+        boolean is32Bit = new SystemProperty("sun.arch.data.model").get().equals("32");
         if (osName.contains("Windows")) {
             if (is32Bit) {
                 current = WINDOWS_32;

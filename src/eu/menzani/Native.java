@@ -4,7 +4,7 @@ import eu.menzani.lang.UncaughtException;
 import eu.menzani.system.ApplicationProperty;
 import eu.menzani.system.Platform;
 import eu.menzani.system.PlatformNotSupportedException;
-import eu.menzani.system.SystemProperties;
+import eu.menzani.system.SystemPaths;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +44,6 @@ public class Native {
 
     private static Path libraryDirectory() {
         return new ApplicationProperty(Native.class, "nativeLibrary", "directory")
-                .getAsPathOr(() -> SystemProperties.TEMP_FOLDER);
+                .getAsPathOr(() -> SystemPaths.TEMP_FOLDER);
     }
 }

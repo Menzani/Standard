@@ -1,4 +1,4 @@
-package eu.menzani.misc;
+package eu.menzani.struct;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

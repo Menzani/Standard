@@ -1,4 +1,4 @@
-package eu.menzani.misc;
+package eu.menzani.struct;
 
 import eu.menzani.atomic.AtomicBoolean;
 import eu.menzani.lang.Lang;

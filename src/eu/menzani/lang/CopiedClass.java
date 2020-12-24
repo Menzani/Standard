@@ -1,7 +1,7 @@
 package eu.menzani.lang;
 
-import eu.menzani.misc.ConcurrentKeyedCounter;
-import eu.menzani.misc.KeyedCounter;
+import eu.menzani.struct.ConcurrentKeyedCounter;
+import eu.menzani.struct.KeyedCounter;
 import net.bytebuddy.ByteBuddy;
 
 import java.lang.reflect.Modifier;

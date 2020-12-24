@@ -1,4 +1,4 @@
-package eu.menzani.misc;
+package eu.menzani.struct;
 
 public class SimpleBooleanToggle extends BooleanToggle {
     private boolean value;

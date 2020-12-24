@@ -10,24 +10,47 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
     public static void addAction(Action action) {
-        instance.actions.add(action);
+        try {
+            instance.actions.add(action);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     public static void addErrorReport() {
-        addAction(new ErrorReport());
+        try {
+            addAction(new ErrorReport());
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void addErrorReport(FinalAction finalAction, String header) {
+        try {
+            addAction(new ErrorReport(header, finalAction));
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     public static void addSwingAction(SwingAction swingAction) {
-        instance.swingActions.add(swingAction);
-    }
-
-    private static final GlobalExceptionHandler instance = new GlobalExceptionHandler();
-
-    static {
         try {
-            instance.register();
+            instance.swingActions.add(swingAction);
         } catch (Throwable e) {
             e.printStackTrace();
+        }
+    }
+
+    private static final GlobalExceptionHandler instance = createInstance();
+
+    private static GlobalExceptionHandler createInstance() {
+        try {
+            GlobalExceptionHandler instance = new GlobalExceptionHandler();
+            instance.register();
+            return instance;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -43,10 +66,10 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     @Override
     public void uncaughtException(Thread thread, Throwable throwable) {
-        if (throwable instanceof ThreadDeath) {
-            return;
-        }
         try {
+            if (throwable instanceof ThreadDeath) {
+                return;
+            }
             if (throwable instanceof ExceptionInInitializerError) {
                 throwable = throwable.getCause();
             }

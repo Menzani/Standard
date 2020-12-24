@@ -10,14 +10,24 @@ class ErrorReport implements Action {
     private static final Desktop desktop = Desktop.getDesktop();
 
     private final String header;
+    private final FinalAction finalAction;
 
     ErrorReport() {
+        this(createDefaultHeader(), HaltFinalAction.INSTANCE);
+    }
+
+    private static String createDefaultHeader() {
         String ln = System.lineSeparator();
-        header = "An error occurred in " + Application.getName() + ln + ln +
+        return "An error occurred in " + Application.getName() + ln + ln +
                 "The application was terminated to prevent data corruption." + ln +
                 "Some data may have been lost." + ln + ln +
                 "Error details:" + ln +
                 "=========================================================================================" + ln;
+    }
+
+    ErrorReport(String header, FinalAction finalAction) {
+        this.header = header;
+        this.finalAction = finalAction;
     }
 
     @Override
@@ -25,6 +35,6 @@ class ErrorReport implements Action {
         Path reportFile = Files.createTempFile("An error occurred   ", ".txt");
         Files.writeString(reportFile, header + stackTraceForFile);
         desktop.open(reportFile.toFile());
-        return HaltFinalAction.INSTANCE;
+        return finalAction;
     }
 }

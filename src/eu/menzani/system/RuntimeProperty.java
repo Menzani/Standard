@@ -91,7 +91,7 @@ public abstract class RuntimeProperty {
     @Override
     public String toString() {
         String result = "-D" + key;
-        if (!value.equals("")) {
+        if (value != null && !value.equals("")) {
             result += '=' + value;
         }
         return result;

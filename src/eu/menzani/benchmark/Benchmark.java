@@ -1,6 +1,7 @@
 package eu.menzani.benchmark;
 
 import eu.menzani.lang.Check;
+import eu.menzani.lang.Nonblocking;
 import eu.menzani.lang.UncaughtException;
 import eu.menzani.system.*;
 
@@ -57,6 +58,10 @@ public abstract class Benchmark {
         return Path.of("java");
     }
 
+    protected boolean shouldAutoProfile() {
+        return true;
+    }
+
     public void launchBenchmark() {
         launchBenchmark(ConsoleBenchmarkListener.INSTANCE);
     }
@@ -109,11 +114,11 @@ public abstract class Benchmark {
     }
 
     protected void runBenchmark() {
-        Runtime runtime = Runtime.getRuntime();
-        int numIterations = getNumIterations();
         int concurrency = getConcurrency();
         Check.notLesser(concurrency, 1);
+        Runtime runtime = Runtime.getRuntime();
         long warmupMemoryCap = runtime.totalMemory() / 2L;
+        int numIterations = getNumIterations();
 
         long startMemory = runtime.freeMemory();
         test(numIterations);
@@ -123,16 +128,37 @@ public abstract class Benchmark {
         if (concurrency == 1) {
             getThreadManipulation().applyToCurrentThread();
 
-            long start = System.nanoTime();
-            do {
-                test(numIterations);
-            } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > warmupMemoryCap);
-            synchronized (this) {
-                results.clear();
+            if (shouldAutoProfile()) {
+                Profiler profiler = new Profiler(this, numIterations);
+                long start = System.nanoTime();
+                do {
+                    profiler.start();
+                    test(numIterations);
+                    profiler.stop();
+                } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > warmupMemoryCap);
+                synchronized (this) {
+                    results.clear();
+                }
+                profiler = new Profiler(this, numIterations);
+                start = System.nanoTime();
+                do {
+                    profiler.start();
+                    test(numIterations);
+                    profiler.stop();
+                } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > testMemoryCap);
+            } else {
+                long start = System.nanoTime();
+                do {
+                    test(numIterations);
+                } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > warmupMemoryCap);
+                synchronized (this) {
+                    results.clear();
+                }
+                start = System.nanoTime();
+                do {
+                    test(numIterations);
+                } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > testMemoryCap);
             }
-            do {
-                test(numIterations);
-            } while (System.nanoTime() - start < 6L * 1_000_000_000L && runtime.freeMemory() > testMemoryCap);
         } else {
             Thread[] threads = new Thread[concurrency];
             ThreadManipulationSpread threadManipulation = getConcurrentThreadManipulation();
@@ -142,12 +168,8 @@ public abstract class Benchmark {
             for (Thread thread : threads) {
                 thread.start();
             }
-            try {
-                for (Thread thread : threads) {
-                    thread.join();
-                }
-            } catch (InterruptedException e) {
-                throw new AssertionError();
+            for (Thread thread : threads) {
+                Nonblocking.join(thread);
             }
             synchronized (this) {
                 results.clear();
@@ -159,12 +181,8 @@ public abstract class Benchmark {
             for (Thread thread : threads) {
                 thread.start();
             }
-            try {
-                for (Thread thread : threads) {
-                    thread.join();
-                }
-            } catch (InterruptedException e) {
-                throw new AssertionError();
+            for (Thread thread : threads) {
+                Nonblocking.join(thread);
             }
         }
 

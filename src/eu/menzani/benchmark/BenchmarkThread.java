@@ -22,9 +22,19 @@ class BenchmarkThread extends Thread {
         Runtime runtime = Runtime.getRuntime();
         long memoryCap = this.memoryCap;
 
-        long start = System.nanoTime();
-        do {
-            benchmark.test(numIterations);
-        } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > memoryCap);
+        if (benchmark.shouldAutoProfile()) {
+            Profiler profiler = new Profiler(benchmark, numIterations);
+            long start = System.nanoTime();
+            do {
+                profiler.start();
+                benchmark.test(numIterations);
+                profiler.stop();
+            } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > memoryCap);
+        } else {
+            long start = System.nanoTime();
+            do {
+                benchmark.test(numIterations);
+            } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > memoryCap);
+        }
     }
 }

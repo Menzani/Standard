@@ -19,7 +19,7 @@ public class SunUnsafe {
         }
     }
 
-    static long objectFieldOffset(Class<?> clazz, String fieldName) {
+    public static long objectFieldOffset(Class<?> clazz, String fieldName) {
         return UNSAFE.objectFieldOffset(Lang.getField(clazz, fieldName));
     }
 }

@@ -1,6 +1,6 @@
 package eu.menzani.system;
 
-import eu.menzani.InternalUnsafe;
+import eu.menzani.SunUnsafe;
 
 public enum Platform {
     LINUX_32(false, true, false, true),
@@ -47,7 +47,7 @@ public enum Platform {
     }
 
     public static boolean areOopsCompressed() {
-        return InternalUnsafe.OopsCompressed.value;
+        return OopsCompressed.value;
     }
 
     static {
@@ -73,6 +73,26 @@ public enum Platform {
             }
         } else {
             throw new AssertionError();
+        }
+    }
+
+    private static class OopsCompressed {
+        static final boolean value;
+
+        private int i;
+
+        static {
+            long offset = SunUnsafe.objectFieldOffset(OopsCompressed.class, "i");
+            if (offset == 8L) {
+                assert current().is32Bit();
+                value = false;
+            } else if (offset == 12L) {
+                value = true;
+            } else if (offset == 16L) {
+                value = false;
+            } else {
+                throw new AssertionError();
+            }
         }
     }
 }

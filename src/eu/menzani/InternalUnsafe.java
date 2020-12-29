@@ -46,24 +46,4 @@ public class InternalUnsafe {
             implAddOpens.call(packageName, to);
         }
     }
-
-    public static class OopsCompressed {
-        public static final boolean value;
-
-        int i;
-
-        static {
-            long offset = SunUnsafe.objectFieldOffset(OopsCompressed.class, "i");
-            if (offset == 8L) {
-                assert Platform.current().is32Bit();
-                value = false;
-            } else if (offset == 12L) {
-                value = true;
-            } else if (offset == 16L) {
-                value = false;
-            } else {
-                throw new AssertionError();
-            }
-        }
-    }
 }

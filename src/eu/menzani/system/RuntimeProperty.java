@@ -59,25 +59,29 @@ public abstract class RuntimeProperty {
         return Path.of(value);
     }
 
-    public void set(String value) {
+    public RuntimeProperty set(String value) {
         Assume.notNull(value);
         this.value = value;
+        return this;
     }
 
-    public void setOrRemove(String value) {
+    public RuntimeProperty setOrRemove(String value) {
         this.value = value;
+        return this;
     }
 
-    public void setAsBoolean(boolean value) {
+    public RuntimeProperty setAsBoolean(boolean value) {
         if (value) {
             set("");
         } else {
             remove();
         }
+        return this;
     }
 
-    public void remove() {
+    public RuntimeProperty remove() {
         value = null;
+        return this;
     }
 
     public void update() {
@@ -90,8 +94,11 @@ public abstract class RuntimeProperty {
 
     @Override
     public String toString() {
-        String result = "-D" + key;
-        if (value != null && !value.equals("")) {
+        if (value == null) {
+            return "";
+        }
+        String result = " -D" + key;
+        if (!value.equals("")) {
             result += '=' + value;
         }
         return result;

@@ -8,19 +8,15 @@ import java.awt.*;
 import java.util.function.Consumer;
 
 public class Swing {
-    private static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    public static final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
 
     public static void centerFrameHorizontally(JFrame frame, Percent y) {
         positionFrame(frame, Percent.FIFTY, y);
     }
 
-    public static void centerFrameVertically(JFrame frame, Percent x) {
-        positionFrame(frame, x, Percent.FIFTY);
-    }
-
     public static void positionFrame(JFrame frame, Percent x, Percent y) {
-        float widthDiff = screenSize.width - frame.getWidth();
-        float heightDiff = screenSize.height - frame.getHeight();
+        float widthDiff = SCREEN_SIZE.width - frame.getWidth();
+        float heightDiff = SCREEN_SIZE.height - frame.getHeight();
         frame.setLocation(Math.round(widthDiff * x.getAsFractionAsFloat()), Math.round(heightDiff * y.getAsFractionAsFloat()));
     }
 

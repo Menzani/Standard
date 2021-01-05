@@ -2,16 +2,16 @@ package eu.menzani.swing;
 
 import java.awt.*;
 
-public class ConcurrentMessageBox extends MessageBox {
-    public ConcurrentMessageBox() {
+public class JConcurrentMessageBox extends JMessageBox {
+    public JConcurrentMessageBox() {
         super();
     }
 
-    public ConcurrentMessageBox(String title) {
+    public JConcurrentMessageBox(String title) {
         super(title);
     }
 
-    public ConcurrentMessageBox(Component parent, String title) {
+    public JConcurrentMessageBox(Component parent, String title) {
         super(parent, title);
     }
 

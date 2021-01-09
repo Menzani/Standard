@@ -1,4 +1,4 @@
-package eu.menzani.javafx;
+package eu.menzani.fx;
 
 import eu.menzani.struct.Percent;
 import javafx.application.Platform;

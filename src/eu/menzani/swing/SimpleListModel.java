@@ -194,9 +194,7 @@ public class SimpleListModel<E> extends AbstractListModel<E> implements List<E> 
 
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
-        if (index < 0 || index > delegate.size()) {
-            throw new ArrayIndexOutOfBoundsException("index out of range: " + index);
-        }
+        Objects.checkIndex(index, delegate.size() + 1);
         if (c.isEmpty()) {
             return false;
         }

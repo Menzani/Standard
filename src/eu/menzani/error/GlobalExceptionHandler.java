@@ -1,6 +1,6 @@
 package eu.menzani.error;
 
-import eu.menzani.javafx.FX;
+import eu.menzani.fx.FX;
 import eu.menzani.misc.Patterns;
 import eu.menzani.swing.Swing;
 

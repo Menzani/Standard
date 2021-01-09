@@ -12,7 +12,7 @@ module eu.menzani {
     exports eu.menzani.concurrent;
     exports eu.menzani.error;
     exports eu.menzani.io;
-    exports eu.menzani.javafx;
+    exports eu.menzani.fx;
     exports eu.menzani.lang;
     exports eu.menzani.lang.mutable;
     exports eu.menzani.misc;

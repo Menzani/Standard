@@ -1,6 +1,5 @@
 package eu.menzani.error;
 
-import eu.menzani.fx.FX;
 import eu.menzani.misc.Patterns;
 import eu.menzani.swing.Swing;
 
@@ -42,14 +41,6 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
         }
     }
 
-    public static void addFXAction(SwingOrFXAction fxAction) {
-        try {
-            instance.fxActions.add(fxAction);
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-    }
-
     private static final GlobalExceptionHandler instance = createInstance();
 
     private static GlobalExceptionHandler createInstance() {
@@ -65,7 +56,6 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private final List<Action> actions = new CopyOnWriteArrayList<>();
     private final List<SwingOrFXAction> swingActions = new CopyOnWriteArrayList<>();
-    private final List<SwingOrFXAction> fxActions = new CopyOnWriteArrayList<>();
 
     private GlobalExceptionHandler() {
     }
@@ -88,32 +78,17 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
             throwable.printStackTrace(new PrintWriter(writer));
             String stackTrace = "Exception in thread \"" + thread.getName() + "\" " + writer.toString();
 
-            boolean swingActionsNotEmpty = !swingActions.isEmpty();
-            boolean fxActionsNotEmpty = !fxActions.isEmpty();
-            if (swingActionsNotEmpty || fxActionsNotEmpty) {
+            if (!swingActions.isEmpty()) {
                 String stackTraceForLabel = "<html>" + stackTrace.replace("\n", "<br>").replace("\t", "&emsp;") + "</html>";
-                if (swingActionsNotEmpty) {
-                    Swing.run(() -> {
-                        try {
-                            for (SwingOrFXAction swingAction : swingActions) {
-                                swingAction.run(stackTrace, stackTraceForLabel);
-                            }
-                        } catch (Throwable e) {
-                            e.printStackTrace();
+                Swing.run(() -> {
+                    try {
+                        for (SwingOrFXAction swingAction : swingActions) {
+                            swingAction.run(stackTrace, stackTraceForLabel);
                         }
-                    });
-                }
-                if (fxActionsNotEmpty) {
-                    FX.run(() -> {
-                        try {
-                            for (SwingOrFXAction fxAction : fxActions) {
-                                fxAction.run(stackTrace, stackTraceForLabel);
-                            }
-                        } catch (Throwable e) {
-                            e.printStackTrace();
-                        }
-                    });
-                }
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                    }
+                });
             }
             String stackTraceForFile = Patterns.normalizeLineSeparators(stackTrace);
             FinalAction finalAction = NoFinalAction.INSTANCE;

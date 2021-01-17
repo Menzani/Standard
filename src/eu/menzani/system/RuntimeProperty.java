@@ -93,14 +93,22 @@ public abstract class RuntimeProperty {
     }
 
     @Override
-    public String toString() {
+    public @Optional String toString() {
         if (value == null) {
-            return "";
+            return null;
         }
-        String result = " -D" + key;
+        String result = "-D" + key;
         if (!value.equals("")) {
             result += '=' + value;
         }
         return result;
+    }
+
+    public String toCommandLineString() {
+        String string = toString();
+        if (string == null) {
+            return "";
+        }
+        return ' ' + string;
     }
 }

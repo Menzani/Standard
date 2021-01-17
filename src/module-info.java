@@ -4,7 +4,6 @@ module eu.menzani {
     requires static net.bytebuddy;
     requires static jdk.management;
     requires static java.desktop;
-    requires static javafx.graphics;
 
     exports eu.menzani.atomic;
     exports eu.menzani.benchmark;
@@ -12,7 +11,6 @@ module eu.menzani {
     exports eu.menzani.concurrent;
     exports eu.menzani.error;
     exports eu.menzani.io;
-    exports eu.menzani.fx;
     exports eu.menzani.lang;
     exports eu.menzani.lang.mutable;
     exports eu.menzani.misc;

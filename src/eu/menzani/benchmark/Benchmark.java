@@ -74,7 +74,7 @@ public abstract class Benchmark {
             Class<?> clazz = getClass();
             List<String> command = List.of(
                     getJavaRuntime().toString(),
-                    launched.toString(),
+                    launched.setAsBoolean(true).toString(),
                     "-Xms8g",
                     "-Xmx8g",
                     "-XX:+UseLargePages",

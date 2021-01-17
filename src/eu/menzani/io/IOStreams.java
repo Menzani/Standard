@@ -1,7 +1,6 @@
 package eu.menzani.io;
 
 import eu.menzani.lang.UncaughtException;
-import javafx.scene.text.Font;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -26,14 +25,6 @@ public class IOStreams {
     public static BufferedImage toImage(InputStream stream) {
         try (stream) {
             return ImageIO.read(stream);
-        } catch (IOException e) {
-            throw new UncaughtException(e);
-        }
-    }
-
-    public static void loadFXFont(InputStream stream) {
-        try (stream) {
-            Font.loadFont(stream, 0D);
         } catch (IOException e) {
             throw new UncaughtException(e);
         }

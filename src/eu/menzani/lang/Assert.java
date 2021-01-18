@@ -160,4 +160,15 @@ public class Assert {
     public static void between(double value, double lowerBound, double upperBound) {
         assert value >= lowerBound && value <= upperBound : value;
     }
+
+    public static <T extends Throwable> T fails(FailingLogic logic, Class<T> exceptionClass) {
+        try {
+            logic.run();
+        } catch (Throwable e) {
+            Assert.equal(e.getClass(), exceptionClass);
+            return (T) e;
+        }
+        assert false;
+        return null;
+    }
 }

@@ -1,56 +1,55 @@
 package eu.menzani.lang;
 
-import eu.menzani.lang.mutable.BooleanRef;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.ListIterator;
 
-public class ArrayBuilder<T> {
-    private final List<T> list;
-    private final Class<?> elementType;
+public class ArrayBuilder<T, U> {
+    private final List<T> from;
+    private final List<U> to;
+    private final Class<U> elementType;
 
-    public ArrayBuilder(Class<T> elementType) {
-        list = new ArrayList<>();
+    public ArrayBuilder(Class<U> elementType) {
+        from = new ArrayList<>();
+        to = new ArrayList<>();
         this.elementType = elementType;
     }
 
-    public ArrayBuilder(int capacity, Class<T> elementType) {
-        list = new ArrayList<>(capacity);
+    public ArrayBuilder(int capacity, Class<U> elementType) {
+        from = new ArrayList<>(capacity);
+        to = new ArrayList<>(capacity);
         this.elementType = elementType;
     }
 
-    public ArrayBuilder(T[] array) {
-        list = new ArrayList<>(Arrays.asList(array));
-        elementType = array.getClass().getComponentType();
+    public ArrayBuilder(T[] array, Class<U> elementType) {
+        from = ListBuilder.fromArray(array);
+        to = new ArrayList<>(array.length);
+        this.elementType = elementType;
+    }
+
+    public ArrayBuilder(List<T> list, Class<U> elementType) {
+        from = list;
+        to = new ArrayList<>(list.size());
+        this.elementType = elementType;
     }
 
     public void add(T element) {
-        list.add(element);
+        from.add(element);
     }
 
-    public void map(Mapper<T> mapper) {
-        ListIterator<T> iterator = list.listIterator();
-        BooleanRef shouldRemove = new BooleanRef();
-        while (iterator.hasNext()) {
-            shouldRemove.value = false;
-            T newElement = mapper.map(iterator.next(), shouldRemove);
-            if (shouldRemove.value) {
-                iterator.remove();
-            } else {
-                iterator.set(newElement);
-            }
+    public boolean filter(Filter<? super T> filter) {
+        return from.removeIf(filter);
+    }
+
+    public void map(Mapper<? super T, ? extends U> mapper) {
+        for (T element : from) {
+            U newElement = mapper.apply(element);
+            to.add(newElement);
         }
     }
 
-    public T[] build() {
-        @SuppressWarnings("unchecked") T[] dummy = (T[]) Array.newInstance(elementType, 0);
-        return list.toArray(dummy);
-    }
-
-    public interface Mapper<E> {
-        E map(E element, BooleanRef shouldRemove);
+    public U[] build() {
+        @SuppressWarnings("unchecked") var dummy = (U[]) Array.newInstance(elementType, 0);
+        return to.toArray(dummy);
     }
 }

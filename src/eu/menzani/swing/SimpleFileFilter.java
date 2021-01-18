@@ -1,7 +1,5 @@
 package eu.menzani.swing;
 
-import eu.menzani.lang.ArrayBuilder;
-
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import java.util.StringJoiner;
@@ -11,9 +9,10 @@ public class SimpleFileFilter extends FileFilter {
     private final String description;
 
     public SimpleFileFilter(String description, String... extensions) {
-        ArrayBuilder<String> builder = new ArrayBuilder<>(extensions);
-        builder.map((element, shouldRemove) -> '.' + element);
-        this.extensions = builder.build();
+        this.extensions = extensions;
+        for (int i = 0; i < extensions.length; i++) {
+            extensions[i] = '.' + extensions[i];
+        }
 
         StringJoiner joiner = new StringJoiner(", ", description + " (", ")");
         for (String extension : this.extensions) {

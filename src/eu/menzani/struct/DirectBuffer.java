@@ -1,4 +1,4 @@
-package eu.menzani.buffer;
+package eu.menzani.struct;
 
 import eu.menzani.lang.Assume;
 import eu.menzani.system.Unsafe;

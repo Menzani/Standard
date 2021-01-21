@@ -1,4 +1,6 @@
-package eu.menzani.lang;
+package eu.menzani.collection;
+
+import eu.menzani.lang.Assume;
 
 import java.io.Serializable;
 import java.util.AbstractList;

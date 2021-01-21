@@ -1,77 +1,82 @@
 package eu.menzani.test;
 
-import eu.menzani.lang.ArrayBuilder;
+import eu.menzani.benchmark.Stopwatch;
+import eu.menzani.collection.ArrayBuilder;
+import eu.menzani.system.ExtensibleClassLoader;
+import eu.menzani.system.Paths;
 import eu.menzani.system.SystemProperty;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Set;
 
 class Runner {
     public static void main(String[] args) throws Exception {
-        long start = System.nanoTime();
+        Stopwatch stopwatch = new Stopwatch();
 
         Runner runner = new Runner();
         runner.scan(SystemProperty.CLASS_PATH);
         runner.scan(SystemProperty.MODULE_PATH);
         runner.buildIndex();
-        runner.run();
+        runner.run(stopwatch);
 
-        long end = System.nanoTime();
-        long elapsed = (end - start) / 1_000_000_000L;
-        if (elapsed > 5L) {
-            System.out.println("Completed in " + formatExecutionTime(elapsed));
-        }
+        stopwatch.stop();
     }
 
-    private static String formatExecutionTime(long seconds) {
-        long secondsPart = seconds % 60L;
-        long minutesPart = (seconds / 60L) % 60L;
-        long hoursPart = (seconds / (60L * 60L)) % 24L;
-        long daysPart = seconds / (60L * 60L * 24L);
-        String text = "";
-        if (daysPart != 0L) text += daysPart + "d ";
-        if (hoursPart != 0L) text += hoursPart + "h ";
-        if (minutesPart != 0L) text += minutesPart + "m ";
-        return text + secondsPart + 's';
-    }
+    private static final Path ideaProductionOutputPath = Path.of("production");
+    private static final Path ideaTestOutputPath = Path.of("test");
+
+    private static final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
+    private static final MethodType emptyConstructorMethodType = MethodType.methodType(void.class);
 
     private final Scanner scanner = new Scanner();
     private Index index;
 
-    private void scan(List<Path> paths) throws IOException {
+    private void scan(Set<Path> paths) throws IOException {
         for (Path path : paths) {
-            if (Files.isDirectory(path)) {
-                scanner.setStartIndex(path.toString().length() + 1);
-                Files.walkFileTree(path, scanner);
+            if (Paths.isWorkingDirectory(path)) continue;
+            int indexOfIdeaProductionOutputPath = Paths.indexOf(path, ideaProductionOutputPath);
+            if (indexOfIdeaProductionOutputPath != -1) {
+                Path ideaModuleTestOutputPath = Paths.replace(path, indexOfIdeaProductionOutputPath, ideaTestOutputPath);
+                scanner.setStartIndex(ideaModuleTestOutputPath.toString().length() + 1);
+                Files.walkFileTree(ideaModuleTestOutputPath, scanner);
             }
         }
     }
 
-    private void buildIndex() {
-        ArrayBuilder<String, TestClass> indexBuilder = new ArrayBuilder<>(scanner.getClassNames(), TestClass.class);
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        indexBuilder.map(className -> {
+    private void buildIndex() throws ReflectiveOperationException {
+        ExtensibleClassLoader classLoader = scanner.getClassLoader();
+
+        ArrayBuilder<String, TestClass> indexBuilder = new ArrayBuilder<>(classLoader.getLoadedClassNames(), TestClass.class);
+        for (String className : indexBuilder.collection()) {
             Class<?> clazz = Class.forName(className, false, classLoader);
+
             ArrayBuilder<Method, TestMethod> testMethodsBuilder = new ArrayBuilder<>(clazz.getMethods(), TestMethod.class);
-            testMethodsBuilder.filter(method -> method.getDeclaringClass() == Object.class);
-            testMethodsBuilder.map(TestMethod::new);
-            TestClass testClass = new TestClass(clazz, className, clazz.getConstructor(), testMethodsBuilder.build());
+            for (Method method : testMethodsBuilder.array()) {
+                if (method.getDeclaringClass() == Object.class) continue;
+                testMethodsBuilder.add(new TestMethod(method));
+            }
+
+            TestClass testClass = new TestClass(clazz, className, lookup.findConstructor(clazz, emptyConstructorMethodType), testMethodsBuilder.build());
             testClass.initTestMethods();
-            return testClass;
-        });
+            indexBuilder.add(testClass);
+        }
+
         index = new Index(indexBuilder.build());
         index.validate();
     }
 
-    private void run() throws ReflectiveOperationException {
+    private void run(Stopwatch stopwatch) throws ReflectiveOperationException {
         if (index.shouldExecuteAll()) {
             for (TestClass testClass : index.getTestClasses()) {
                 run(testClass);
             }
+            stopwatch.setPrefix("Completed in ");
         } else {
             for (TestClass testClass : index.getTestClasses()) {
                 if (testClass.shouldExecuteOnlyThis()) {
@@ -84,6 +89,7 @@ class Runner {
                     }
                 }
             }
+            stopwatch.setPrefix("Executed some in ");
         }
     }
 
@@ -98,10 +104,13 @@ class Runner {
     private static boolean run(TestClass testClass, TestMethod testMethod) throws ReflectiveOperationException {
         Object instance;
         try {
-            instance = testClass.getConstructor().newInstance();
-        } catch (InvocationTargetException | ExceptionInInitializerError e) {
+            instance = testClass.getConstructor().invoke();
+        } catch (Throwable e) {
             System.err.println(testClass);
-            e.getCause().printStackTrace();
+            if (e instanceof ExceptionInInitializerError) {
+                e = e.getCause();
+            }
+            e.printStackTrace();
             return true;
         }
         try {

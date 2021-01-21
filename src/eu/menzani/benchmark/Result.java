@@ -1,10 +1,8 @@
 package eu.menzani.benchmark;
 
-import java.text.DecimalFormat;
+import eu.menzani.time.TimeFormat;
 
 class Result {
-    private static final DecimalFormat doubleFormat = new DecimalFormat("#.##");
-
     final String profilerName;
     private final ResultFormat format;
 
@@ -41,7 +39,7 @@ class Result {
             maximum = this.maximum;
         }
         double average = sum / count;
-        String report = profilerName + ": " + formatDouble(average);
+        String report = profilerName + ": " + formatAverage(average);
         if (count > 1D && maximum != 0D) {
             double absoluteVariance = Math.max(maximum - average, average - minimum);
             long relativeVariance = Math.round(absoluteVariance / average * 100D);
@@ -50,24 +48,12 @@ class Result {
         System.out.println(report);
     }
 
-    private String formatDouble(double value) {
+    private String formatAverage(double average) {
         switch (format) {
             case TIME:
-                if (value < 2_000D) {
-                    return doubleFormat.format(value) + "ns";
-                }
-                if (value < 2_000_000D) {
-                    return doubleFormat.format(value / 1_000D) + "us";
-                }
-                return doubleFormat.format(value / 1_000_000D) + "ms";
+                return TimeFormat.formatComputerTime(average);
             case THROUGHPUT:
-                if (value < 1_000D) {
-                    return doubleFormat.format(1_000D / value) + "M msg/sec";
-                }
-                if (value < 1_000_000D) {
-                    return doubleFormat.format(1_000_000D / value) + "K msg/sec";
-                }
-                return doubleFormat.format(1_000_000_000D / value) + " msg/sec";
+                return TimeFormat.formatThroughput(average);
             default:
                 throw new AssertionError();
         }

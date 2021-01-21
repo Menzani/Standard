@@ -1,9 +1,9 @@
 package eu.menzani.system;
 
-import eu.menzani.lang.ListBuilder;
+import eu.menzani.collection.SetBuilder;
 
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Set;
 
 public class SystemProperty extends RuntimeProperty {
     public SystemProperty(String first, String... more) {
@@ -42,12 +42,14 @@ public class SystemProperty extends RuntimeProperty {
         return this;
     }
 
-    public static final List<Path> CLASS_PATH = mapToPath(new SystemProperty("java", "class", "path").get());
-    public static final List<Path> MODULE_PATH = mapToPath(new SystemProperty("jdk", "module", "path").get());
+    public static final Set<Path> CLASS_PATH = mapToPath(new SystemProperty("java", "class", "path").get());
+    public static final Set<Path> MODULE_PATH = mapToPath(new SystemProperty("jdk", "module", "path").get());
 
-    private static List<Path> mapToPath(String string) {
-        ListBuilder<String, Path> listBuilder = new ListBuilder<>(string.split(";"));
-        listBuilder.map(Path::of);
-        return listBuilder.buildUnmodifiable();
+    private static Set<Path> mapToPath(String string) {
+        SetBuilder<String, Path> builder = new SetBuilder<>(string.split(";"));
+        for (String path : builder.array()) {
+            builder.add(Path.of(path));
+        }
+        return builder.buildUnmodifiable();
     }
 }

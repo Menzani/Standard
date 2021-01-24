@@ -10,34 +10,35 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 public class Native {
     public static void init() {
     }
 
     static {
-        String libraryName = libraryName();
-        Path libraryPath = libraryDirectory().resolve(libraryName);
+        LibraryInfo libraryInfo = libraryInfo();
+        Path libraryPath = libraryDirectory().resolve(libraryInfo.getFileName());
 
-        try (InputStream stream = Native.class.getResourceAsStream(libraryName)) {
-            Files.copy(stream, libraryPath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new UncaughtException(e);
+        if (Files.notExists(libraryPath)) {
+            try (InputStream stream = Native.class.getResourceAsStream(libraryInfo.getResourceName())) {
+                Files.copy(stream, libraryPath);
+            } catch (IOException e) {
+                throw new UncaughtException(e);
+            }
         }
         System.load(libraryPath.toAbsolutePath().toString());
     }
 
-    private static String libraryName() {
+    private static LibraryInfo libraryInfo() {
         switch (Platform.current()) {
             case LINUX_32:
-                return "libstandard_32.so";
+                return new LibraryInfo("libstandard_32", "so");
             case LINUX_64:
-                return "libstandard_64.so";
+                return new LibraryInfo("libstandard_64", "so");
             case WINDOWS_32:
-                return "Standard_32.dll";
+                return new LibraryInfo("Standard_32", "dll");
             case WINDOWS_64:
-                return "Standard_64.dll";
+                return new LibraryInfo("Standard_64", "dll");
         }
         throw new PlatformNotSupportedException();
     }
@@ -45,5 +46,25 @@ public class Native {
     private static Path libraryDirectory() {
         return new ApplicationProperty(Native.class, "nativeLibrary", "directory")
                 .getAsPathOr(() -> Paths.TEMP_FOLDER);
+    }
+
+    private static class LibraryInfo {
+        private static final long versionId = 2278256207267942924L;
+
+        private final String name;
+        private final String extension;
+
+        LibraryInfo(String name, String extension) {
+            this.name = name;
+            this.extension = '.' + extension;
+        }
+
+        String getResourceName() {
+            return name + extension;
+        }
+
+        String getFileName() {
+            return name + '_' + versionId + extension;
+        }
     }
 }

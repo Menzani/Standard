@@ -20,7 +20,12 @@ class TestMethod extends TestElement {
     }
 
     @Override
+    public int hashCode() {
+        return method.hashCode();
+    }
+
+    @Override
     public String toString() {
-        return testClass.toString() + '.' + method.getName();
+        return testClass.toString() + ' ' + method.getName();
     }
 }

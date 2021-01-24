@@ -23,7 +23,9 @@ class Runner {
         runner.scan(SystemProperty.CLASS_PATH);
         runner.scan(SystemProperty.MODULE_PATH);
         runner.buildIndex();
+        runner.loadFailedTests();
         runner.run(stopwatch);
+        runner.saveFailedTests();
 
         stopwatch.stop();
     }
@@ -36,6 +38,7 @@ class Runner {
 
     private final Scanner scanner = new Scanner();
     private Index index;
+    private FailedTests failedTests;
 
     private void scan(Set<Path> paths) throws IOException {
         for (Path path : paths) {
@@ -71,12 +74,32 @@ class Runner {
         index.validate();
     }
 
+    private void loadFailedTests() throws IOException {
+        failedTests = new FailedTests(index.hashCode());
+
+        if (failedTests.shouldExecuteOnlyFailed()) {
+            for (TestClass testClass : index.getTestClasses()) {
+                boolean containsFailed = false;
+                for (TestMethod testMethod : testClass.getTestMethods()) {
+                    if (failedTests.didNotFail(testMethod)) {
+                        testMethod.disable();
+                    } else {
+                        containsFailed = true;
+                    }
+                }
+                if (!containsFailed && failedTests.didNotFail(testClass)) {
+                    testClass.disable();
+                }
+            }
+        }
+    }
+
     private void run(Stopwatch stopwatch) throws ReflectiveOperationException {
         if (index.shouldExecuteAll()) {
             for (TestClass testClass : index.getTestClasses()) {
                 run(testClass);
             }
-            stopwatch.setPrefix("Completed in ");
+            stopwatch.setPrefix(failedTests.shouldExecuteOnlyFailed() ? "Re-ran failed tests in " : "Completed in ");
         } else {
             for (TestClass testClass : index.getTestClasses()) {
                 if (testClass.shouldExecuteOnlyThis()) {
@@ -93,7 +116,8 @@ class Runner {
         }
     }
 
-    private static void run(TestClass testClass) throws ReflectiveOperationException {
+    private void run(TestClass testClass) throws ReflectiveOperationException {
+        if (testClass.isDisabled()) return;
         for (TestMethod testMethod : testClass.getTestMethods()) {
             if (run(testClass, testMethod)) {
                 break;
@@ -101,7 +125,8 @@ class Runner {
         }
     }
 
-    private static boolean run(TestClass testClass, TestMethod testMethod) throws ReflectiveOperationException {
+    private boolean run(TestClass testClass, TestMethod testMethod) throws ReflectiveOperationException {
+        if (testMethod.isDisabled()) return false;
         Object instance;
         try {
             instance = testClass.getConstructor().invoke();
@@ -111,6 +136,7 @@ class Runner {
                 e = e.getCause();
             }
             e.printStackTrace();
+            failedTests.add(testClass);
             return true;
         }
         try {
@@ -118,7 +144,15 @@ class Runner {
         } catch (InvocationTargetException e) {
             System.err.println(testMethod);
             e.getCause().printStackTrace();
+            failedTests.add(testMethod);
         }
         return false;
+    }
+
+    private void saveFailedTests() throws IOException {
+        if (failedTests.shouldExecuteOnlyFailed() && !index.shouldExecuteAll()) {
+            return;
+        }
+        failedTests.save();
     }
 }

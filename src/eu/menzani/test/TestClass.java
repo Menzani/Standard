@@ -1,5 +1,7 @@
 package eu.menzani.test;
 
+import eu.menzani.misc.Arrays;
+
 import java.lang.invoke.MethodHandle;
 
 class TestClass extends TestElement {
@@ -37,13 +39,18 @@ class TestClass extends TestElement {
         }
     }
 
-    boolean shouldExecuteAll() {
+    boolean shouldNotExecuteAll() {
         for (TestMethod testMethod : testMethods) {
             if (testMethod.shouldExecuteOnlyThis()) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.orderIndependentHashCode(testMethods);
     }
 
     @Override

@@ -2,7 +2,6 @@ package eu.menzani.test;
 
 import eu.menzani.benchmark.Stopwatch;
 import eu.menzani.collection.ArrayBuilder;
-import eu.menzani.system.ExtensibleClassLoader;
 import eu.menzani.system.Paths;
 import eu.menzani.system.SystemProperty;
 
@@ -46,26 +45,28 @@ class Runner {
             int indexOfIdeaProductionOutputPath = Paths.indexOf(path, ideaProductionOutputPath);
             if (indexOfIdeaProductionOutputPath != -1) {
                 Path ideaModuleTestOutputPath = Paths.replace(path, indexOfIdeaProductionOutputPath, ideaTestOutputPath);
-                scanner.setStartIndex(ideaModuleTestOutputPath.toString().length() + 1);
-                Files.walkFileTree(ideaModuleTestOutputPath, scanner);
+                if (Files.exists(ideaModuleTestOutputPath)) {
+                    Files.walkFileTree(ideaModuleTestOutputPath, scanner);
+                }
             }
         }
     }
 
-    private void buildIndex() throws ReflectiveOperationException {
-        ExtensibleClassLoader classLoader = scanner.getClassLoader();
+    private void buildIndex() throws Exception {
+        Class<?> currentClass = getClass();
+        scanner.loadClasses(currentClass.getClassLoader(), currentClass.getProtectionDomain());
 
-        ArrayBuilder<String, TestClass> indexBuilder = new ArrayBuilder<>(classLoader.getLoadedClassNames(), TestClass.class);
-        for (String className : indexBuilder.collection()) {
-            Class<?> clazz = Class.forName(className, false, classLoader);
+        ArrayBuilder<Scanner.LoadedClass, TestClass> indexBuilder = new ArrayBuilder<>(scanner.getTestClasses(), TestClass.class);
+        for (Scanner.LoadedClass loadedClass : indexBuilder) {
+            Class<?> clazz = loadedClass.loaded;
 
             ArrayBuilder<Method, TestMethod> testMethodsBuilder = new ArrayBuilder<>(clazz.getMethods(), TestMethod.class);
-            for (Method method : testMethodsBuilder.array()) {
+            for (Method method : testMethodsBuilder) {
                 if (method.getDeclaringClass() == Object.class) continue;
                 testMethodsBuilder.add(new TestMethod(method));
             }
 
-            TestClass testClass = new TestClass(clazz, className, lookup.findConstructor(clazz, emptyConstructorMethodType), testMethodsBuilder.build());
+            TestClass testClass = new TestClass(clazz, loadedClass.name, lookup.findConstructor(clazz, emptyConstructorMethodType), testMethodsBuilder.build());
             testClass.initTestMethods();
             indexBuilder.add(testClass);
         }
@@ -79,15 +80,20 @@ class Runner {
 
         if (failedTests.shouldExecuteOnlyFailed()) {
             for (TestClass testClass : index.getTestClasses()) {
+                if (failedTests.didFail(testClass)) {
+                    continue;
+                }
+
                 boolean containsFailed = false;
                 for (TestMethod testMethod : testClass.getTestMethods()) {
-                    if (failedTests.didNotFail(testMethod)) {
-                        testMethod.disable();
-                    } else {
+                    if (failedTests.didFail(testMethod)) {
                         containsFailed = true;
+                    } else {
+                        testMethod.disable();
                     }
                 }
-                if (!containsFailed && failedTests.didNotFail(testClass)) {
+
+                if (!containsFailed) {
                     testClass.disable();
                 }
             }

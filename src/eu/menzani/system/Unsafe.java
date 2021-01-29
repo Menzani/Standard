@@ -129,6 +129,10 @@ public class Unsafe {
         return UNSAFE.pageSize();
     }
 
+    public static Class<?> defineClass(String name, byte[] b, ClassLoader loader, ProtectionDomain protectionDomain) {
+        return UNSAFE.defineClass(name, b, 0, b.length, loader, protectionDomain);
+    }
+
     public static Class<?> defineClass(String name, byte[] b, int off, int len, ClassLoader loader, ProtectionDomain protectionDomain) {
         return UNSAFE.defineClass(name, b, off, len, loader, protectionDomain);
     }

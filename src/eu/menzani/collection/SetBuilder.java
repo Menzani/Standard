@@ -1,20 +1,21 @@
 package eu.menzani.collection;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SetBuilder<F, T> {
-    private final F[] from;
+public class SetBuilder<F, T> extends CollectionBuilder<F> {
     private final Set<T> to;
 
-    public SetBuilder(F[] from) {
-        this.from = from;
-        to = new HashSet<>(from.length);
+    public SetBuilder(Collection<F> from) {
+        super(from);
+        to = new HashSet<>(from.size());
     }
 
-    public F[] array() {
-        return from;
+    public SetBuilder(F[] from) {
+        super(from);
+        to = new HashSet<>(from.length);
     }
 
     public void add(T element) {

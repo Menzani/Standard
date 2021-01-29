@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Unit Tests" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="eu.menzani.test.Runner" />
-    <module name="Standard" />
+    <module name="Test" />
     <option name="VM_PARAMETERS" value="-ea" />
     <method v="2">
       <option name="Make" enabled="true" />

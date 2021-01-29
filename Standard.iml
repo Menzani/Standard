@@ -5,7 +5,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/res" type="java-resource" relativeOutputPath="eu.menzani" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" packagePrefix="eu.menzani" />
+      <sourceFolder url="file://$MODULE_DIR$/unit-test" isTestSource="true" packagePrefix="eu.menzani" />
       <excludeFolder url="file://$MODULE_DIR$/lib" />
     </content>
     <orderEntry type="inheritedJdk" />

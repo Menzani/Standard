@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Standard-Test (sources)">
+    <output-path>R:/</output-path>
+    <root id="archive" name="Standard-Test-sources.jar">
+      <element id="module-source" name="Test" />
+    </root>
+  </artifact>
+</component>

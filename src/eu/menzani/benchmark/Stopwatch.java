@@ -21,6 +21,6 @@ public class Stopwatch {
 
     public void stop() {
         final long end = System.nanoTime();
-        System.out.println(prefix + TimeFormat.formatComputerTime(end - start));
+        System.out.println(prefix + TimeFormat.formatExecutionTime(end - start));
     }
 }

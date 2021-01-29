@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.NoSuchElementException;
 import java.util.RandomAccess;
+import java.util.function.Consumer;
 
 public class ArrayView<T> extends AbstractList<T> implements RandomAccess, Serializable {
     private static final long serialVersionUID = 0L;
@@ -38,6 +39,13 @@ public class ArrayView<T> extends AbstractList<T> implements RandomAccess, Seria
     @Override
     public java.util.Iterator<T> iterator() {
         return new Iterator();
+    }
+
+    @Override
+    public void forEach(Consumer<? super T> action) {
+        for (int i = fromIndex; i < array.length; i++) {
+            action.accept(array[i]);
+        }
     }
 
     private class Iterator implements java.util.Iterator<T> {

@@ -17,6 +17,5 @@ module eu.menzani {
     exports eu.menzani.struct;
     exports eu.menzani.swing;
     exports eu.menzani.system;
-    exports eu.menzani.test;
     exports eu.menzani.time;
 }

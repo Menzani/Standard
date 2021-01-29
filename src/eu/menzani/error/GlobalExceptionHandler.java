@@ -33,7 +33,7 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
         }
     }
 
-    public static void addSwingAction(SwingOrFXAction swingAction) {
+    public static void addSwingAction(SwingAction swingAction) {
         try {
             instance.swingActions.add(swingAction);
         } catch (Throwable e) {
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
     }
 
     private final List<Action> actions = new CopyOnWriteArrayList<>();
-    private final List<SwingOrFXAction> swingActions = new CopyOnWriteArrayList<>();
+    private final List<SwingAction> swingActions = new CopyOnWriteArrayList<>();
 
     private GlobalExceptionHandler() {
     }
@@ -82,7 +82,7 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
                 String stackTraceForLabel = "<html>" + stackTrace.replace("\n", "<br>").replace("\t", "&emsp;") + "</html>";
                 Swing.run(() -> {
                     try {
-                        for (SwingOrFXAction swingAction : swingActions) {
+                        for (SwingAction swingAction : swingActions) {
                             swingAction.run(stackTrace, stackTraceForLabel);
                         }
                     } catch (Throwable e) {

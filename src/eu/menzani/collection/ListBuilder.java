@@ -1,20 +1,21 @@
 package eu.menzani.collection;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ListBuilder<F, T> {
-    private final F[] from;
+public class ListBuilder<F, T> extends CollectionBuilder<F> {
     private final List<T> to;
 
-    public ListBuilder(F[] from) {
-        this.from = from;
-        to = new ArrayList<>(from.length);
+    public ListBuilder(Collection<F> from) {
+        super(from);
+        to = new ArrayList<>(from.size());
     }
 
-    public F[] array() {
-        return from;
+    public ListBuilder(F[] from) {
+        super(from);
+        to = new ArrayList<>(from.length);
     }
 
     public void add(T element) {

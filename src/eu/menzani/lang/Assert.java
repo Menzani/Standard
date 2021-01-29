@@ -1,5 +1,7 @@
 package eu.menzani.lang;
 
+import java.util.function.Supplier;
+
 public class Assert {
     public static void equal(int left, int right) {
         assert left == right : left;
@@ -161,6 +163,7 @@ public class Assert {
         assert value >= lowerBound && value <= upperBound : value;
     }
 
+    @SuppressWarnings("unchecked")
     public static <T extends Throwable> T fails(FailingLogic logic, Class<T> exceptionClass) {
         try {
             logic.run();
@@ -168,7 +171,17 @@ public class Assert {
             Assert.equal(e.getClass(), exceptionClass);
             return (T) e;
         }
-        assert false;
-        return null;
+        throw new AssertionError();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Throwable> T fails(FailingLogic logic, Class<T> exceptionClass, Supplier<?> messageSupplier) {
+        try {
+            logic.run();
+        } catch (Throwable e) {
+            assert e.getClass() == exceptionClass : messageSupplier.get();
+            return (T) e;
+        }
+        throw new AssertionError();
     }
 }

@@ -1,4 +1,4 @@
-package eu.menzani.test;
+package eu.menzani.misc;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

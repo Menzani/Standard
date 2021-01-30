@@ -1,5 +1,7 @@
 package eu.menzani.test;
 
+import eu.menzani.misc.OnlyThis;
+
 import java.lang.reflect.AnnotatedElement;
 
 abstract class TestElement {

@@ -23,4 +23,27 @@ public class Stopwatch {
         final long end = System.nanoTime();
         System.out.println(prefix + TimeFormat.formatExecutionTime(end - start));
     }
+
+    public void sum() {
+        final long end = System.nanoTime();
+        Sum.INSTANCE.sum += end - start;
+    }
+
+    private static class Sum extends Thread {
+        static final Sum INSTANCE = new Sum();
+
+        static {
+            Runtime.getRuntime().addShutdownHook(INSTANCE);
+        }
+
+        private Sum() {
+        }
+
+        long sum;
+
+        @Override
+        public void run() {
+            System.out.println(TimeFormat.formatComputerTime(sum));
+        }
+    }
 }

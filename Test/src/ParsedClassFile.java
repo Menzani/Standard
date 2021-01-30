@@ -1,52 +1,63 @@
 package eu.menzani.test;
 
 import eu.menzani.misc.Arrays;
-import org.apache.bcel.classfile.JavaClass;
+import eu.menzani.system.Unsafe;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.lang.reflect.Modifier;
+import java.security.ProtectionDomain;
 
 class ParsedClassFile implements Comparable<ParsedClassFile> {
-    private final JavaClass parsed;
-    private final Path file;
+    private final String className;
+    private final String superclassName;
+    private final String[] interfaceNames;
+    private byte[] bytecode;
+    private Class<?> loadedClass;
 
-    ParsedClassFile(JavaClass parsed, Path file) {
-        this.parsed = parsed;
-        this.file = file;
+    ParsedClassFile(String className, String superclassName, String[] interfaceNames) {
+        this.className = className;
+        this.superclassName = superclassName;
+        this.interfaceNames = interfaceNames;
     }
 
-    boolean isTestClass() {
-        return !parsed.isInterface() && !parsed.isAbstract() && !parsed.isNested() && parsed.isPublic() &&
-                parsed.getClassName().endsWith("Test");
+    void setBytecode(byte[] bytecode) {
+        this.bytecode = bytecode;
+    }
+
+    void load(ClassLoader classLoader, ProtectionDomain protectionDomain) {
+        loadedClass = Unsafe.defineClass(className, bytecode, classLoader, protectionDomain);
+    }
+
+    boolean isNotTestClass() {
+        int modifiers = loadedClass.getModifiers();
+        return !Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers) || loadedClass.isInterface() ||
+                !className.endsWith("Test") || loadedClass.getDeclaringClass() != null;
     }
 
     String getClassName() {
-        return parsed.getClassName();
+        return className;
     }
 
-    byte[] readBytecode() throws IOException {
-        return Files.readAllBytes(file);
+    Class<?> getLoadedClass() {
+        return loadedClass;
     }
 
     @Override
-    public boolean equals(Object other) {
-        ParsedClassFile that = (ParsedClassFile) other;
-        return parsed.equals(that.parsed);
+    public boolean equals(Object object) {
+        ParsedClassFile that = (ParsedClassFile) object;
+        return className.equals(that.className);
     }
 
     @Override
     public int hashCode() {
-        return parsed.hashCode();
+        return className.hashCode();
     }
 
     @Override
     public int compareTo(ParsedClassFile that) {
-        if (parsed.equals(that.parsed)) {
+        if (className.equals(that.className)) {
             return 0;
         }
-        String thatClassName = that.parsed.getClassName();
-        if (parsed.getSuperclassName().equals(thatClassName) || Arrays.contains(parsed.getInterfaceNames(), thatClassName)) {
+        if (superclassName.equals(that.className) || Arrays.contains(interfaceNames, that.className)) {
             return 1;
         }
         return -1;

@@ -18,14 +18,8 @@ class FailedTests {
         return file.isNotEmpty();
     }
 
-    boolean didFail(TestElement testElement) {
-        String testElementToString = testElement.toString();
-        for (String line : file.lines()) {
-            if (line.equals(testElementToString)) {
-                return true;
-            }
-        }
-        return false;
+    boolean contains(TestElement testElement) {
+        return file.contains(testElement.toString());
     }
 
     void add(TestElement testElement) {

@@ -8,6 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Standard" />
-    <orderEntry type="library" name="BCEL" level="project" />
+    <orderEntry type="library" name="ASM" level="project" />
   </component>
 </module>

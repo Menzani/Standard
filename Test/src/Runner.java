@@ -6,6 +6,7 @@ import eu.menzani.system.Paths;
 import eu.menzani.system.SystemProperty;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationTargetException;
@@ -56,9 +57,9 @@ class Runner {
         Class<?> currentClass = getClass();
         scanner.loadClasses(currentClass.getClassLoader(), currentClass.getProtectionDomain());
 
-        ArrayBuilder<Scanner.LoadedClass, TestClass> indexBuilder = new ArrayBuilder<>(scanner.getTestClasses(), TestClass.class);
-        for (Scanner.LoadedClass loadedClass : indexBuilder) {
-            Class<?> clazz = loadedClass.loaded;
+        ArrayBuilder<ParsedClassFile, TestClass> indexBuilder = new ArrayBuilder<>(scanner.getTestClasses(), TestClass.class);
+        for (ParsedClassFile classFile : indexBuilder) {
+            Class<?> clazz = classFile.getLoadedClass();
 
             ArrayBuilder<Method, TestMethod> testMethodsBuilder = new ArrayBuilder<>(clazz.getMethods(), TestMethod.class);
             for (Method method : testMethodsBuilder) {
@@ -66,7 +67,8 @@ class Runner {
                 testMethodsBuilder.add(new TestMethod(method));
             }
 
-            TestClass testClass = new TestClass(clazz, loadedClass.name, lookup.findConstructor(clazz, emptyConstructorMethodType), testMethodsBuilder.build());
+            MethodHandle constructor = lookup.findConstructor(clazz, emptyConstructorMethodType);
+            TestClass testClass = new TestClass(clazz, classFile.getClassName(), constructor, testMethodsBuilder.build());
             testClass.initTestMethods();
             indexBuilder.add(testClass);
         }
@@ -80,13 +82,13 @@ class Runner {
 
         if (failedTests.shouldExecuteOnlyFailed()) {
             for (TestClass testClass : index.getTestClasses()) {
-                if (failedTests.didFail(testClass)) {
+                if (failedTests.contains(testClass)) {
                     continue;
                 }
 
                 boolean containsFailed = false;
                 for (TestMethod testMethod : testClass.getTestMethods()) {
-                    if (failedTests.didFail(testMethod)) {
+                    if (failedTests.contains(testMethod)) {
                         containsFailed = true;
                     } else {
                         testMethod.disable();

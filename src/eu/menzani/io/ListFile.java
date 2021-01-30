@@ -93,4 +93,13 @@ public class ListFile implements Closeable {
     public String[] lines() {
         return lines;
     }
+
+    public boolean contains(String line) {
+        for (String _line : lines) {
+            if (_line.equals(line)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

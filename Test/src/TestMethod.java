@@ -11,6 +11,10 @@ class TestMethod extends TestElement {
         this.method = method;
     }
 
+    TestClass getTestClass() {
+        return testClass;
+    }
+
     Method getReflected() {
         return method;
     }

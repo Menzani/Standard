@@ -22,12 +22,12 @@ class FailedTests {
         return file.contains(testElement.toString());
     }
 
-    void add(TestElement testElement) {
+    synchronized void add(TestElement testElement) {
         file.builder.append(testElement.toString());
         file.next();
     }
 
-    void save() throws IOException {
+    synchronized void save() throws IOException {
         file.close();
     }
 }

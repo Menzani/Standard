@@ -1,5 +1,7 @@
 package eu.menzani.benchmark;
 
+import eu.menzani.atomic.AtomicLong;
+import eu.menzani.lang.Lang;
 import eu.menzani.time.TimeFormat;
 
 public class Stopwatch {
@@ -26,7 +28,7 @@ public class Stopwatch {
 
     public void sum() {
         final long end = System.nanoTime();
-        Sum.INSTANCE.sum += end - start;
+        Sum.INSTANCE.add(end - start);
     }
 
     private static class Sum extends Thread {
@@ -36,10 +38,16 @@ public class Stopwatch {
             Runtime.getRuntime().addShutdownHook(INSTANCE);
         }
 
+        private static final long SUM = Lang.objectFieldOffset(Sum.class, "sum");
+
+        private long sum;
+
         private Sum() {
         }
 
-        long sum;
+        void add(long value) {
+            AtomicLong.addVolatile(this, SUM, value);
+        }
 
         @Override
         public void run() {

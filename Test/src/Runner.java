@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,6 +38,7 @@ class Runner {
     private final Scanner scanner = new Scanner();
     private Index index;
     private FailedTests failedTests;
+    private WorkerManager workerManager;
 
     private void scan(Set<Path> paths) throws IOException {
         for (Path path : paths) {
@@ -53,7 +53,7 @@ class Runner {
         }
     }
 
-    private void buildIndex() throws Exception {
+    private void buildIndex() throws ReflectiveOperationException {
         Class<?> currentClass = getClass();
         scanner.loadClasses(currentClass.getClassLoader(), currentClass.getProtectionDomain());
 
@@ -102,59 +102,44 @@ class Runner {
         }
     }
 
-    private void run(Stopwatch stopwatch) throws ReflectiveOperationException {
+    private void run(Stopwatch stopwatch) {
+        workerManager = new WorkerManager(failedTests);
+
         if (index.shouldExecuteAll()) {
             for (TestClass testClass : index.getTestClasses()) {
-                run(testClass);
+                enqueue(testClass);
             }
             stopwatch.setPrefix(failedTests.shouldExecuteOnlyFailed() ? "Re-ran failed tests in " : "Completed in ");
         } else {
             for (TestClass testClass : index.getTestClasses()) {
                 if (testClass.shouldExecuteOnlyThis()) {
-                    run(testClass);
+                    enqueue(testClass);
                 } else {
                     for (TestMethod testMethod : testClass.getTestMethods()) {
                         if (testMethod.shouldExecuteOnlyThis()) {
-                            run(testClass, testMethod);
+                            enqueue(testMethod);
                         }
                     }
                 }
             }
             stopwatch.setPrefix("Executed some in ");
         }
+
+        workerManager.run(Runtime.getRuntime().availableProcessors());
     }
 
-    private void run(TestClass testClass) throws ReflectiveOperationException {
-        if (testClass.isDisabled()) return;
-        for (TestMethod testMethod : testClass.getTestMethods()) {
-            if (run(testClass, testMethod)) {
-                break;
+    private void enqueue(TestClass testClass) {
+        if (testClass.isEnabled()) {
+            for (TestMethod testMethod : testClass.getTestMethods()) {
+                enqueue(testMethod);
             }
         }
     }
 
-    private boolean run(TestClass testClass, TestMethod testMethod) throws ReflectiveOperationException {
-        if (testMethod.isDisabled()) return false;
-        Object instance;
-        try {
-            instance = testClass.getConstructor().invoke();
-        } catch (Throwable e) {
-            System.err.println(testClass);
-            if (e instanceof ExceptionInInitializerError) {
-                e = e.getCause();
-            }
-            e.printStackTrace();
-            failedTests.add(testClass);
-            return true;
+    private void enqueue(TestMethod testMethod) {
+        if (testMethod.isEnabled()) {
+            workerManager.enqueue(testMethod);
         }
-        try {
-            testMethod.getReflected().invoke(instance);
-        } catch (InvocationTargetException e) {
-            System.err.println(testMethod);
-            e.getCause().printStackTrace();
-            failedTests.add(testMethod);
-        }
-        return false;
     }
 
     private void saveFailedTests() throws IOException {

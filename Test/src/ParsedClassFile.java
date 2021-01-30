@@ -42,12 +42,6 @@ class ParsedClassFile implements Comparable<ParsedClassFile> {
     }
 
     @Override
-    public boolean equals(Object object) {
-        ParsedClassFile that = (ParsedClassFile) object;
-        return className.equals(that.className);
-    }
-
-    @Override
     public int hashCode() {
         return className.hashCode();
     }

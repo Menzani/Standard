@@ -1,9 +1,9 @@
 package eu.menzani.test;
 
 import eu.menzani.lang.ControlFlowException;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.Opcodes;
+import net.bytebuddy.jar.asm.ClassReader;
+import net.bytebuddy.jar.asm.ClassVisitor;
+import net.bytebuddy.jar.asm.Opcodes;
 
 class ClassParser extends ClassVisitor {
     ClassParser() {

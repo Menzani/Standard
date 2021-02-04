@@ -6,14 +6,12 @@ import java.lang.invoke.MethodHandle;
 
 class TestClass extends TestElement {
     private final Class<?> clazz;
-    private final String name;
     private final MethodHandle constructor;
     private final TestMethod[] testMethods;
 
-    TestClass(Class<?> clazz, String name, MethodHandle constructor, TestMethod[] testMethods) {
+    TestClass(Class<?> clazz, MethodHandle constructor, TestMethod[] testMethods) {
         super(clazz);
         this.clazz = clazz;
-        this.name = name;
         this.constructor = constructor;
         this.testMethods = testMethods;
     }
@@ -55,6 +53,6 @@ class TestClass extends TestElement {
 
     @Override
     public String toString() {
-        return name;
+        return clazz.getName();
     }
 }

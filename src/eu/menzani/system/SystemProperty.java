@@ -44,8 +44,11 @@ public class SystemProperty extends RuntimeProperty {
         return this;
     }
 
-    public static final Set<Path> CLASS_PATH = mapToPath(new SystemProperty("java", "class", "path").get());
-    public static final Set<Path> MODULE_PATH = mapToPath(new SystemProperty("jdk", "module", "path").getOrNull());
+    public static final String CLASS_PATH_STRING = new SystemProperty("java", "class", "path").get();
+    public static final @Optional String MODULE_PATH_STRING = new SystemProperty("jdk", "module", "path").getOrNull();
+
+    public static final Set<Path> CLASS_PATH = mapToPath(CLASS_PATH_STRING);
+    public static final Set<Path> MODULE_PATH = mapToPath(MODULE_PATH_STRING);
 
     private static Set<Path> mapToPath(@Optional String string) {
         if (string == null) {

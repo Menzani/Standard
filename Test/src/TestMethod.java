@@ -25,17 +25,11 @@ class TestMethod extends TestElement {
 
     @Override
     public int hashCode() {
-        // Taken from Method#hashCode()
-        return testClass.toString().hashCode() ^ method.getName().hashCode();
+        return method.hashCode();
     }
 
     @Override
     public String toString() {
-        // + operator is not optimized
-        StringBuilder builder = new StringBuilder(128);
-        builder.append(testClass.toString());
-        builder.append(' ');
-        builder.append(method.getName());
-        return builder.toString();
+        return testClass.toString() + ' ' + method.getName();
     }
 }

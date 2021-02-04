@@ -33,9 +33,7 @@ public class SetBuilder<F, T> extends CollectionBuilder<F> {
     @SafeVarargs
     public static <T> HashSet<T> fromArray(T... elements) {
         HashSet<T> set = new HashSet<>(elements.length);
-        for (T element : elements) {
-            set.add(element);
-        }
+        Collections.addAll(set, elements);
         return set;
     }
 }

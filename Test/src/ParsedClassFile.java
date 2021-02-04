@@ -24,7 +24,7 @@ class ParsedClassFile implements Comparable<ParsedClassFile> {
     }
 
     void load(ClassLoader classLoader, ProtectionDomain protectionDomain) {
-        loadedClass = Unsafe.defineClass(className, bytecode, classLoader, protectionDomain);
+        loadedClass = Unsafe.defineClass(className, bytecode, 0, bytecode.length, classLoader, protectionDomain);
     }
 
     boolean isNotTestClass() {
@@ -33,22 +33,13 @@ class ParsedClassFile implements Comparable<ParsedClassFile> {
                 !className.endsWith("Test") || loadedClass.getDeclaringClass() != null;
     }
 
-    String getClassName() {
-        return className;
-    }
-
     Class<?> getLoadedClass() {
         return loadedClass;
     }
 
     @Override
-    public int hashCode() {
-        return className.hashCode();
-    }
-
-    @Override
     public int compareTo(ParsedClassFile that) {
-        if (className.equals(that.className)) {
+        if (this == that) {
             return 0;
         }
         if (superclassName.equals(that.className) || Arrays.contains(interfaceNames, that.className)) {

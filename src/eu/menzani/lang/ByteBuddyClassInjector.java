@@ -34,7 +34,8 @@ public class ByteBuddyClassInjector extends ClassInjector.AbstractBase {
                 try {
                     result.put(name, Class.forName(name, false, classLoader));
                 } catch (ClassNotFoundException e) {
-                    result.put(name, Unsafe.defineClass(name, entry.getValue(), classLoader, protectionDomain));
+                    byte[] binaryRepresentation = entry.getValue();
+                    result.put(name, Unsafe.defineClass(name, binaryRepresentation, 0, binaryRepresentation.length, classLoader, protectionDomain));
                 }
             }
         }

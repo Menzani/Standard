@@ -23,7 +23,10 @@ class Scanner extends SimpleFileVisitor<Path> {
         return FileVisitResult.CONTINUE;
     }
 
-    void loadClasses(ClassLoader classLoader, ProtectionDomain protectionDomain) {
+    void loadClasses(Class<?> callerClass) {
+        ClassLoader classLoader = callerClass.getClassLoader();
+        ProtectionDomain protectionDomain = callerClass.getProtectionDomain();
+
         Iterator<ParsedClassFile> iterator = classFiles.iterator();
         while (iterator.hasNext()) {
             ParsedClassFile classFile = iterator.next();

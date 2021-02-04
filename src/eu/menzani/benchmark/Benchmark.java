@@ -1,5 +1,6 @@
 package eu.menzani.benchmark;
 
+import eu.menzani.collection.ListBuilder;
 import eu.menzani.lang.Check;
 import eu.menzani.lang.Nonblocking;
 import eu.menzani.lang.UncaughtException;
@@ -11,6 +12,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class Benchmark {
@@ -72,7 +74,7 @@ public abstract class Benchmark {
             runBenchmark();
         } else {
             Class<?> clazz = getClass();
-            List<String> command = List.of(
+            List<String> command = ListBuilder.fromArray(
                     getJavaRuntime().toString(),
                     launched.setAsBoolean(true).toString(),
                     "-Xms8g",
@@ -82,12 +84,23 @@ public abstract class Benchmark {
                     "-XX:+UnlockExperimentalVMOptions",
                     "-XX:+UseEpsilonGC",
                     "-XX:-RestrictContended",
-                    "-XX:-UseBiasedLocking",
-                    "-p",
-                    new SystemProperty("jdk.module.path").get(),
-                    "-m",
-                    clazz.getModule().getName() + '/' + clazz.getName()
+                    "-XX:-UseBiasedLocking"
             );
+
+            if (SystemProperty.MODULE_PATH_STRING == null) {
+                Collections.addAll(command,
+                        "-cp",
+                        SystemProperty.CLASS_PATH_STRING,
+                        clazz.getName()
+                );
+            } else {
+                Collections.addAll(command,
+                        "-p",
+                        SystemProperty.MODULE_PATH_STRING,
+                        "-m",
+                        clazz.getModule().getName() + '/' + clazz.getName()
+                );
+            }
 
             ProcessBuilder builder = new ProcessBuilder(command);
             builder.redirectErrorStream(true);

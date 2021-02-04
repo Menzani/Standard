@@ -22,7 +22,7 @@ import java.lang.reflect.Modifier;
  */
 public class CopiedClass<T> {
     private static final ByteBuddy byteBuddy = new ByteBuddy();
-    private static final KeyedCounter<Class<?>> ids = new ConcurrentKeyedCounter<>();
+    private static final KeyedCounter<Class<?>> id = new ConcurrentKeyedCounter<>();
 
     private final Class<T> copy;
     private final Class<?> original;
@@ -33,7 +33,7 @@ public class CopiedClass<T> {
         }
         return new CopiedClass<>(byteBuddy
                 .redefine(original)
-                .name(original.getName() + "$Copy" + ids.increment(original))
+                .name(original.getName() + "$Copy" + id.increment(original))
                 .make()
                 .load(original.getClassLoader(), ByteBuddyClassLoadingStrategy.INHERIT_PROTECTION_DOMAIN)
                 .getLoaded(), original);

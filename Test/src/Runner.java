@@ -54,8 +54,7 @@ class Runner {
     }
 
     private void buildIndex() throws ReflectiveOperationException {
-        Class<?> currentClass = getClass();
-        scanner.loadClasses(currentClass.getClassLoader(), currentClass.getProtectionDomain());
+        scanner.loadClasses(getClass());
 
         ArrayBuilder<ParsedClassFile, TestClass> indexBuilder = new ArrayBuilder<>(scanner.getTestClasses(), TestClass.class);
         for (ParsedClassFile classFile : indexBuilder) {
@@ -68,7 +67,7 @@ class Runner {
             }
 
             MethodHandle constructor = lookup.findConstructor(clazz, emptyConstructorMethodType);
-            TestClass testClass = new TestClass(clazz, classFile.getClassName(), constructor, testMethodsBuilder.build());
+            TestClass testClass = new TestClass(clazz, constructor, testMethodsBuilder.build());
             testClass.initTestMethods();
             indexBuilder.add(testClass);
         }

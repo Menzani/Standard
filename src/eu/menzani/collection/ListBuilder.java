@@ -33,9 +33,7 @@ public class ListBuilder<F, T> extends CollectionBuilder<F> {
     @SafeVarargs
     public static <T> ArrayList<T> fromArray(T... elements) {
         ArrayList<T> list = new ArrayList<>(elements.length);
-        for (T element : elements) {
-            list.add(element);
-        }
+        Collections.addAll(list, elements);
         return list;
     }
 }

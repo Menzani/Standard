@@ -59,104 +59,112 @@ public class AtomicInt {
     }
 
     public static int getAndIncrementPlain(Object instance, long offset) {
-        return getAndAddPlain(instance, offset, 1);
+        int oldValue = UNSAFE.getInt(instance, offset);
+        UNSAFE.putInt(instance, offset, oldValue + 1);
+        return oldValue;
     }
 
     public static int getPlainAndIncrementRelease(Object instance, long offset) {
-        return getPlainAndAddRelease(instance, offset, 1);
+        return UNSAFE.getAndAddIntRelease(instance, offset, 1);
     }
 
     public static int getAcquireAndIncrementPlain(Object instance, long offset) {
-        return getAcquireAndAddPlain(instance, offset, 1);
+        return UNSAFE.getAndAddIntAcquire(instance, offset, 1);
     }
 
     public static int getAndIncrementVolatile(Object instance, long offset) {
-        return getAndAddVolatile(instance, offset, 1);
+        return UNSAFE.getAndAddInt(instance, offset, 1);
     }
 
     public static int getAndDecrementPlain(Object instance, long offset) {
-        return getAndAddPlain(instance, offset, -1);
+        int oldValue = UNSAFE.getInt(instance, offset);
+        UNSAFE.putInt(instance, offset, oldValue - 1);
+        return oldValue;
     }
 
     public static int getPlainAndDecrementRelease(Object instance, long offset) {
-        return getPlainAndAddRelease(instance, offset, -1);
+        return UNSAFE.getAndAddIntRelease(instance, offset, -1);
     }
 
     public static int getAcquireAndDecrementPlain(Object instance, long offset) {
-        return getAcquireAndAddPlain(instance, offset, -1);
+        return UNSAFE.getAndAddIntAcquire(instance, offset, -1);
     }
 
     public static int getAndDecrementVolatile(Object instance, long offset) {
-        return getAndAddVolatile(instance, offset, -1);
+        return UNSAFE.getAndAddInt(instance, offset, -1);
     }
 
     public static int incrementAndGetPlain(Object instance, long offset) {
-        return addAndGetPlain(instance, offset, 1);
+        int newValue = UNSAFE.getInt(instance, offset) + 1;
+        UNSAFE.putInt(instance, offset, newValue);
+        return newValue;
     }
 
     public static int incrementReleaseAndGetPlain(Object instance, long offset) {
-        return addReleaseAndGetPlain(instance, offset, 1);
+        return UNSAFE.getAndAddIntRelease(instance, offset, 1) + 1;
     }
 
     public static int incrementPlainAndGetAcquire(Object instance, long offset) {
-        return addPlainAndGetAcquire(instance, offset, 1);
+        return UNSAFE.getAndAddIntAcquire(instance, offset, 1) + 1;
     }
 
     public static int incrementAndGetVolatile(Object instance, long offset) {
-        return addAndGetVolatile(instance, offset, 1);
+        return UNSAFE.getAndAddInt(instance, offset, 1) + 1;
     }
 
     public static void incrementPlain(Object instance, long offset) {
-        addPlain(instance, offset, 1);
+        UNSAFE.putInt(instance, offset, UNSAFE.getInt(instance, offset) + 1);
     }
 
     public static void incrementPlainRelease(Object instance, long offset) {
-        addPlainRelease(instance, offset, 1);
+        UNSAFE.getAndAddIntRelease(instance, offset, 1);
     }
 
     public static void incrementAcquirePlain(Object instance, long offset) {
-        addAcquirePlain(instance, offset, 1);
+        UNSAFE.getAndAddIntAcquire(instance, offset, 1);
     }
 
     public static void incrementVolatile(Object instance, long offset) {
-        addVolatile(instance, offset, 1);
+        UNSAFE.getAndAddInt(instance, offset, 1);
     }
 
     public static int decrementAndGetPlain(Object instance, long offset) {
-        return addAndGetPlain(instance, offset, -1);
+        int newValue = UNSAFE.getInt(instance, offset) - 1;
+        UNSAFE.putInt(instance, offset, newValue);
+        return newValue;
     }
 
     public static int decrementReleaseAndGetPlain(Object instance, long offset) {
-        return addReleaseAndGetPlain(instance, offset, -1);
+        return UNSAFE.getAndAddIntRelease(instance, offset, -1) - 1;
     }
 
     public static int decrementPlainAndGetAcquire(Object instance, long offset) {
-        return addPlainAndGetAcquire(instance, offset, -1);
+        return UNSAFE.getAndAddIntAcquire(instance, offset, -1) - 1;
     }
 
     public static int decrementAndGetVolatile(Object instance, long offset) {
-        return addAndGetVolatile(instance, offset, -1);
+        return UNSAFE.getAndAddInt(instance, offset, -1) - 1;
     }
 
     public static void decrementPlain(Object instance, long offset) {
-        addPlain(instance, offset, -1);
+        UNSAFE.putInt(instance, offset, UNSAFE.getInt(instance, offset) - 1);
     }
 
     public static void decrementPlainRelease(Object instance, long offset) {
-        addPlainRelease(instance, offset, -1);
+        UNSAFE.getAndAddIntRelease(instance, offset, -1);
     }
 
     public static void decrementAcquirePlain(Object instance, long offset) {
-        addAcquirePlain(instance, offset, -1);
+        UNSAFE.getAndAddIntAcquire(instance, offset, -1);
     }
 
     public static void decrementVolatile(Object instance, long offset) {
-        addVolatile(instance, offset, -1);
+        UNSAFE.getAndAddInt(instance, offset, -1);
     }
 
     public static int getAndAddPlain(Object instance, long offset, int value) {
-        int oldValue = getPlain(instance, offset);
-        setPlain(instance, offset, oldValue + value);
+        int oldValue = UNSAFE.getInt(instance, offset);
+        UNSAFE.putInt(instance, offset, oldValue + value);
         return oldValue;
     }
 
@@ -173,25 +181,25 @@ public class AtomicInt {
     }
 
     public static int addAndGetPlain(Object instance, long offset, int value) {
-        int newValue = getPlain(instance, offset) + value;
-        setPlain(instance, offset, newValue);
+        int newValue = UNSAFE.getInt(instance, offset) + value;
+        UNSAFE.putInt(instance, offset, newValue);
         return newValue;
     }
 
     public static int addReleaseAndGetPlain(Object instance, long offset, int value) {
-        return getPlainAndAddRelease(instance, offset, value) + value;
+        return UNSAFE.getAndAddIntRelease(instance, offset, value) + value;
     }
 
     public static int addPlainAndGetAcquire(Object instance, long offset, int value) {
-        return getAcquireAndAddPlain(instance, offset, value) + value;
+        return UNSAFE.getAndAddIntAcquire(instance, offset, value) + value;
     }
 
     public static int addAndGetVolatile(Object instance, long offset, int value) {
-        return getAndAddVolatile(instance, offset, value) + value;
+        return UNSAFE.getAndAddInt(instance, offset, value) + value;
     }
 
     public static void addPlain(Object instance, long offset, int value) {
-        setPlain(instance, offset, getPlain(instance, offset) + value);
+        UNSAFE.putInt(instance, offset, UNSAFE.getInt(instance, offset) + value);
     }
 
     public static void addPlainRelease(Object instance, long offset, int value) {
@@ -267,46 +275,46 @@ public class AtomicInt {
     }
 
     public static int getAndUpdate(Object instance, long offset, IntUnaryOperator updateFunction) {
-        int prev = getVolatile(instance, offset), next = 0;
+        int prev = UNSAFE.getIntVolatile(instance, offset), next = 0;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = updateFunction.applyAsInt(prev);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetInt(instance, offset, prev, next))
                 return prev;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getIntVolatile(instance, offset)));
         }
     }
 
     public static int updateAndGet(Object instance, long offset, IntUnaryOperator updateFunction) {
-        int prev = getVolatile(instance, offset), next = 0;
+        int prev = UNSAFE.getIntVolatile(instance, offset), next = 0;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = updateFunction.applyAsInt(prev);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetInt(instance, offset, prev, next))
                 return next;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getIntVolatile(instance, offset)));
         }
     }
 
     public static int getAndAccumulate(Object instance, long offset, int constant, IntBinaryOperator accumulatorFunction) {
-        int prev = getVolatile(instance, offset), next = 0;
+        int prev = UNSAFE.getIntVolatile(instance, offset), next = 0;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = accumulatorFunction.applyAsInt(prev, constant);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetInt(instance, offset, prev, next))
                 return prev;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getIntVolatile(instance, offset)));
         }
     }
 
     public static int accumulateAndGet(Object instance, long offset, int constant, IntBinaryOperator accumulatorFunction) {
-        int prev = getVolatile(instance, offset), next = 0;
+        int prev = UNSAFE.getIntVolatile(instance, offset), next = 0;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = accumulatorFunction.applyAsInt(prev, constant);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetInt(instance, offset, prev, next))
                 return next;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getIntVolatile(instance, offset)));
         }
     }
 }

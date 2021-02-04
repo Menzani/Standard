@@ -59,104 +59,112 @@ public class AtomicLong {
     }
 
     public static long getAndIncrementPlain(Object instance, long offset) {
-        return getAndAddPlain(instance, offset, 1L);
+        long oldValue = UNSAFE.getLong(instance, offset);
+        UNSAFE.putLong(instance, offset, oldValue + 1L);
+        return oldValue;
     }
 
     public static long getPlainAndIncrementRelease(Object instance, long offset) {
-        return getPlainAndAddRelease(instance, offset, 1L);
+        return UNSAFE.getAndAddLongRelease(instance, offset, 1L);
     }
 
     public static long getAcquireAndIncrementPlain(Object instance, long offset) {
-        return getAcquireAndAddPlain(instance, offset, 1L);
+        return UNSAFE.getAndAddLongAcquire(instance, offset, 1L);
     }
 
     public static long getAndIncrementVolatile(Object instance, long offset) {
-        return getAndAddVolatile(instance, offset, 1L);
+        return UNSAFE.getAndAddLong(instance, offset, 1L);
     }
 
     public static long getAndDecrementPlain(Object instance, long offset) {
-        return getAndAddPlain(instance, offset, -1L);
+        long oldValue = UNSAFE.getLong(instance, offset);
+        UNSAFE.putLong(instance, offset, oldValue - 1L);
+        return oldValue;
     }
 
     public static long getPlainAndDecrementRelease(Object instance, long offset) {
-        return getPlainAndAddRelease(instance, offset, -1L);
+        return UNSAFE.getAndAddLongRelease(instance, offset, -1L);
     }
 
     public static long getAcquireAndDecrementPlain(Object instance, long offset) {
-        return getAcquireAndAddPlain(instance, offset, -1L);
+        return UNSAFE.getAndAddLongAcquire(instance, offset, -1L);
     }
 
     public static long getAndDecrementVolatile(Object instance, long offset) {
-        return getAndAddVolatile(instance, offset, -1L);
+        return UNSAFE.getAndAddLong(instance, offset, -1L);
     }
 
     public static long incrementAndGetPlain(Object instance, long offset) {
-        return addAndGetPlain(instance, offset, 1L);
+        long newValue = UNSAFE.getLong(instance, offset) + 1L;
+        UNSAFE.putLong(instance, offset, newValue);
+        return newValue;
     }
 
     public static long incrementReleaseAndGetPlain(Object instance, long offset) {
-        return addReleaseAndGetPlain(instance, offset, 1L);
+        return UNSAFE.getAndAddLongRelease(instance, offset, 1L) + 1L;
     }
 
     public static long incrementPlainAndGetAcquire(Object instance, long offset) {
-        return addPlainAndGetAcquire(instance, offset, 1L);
+        return UNSAFE.getAndAddLongAcquire(instance, offset, 1L) + 1L;
     }
 
     public static long incrementAndGetVolatile(Object instance, long offset) {
-        return addAndGetVolatile(instance, offset, 1L);
+        return UNSAFE.getAndAddLong(instance, offset, 1L) + 1L;
     }
 
     public static void incrementPlain(Object instance, long offset) {
-        addPlain(instance, offset, 1L);
+        UNSAFE.putLong(instance, offset, UNSAFE.getLong(instance, offset) + 1L);
     }
 
     public static void incrementPlainRelease(Object instance, long offset) {
-        addPlainRelease(instance, offset, 1L);
+        UNSAFE.getAndAddLongRelease(instance, offset, 1L);
     }
 
     public static void incrementAcquirePlain(Object instance, long offset) {
-        addAcquirePlain(instance, offset, 1L);
+        UNSAFE.getAndAddLongAcquire(instance, offset, 1L);
     }
 
     public static void incrementVolatile(Object instance, long offset) {
-        addVolatile(instance, offset, 1L);
+        UNSAFE.getAndAddLong(instance, offset, 1L);
     }
 
     public static long decrementAndGetPlain(Object instance, long offset) {
-        return addAndGetPlain(instance, offset, -1L);
+        long newValue = UNSAFE.getLong(instance, offset) - 1L;
+        UNSAFE.putLong(instance, offset, newValue);
+        return newValue;
     }
 
     public static long decrementReleaseAndGetPlain(Object instance, long offset) {
-        return addReleaseAndGetPlain(instance, offset, -1L);
+        return UNSAFE.getAndAddLongRelease(instance, offset, -1L) - 1L;
     }
 
     public static long decrementPlainAndGetAcquire(Object instance, long offset) {
-        return addPlainAndGetAcquire(instance, offset, -1L);
+        return UNSAFE.getAndAddLongAcquire(instance, offset, -1L) - 1L;
     }
 
     public static long decrementAndGetVolatile(Object instance, long offset) {
-        return addAndGetVolatile(instance, offset, -1L);
+        return UNSAFE.getAndAddLong(instance, offset, -1L) - 1L;
     }
 
     public static void decrementPlain(Object instance, long offset) {
-        addPlain(instance, offset, -1L);
+        UNSAFE.putLong(instance, offset, UNSAFE.getLong(instance, offset) - 1L);
     }
 
     public static void decrementPlainRelease(Object instance, long offset) {
-        addPlainRelease(instance, offset, -1L);
+        UNSAFE.getAndAddLongRelease(instance, offset, -1L);
     }
 
     public static void decrementAcquirePlain(Object instance, long offset) {
-        addAcquirePlain(instance, offset, -1L);
+        UNSAFE.getAndAddLongAcquire(instance, offset, -1L);
     }
 
     public static void decrementVolatile(Object instance, long offset) {
-        addVolatile(instance, offset, -1L);
+        UNSAFE.getAndAddLong(instance, offset, -1L);
     }
 
     public static long getAndAddPlain(Object instance, long offset, long value) {
-        long oldValue = getPlain(instance, offset);
-        setPlain(instance, offset, oldValue + value);
+        long oldValue = UNSAFE.getLong(instance, offset);
+        UNSAFE.putLong(instance, offset, oldValue + value);
         return oldValue;
     }
 
@@ -173,25 +181,25 @@ public class AtomicLong {
     }
 
     public static long addAndGetPlain(Object instance, long offset, long value) {
-        long newValue = getPlain(instance, offset) + value;
-        setPlain(instance, offset, newValue);
+        long newValue = UNSAFE.getLong(instance, offset) + value;
+        UNSAFE.putLong(instance, offset, newValue);
         return newValue;
     }
 
     public static long addReleaseAndGetPlain(Object instance, long offset, long value) {
-        return getPlainAndAddRelease(instance, offset, value) + value;
+        return UNSAFE.getAndAddLongRelease(instance, offset, value) + value;
     }
 
     public static long addPlainAndGetAcquire(Object instance, long offset, long value) {
-        return getAcquireAndAddPlain(instance, offset, value) + value;
+        return UNSAFE.getAndAddLongAcquire(instance, offset, value) + value;
     }
 
     public static long addAndGetVolatile(Object instance, long offset, long value) {
-        return getAndAddVolatile(instance, offset, value) + value;
+        return UNSAFE.getAndAddLong(instance, offset, value) + value;
     }
 
     public static void addPlain(Object instance, long offset, long value) {
-        setPlain(instance, offset, getPlain(instance, offset) + value);
+        UNSAFE.putLong(instance, offset, UNSAFE.getLong(instance, offset) + value);
     }
 
     public static void addPlainRelease(Object instance, long offset, long value) {
@@ -267,46 +275,46 @@ public class AtomicLong {
     }
 
     public static long getAndUpdate(Object instance, long offset, LongUnaryOperator updateFunction) {
-        long prev = getVolatile(instance, offset), next = 0L;
+        long prev = UNSAFE.getLongVolatile(instance, offset), next = 0L;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = updateFunction.applyAsLong(prev);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetLong(instance, offset, prev, next))
                 return prev;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getLongVolatile(instance, offset)));
         }
     }
 
     public static long updateAndGet(Object instance, long offset, LongUnaryOperator updateFunction) {
-        long prev = getVolatile(instance, offset), next = 0L;
+        long prev = UNSAFE.getLongVolatile(instance, offset), next = 0L;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = updateFunction.applyAsLong(prev);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetLong(instance, offset, prev, next))
                 return next;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getLongVolatile(instance, offset)));
         }
     }
 
     public static long getAndAccumulate(Object instance, long offset, long constant, LongBinaryOperator accumulatorFunction) {
-        long prev = getVolatile(instance, offset), next = 0L;
+        long prev = UNSAFE.getLongVolatile(instance, offset), next = 0L;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = accumulatorFunction.applyAsLong(prev, constant);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetLong(instance, offset, prev, next))
                 return prev;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getLongVolatile(instance, offset)));
         }
     }
 
     public static long accumulateAndGet(Object instance, long offset, long constant, LongBinaryOperator accumulatorFunction) {
-        long prev = getVolatile(instance, offset), next = 0L;
+        long prev = UNSAFE.getLongVolatile(instance, offset), next = 0L;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = accumulatorFunction.applyAsLong(prev, constant);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetLong(instance, offset, prev, next))
                 return next;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getLongVolatile(instance, offset)));
         }
     }
 }

@@ -24,7 +24,7 @@ class ParsedClassFile implements Comparable<ParsedClassFile> {
     }
 
     void load(ClassLoader classLoader, ProtectionDomain protectionDomain) {
-        loadedClass = Unsafe.defineClass(className, bytecode, 0, bytecode.length, classLoader, protectionDomain);
+        loadedClass = Unsafe.defineClass(className, bytecode, classLoader, protectionDomain);
     }
 
     boolean isNotTestClass() {

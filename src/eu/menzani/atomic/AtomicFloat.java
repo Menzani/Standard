@@ -59,104 +59,112 @@ public class AtomicFloat {
     }
 
     public static float getAndIncrementPlain(Object instance, long offset) {
-        return getAndAddPlain(instance, offset, 1F);
+        float oldValue = UNSAFE.getFloat(instance, offset);
+        UNSAFE.putFloat(instance, offset, oldValue + 1F);
+        return oldValue;
     }
 
     public static float getPlainAndIncrementRelease(Object instance, long offset) {
-        return getPlainAndAddRelease(instance, offset, 1F);
+        return UNSAFE.getAndAddFloatRelease(instance, offset, 1F);
     }
 
     public static float getAcquireAndIncrementPlain(Object instance, long offset) {
-        return getAcquireAndAddPlain(instance, offset, 1F);
+        return UNSAFE.getAndAddFloatAcquire(instance, offset, 1F);
     }
 
     public static float getAndIncrementVolatile(Object instance, long offset) {
-        return getAndAddVolatile(instance, offset, 1F);
+        return UNSAFE.getAndAddFloat(instance, offset, 1F);
     }
 
     public static float getAndDecrementPlain(Object instance, long offset) {
-        return getAndAddPlain(instance, offset, -1F);
+        float oldValue = UNSAFE.getFloat(instance, offset);
+        UNSAFE.putFloat(instance, offset, oldValue - 1F);
+        return oldValue;
     }
 
     public static float getPlainAndDecrementRelease(Object instance, long offset) {
-        return getPlainAndAddRelease(instance, offset, -1F);
+        return UNSAFE.getAndAddFloatRelease(instance, offset, -1F);
     }
 
     public static float getAcquireAndDecrementPlain(Object instance, long offset) {
-        return getAcquireAndAddPlain(instance, offset, -1F);
+        return UNSAFE.getAndAddFloatAcquire(instance, offset, -1F);
     }
 
     public static float getAndDecrementVolatile(Object instance, long offset) {
-        return getAndAddVolatile(instance, offset, -1F);
+        return UNSAFE.getAndAddFloat(instance, offset, -1F);
     }
 
     public static float incrementAndGetPlain(Object instance, long offset) {
-        return addAndGetPlain(instance, offset, 1F);
+        float newValue = UNSAFE.getFloat(instance, offset) + 1F;
+        UNSAFE.putFloat(instance, offset, newValue);
+        return newValue;
     }
 
     public static float incrementReleaseAndGetPlain(Object instance, long offset) {
-        return addReleaseAndGetPlain(instance, offset, 1F);
+        return UNSAFE.getAndAddFloatRelease(instance, offset, 1F) + 1F;
     }
 
     public static float incrementPlainAndGetAcquire(Object instance, long offset) {
-        return addPlainAndGetAcquire(instance, offset, 1F);
+        return UNSAFE.getAndAddFloatAcquire(instance, offset, 1F) + 1F;
     }
 
     public static float incrementAndGetVolatile(Object instance, long offset) {
-        return addAndGetVolatile(instance, offset, 1F);
+        return UNSAFE.getAndAddFloat(instance, offset, 1F) + 1F;
     }
 
     public static void incrementPlain(Object instance, long offset) {
-        addPlain(instance, offset, 1F);
+        UNSAFE.putFloat(instance, offset, UNSAFE.getFloat(instance, offset) + 1F);
     }
 
     public static void incrementPlainRelease(Object instance, long offset) {
-        addPlainRelease(instance, offset, 1F);
+        UNSAFE.getAndAddFloatRelease(instance, offset, 1F);
     }
 
     public static void incrementAcquirePlain(Object instance, long offset) {
-        addAcquirePlain(instance, offset, 1F);
+        UNSAFE.getAndAddFloatAcquire(instance, offset, 1F);
     }
 
     public static void incrementVolatile(Object instance, long offset) {
-        addVolatile(instance, offset, 1F);
+        UNSAFE.getAndAddFloat(instance, offset, 1F);
     }
 
     public static float decrementAndGetPlain(Object instance, long offset) {
-        return addAndGetPlain(instance, offset, -1F);
+        float newValue = UNSAFE.getFloat(instance, offset) - 1F;
+        UNSAFE.putFloat(instance, offset, newValue);
+        return newValue;
     }
 
     public static float decrementReleaseAndGetPlain(Object instance, long offset) {
-        return addReleaseAndGetPlain(instance, offset, -1F);
+        return UNSAFE.getAndAddFloatRelease(instance, offset, -1F) - 1F;
     }
 
     public static float decrementPlainAndGetAcquire(Object instance, long offset) {
-        return addPlainAndGetAcquire(instance, offset, -1F);
+        return UNSAFE.getAndAddFloatAcquire(instance, offset, -1F) - 1F;
     }
 
     public static float decrementAndGetVolatile(Object instance, long offset) {
-        return addAndGetVolatile(instance, offset, -1F);
+        return UNSAFE.getAndAddFloat(instance, offset, -1F) - 1F;
     }
 
     public static void decrementPlain(Object instance, long offset) {
-        addPlain(instance, offset, -1F);
+        UNSAFE.putFloat(instance, offset, UNSAFE.getFloat(instance, offset) - 1F);
     }
 
     public static void decrementPlainRelease(Object instance, long offset) {
-        addPlainRelease(instance, offset, -1F);
+        UNSAFE.getAndAddFloatRelease(instance, offset, -1F);
     }
 
     public static void decrementAcquirePlain(Object instance, long offset) {
-        addAcquirePlain(instance, offset, -1F);
+        UNSAFE.getAndAddFloatAcquire(instance, offset, -1F);
     }
 
     public static void decrementVolatile(Object instance, long offset) {
-        addVolatile(instance, offset, -1F);
+        UNSAFE.getAndAddFloat(instance, offset, -1F);
     }
 
     public static float getAndAddPlain(Object instance, long offset, float value) {
-        float oldValue = getPlain(instance, offset);
-        setPlain(instance, offset, oldValue + value);
+        float oldValue = UNSAFE.getFloat(instance, offset);
+        UNSAFE.putFloat(instance, offset, oldValue + value);
         return oldValue;
     }
 
@@ -173,25 +181,25 @@ public class AtomicFloat {
     }
 
     public static float addAndGetPlain(Object instance, long offset, float value) {
-        float newValue = getPlain(instance, offset) + value;
-        setPlain(instance, offset, newValue);
+        float newValue = UNSAFE.getFloat(instance, offset) + value;
+        UNSAFE.putFloat(instance, offset, newValue);
         return newValue;
     }
 
     public static float addReleaseAndGetPlain(Object instance, long offset, float value) {
-        return getPlainAndAddRelease(instance, offset, value) + value;
+        return UNSAFE.getAndAddFloatRelease(instance, offset, value) + value;
     }
 
     public static float addPlainAndGetAcquire(Object instance, long offset, float value) {
-        return getAcquireAndAddPlain(instance, offset, value) + value;
+        return UNSAFE.getAndAddFloatAcquire(instance, offset, value) + value;
     }
 
     public static float addAndGetVolatile(Object instance, long offset, float value) {
-        return getAndAddVolatile(instance, offset, value) + value;
+        return UNSAFE.getAndAddFloat(instance, offset, value) + value;
     }
 
     public static void addPlain(Object instance, long offset, float value) {
-        setPlain(instance, offset, getPlain(instance, offset) + value);
+        UNSAFE.putFloat(instance, offset, UNSAFE.getFloat(instance, offset) + value);
     }
 
     public static void addPlainRelease(Object instance, long offset, float value) {
@@ -231,46 +239,46 @@ public class AtomicFloat {
     }
 
     public static float getAndUpdate(Object instance, long offset, FloatUnaryOperator updateFunction) {
-        float prev = getVolatile(instance, offset), next = 0F;
+        float prev = UNSAFE.getFloatVolatile(instance, offset), next = 0F;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = updateFunction.applyAsFloat(prev);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetFloat(instance, offset, prev, next))
                 return prev;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getFloatVolatile(instance, offset)));
         }
     }
 
     public static float updateAndGet(Object instance, long offset, FloatUnaryOperator updateFunction) {
-        float prev = getVolatile(instance, offset), next = 0F;
+        float prev = UNSAFE.getFloatVolatile(instance, offset), next = 0F;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = updateFunction.applyAsFloat(prev);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetFloat(instance, offset, prev, next))
                 return next;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getFloatVolatile(instance, offset)));
         }
     }
 
     public static float getAndAccumulate(Object instance, long offset, float constant, FloatBinaryOperator accumulatorFunction) {
-        float prev = getVolatile(instance, offset), next = 0F;
+        float prev = UNSAFE.getFloatVolatile(instance, offset), next = 0F;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = accumulatorFunction.applyAsFloat(prev, constant);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetFloat(instance, offset, prev, next))
                 return prev;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getFloatVolatile(instance, offset)));
         }
     }
 
     public static float accumulateAndGet(Object instance, long offset, float constant, FloatBinaryOperator accumulatorFunction) {
-        float prev = getVolatile(instance, offset), next = 0F;
+        float prev = UNSAFE.getFloatVolatile(instance, offset), next = 0F;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = accumulatorFunction.applyAsFloat(prev, constant);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetFloat(instance, offset, prev, next))
                 return next;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getFloatVolatile(instance, offset)));
         }
     }
 }

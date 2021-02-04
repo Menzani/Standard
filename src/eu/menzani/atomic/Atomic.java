@@ -92,47 +92,51 @@ public class Atomic {
         return (T) UNSAFE.compareAndExchangeObject(instance, offset, oldValue, newValue);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T getAndUpdate(Object instance, long offset, UnaryOperator<T> updateFunction) {
-        T prev = getVolatile(instance, offset), next = null;
+        T prev = (T) UNSAFE.getObjectVolatile(instance, offset), next = null;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = updateFunction.apply(prev);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetObject(instance, offset, prev, next))
                 return prev;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = (T) UNSAFE.getObjectVolatile(instance, offset)));
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T updateAndGet(Object instance, long offset, UnaryOperator<T> updateFunction) {
-        T prev = getVolatile(instance, offset), next = null;
+        T prev = (T) UNSAFE.getObjectVolatile(instance, offset), next = null;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = updateFunction.apply(prev);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetObject(instance, offset, prev, next))
                 return next;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = (T) UNSAFE.getObjectVolatile(instance, offset)));
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T getAndAccumulate(Object instance, long offset, T constant, BinaryOperator<T> accumulatorFunction) {
-        T prev = getVolatile(instance, offset), next = null;
+        T prev = (T) UNSAFE.getObjectVolatile(instance, offset), next = null;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = accumulatorFunction.apply(prev, constant);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetObject(instance, offset, prev, next))
                 return prev;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = (T) UNSAFE.getObjectVolatile(instance, offset)));
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T accumulateAndGet(Object instance, long offset, T constant, BinaryOperator<T> accumulatorFunction) {
-        T prev = getVolatile(instance, offset), next = null;
+        T prev = (T) UNSAFE.getObjectVolatile(instance, offset), next = null;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = accumulatorFunction.apply(prev, constant);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetObject(instance, offset, prev, next))
                 return next;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = (T) UNSAFE.getObjectVolatile(instance, offset)));
         }
     }
 }

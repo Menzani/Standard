@@ -59,104 +59,112 @@ public class AtomicDouble {
     }
 
     public static double getAndIncrementPlain(Object instance, long offset) {
-        return getAndAddPlain(instance, offset, 1D);
+        double oldValue = UNSAFE.getDouble(instance, offset);
+        UNSAFE.putDouble(instance, offset, oldValue + 1D);
+        return oldValue;
     }
 
     public static double getPlainAndIncrementRelease(Object instance, long offset) {
-        return getPlainAndAddRelease(instance, offset, 1D);
+        return UNSAFE.getAndAddDoubleRelease(instance, offset, 1D);
     }
 
     public static double getAcquireAndIncrementPlain(Object instance, long offset) {
-        return getAcquireAndAddPlain(instance, offset, 1D);
+        return UNSAFE.getAndAddDoubleAcquire(instance, offset, 1D);
     }
 
     public static double getAndIncrementVolatile(Object instance, long offset) {
-        return getAndAddVolatile(instance, offset, 1D);
+        return UNSAFE.getAndAddDouble(instance, offset, 1D);
     }
 
     public static double getAndDecrementPlain(Object instance, long offset) {
-        return getAndAddPlain(instance, offset, -1D);
+        double oldValue = UNSAFE.getDouble(instance, offset);
+        UNSAFE.putDouble(instance, offset, oldValue - 1D);
+        return oldValue;
     }
 
     public static double getPlainAndDecrementRelease(Object instance, long offset) {
-        return getPlainAndAddRelease(instance, offset, -1D);
+        return UNSAFE.getAndAddDoubleRelease(instance, offset, -1D);
     }
 
     public static double getAcquireAndDecrementPlain(Object instance, long offset) {
-        return getAcquireAndAddPlain(instance, offset, -1D);
+        return UNSAFE.getAndAddDoubleAcquire(instance, offset, -1D);
     }
 
     public static double getAndDecrementVolatile(Object instance, long offset) {
-        return getAndAddVolatile(instance, offset, -1D);
+        return UNSAFE.getAndAddDouble(instance, offset, -1D);
     }
 
     public static double incrementAndGetPlain(Object instance, long offset) {
-        return addAndGetPlain(instance, offset, 1D);
+        double newValue = UNSAFE.getDouble(instance, offset) + 1D;
+        UNSAFE.putDouble(instance, offset, newValue);
+        return newValue;
     }
 
     public static double incrementReleaseAndGetPlain(Object instance, long offset) {
-        return addReleaseAndGetPlain(instance, offset, 1D);
+        return UNSAFE.getAndAddDoubleRelease(instance, offset, 1D) + 1D;
     }
 
     public static double incrementPlainAndGetAcquire(Object instance, long offset) {
-        return addPlainAndGetAcquire(instance, offset, 1D);
+        return UNSAFE.getAndAddDoubleAcquire(instance, offset, 1D) + 1D;
     }
 
     public static double incrementAndGetVolatile(Object instance, long offset) {
-        return addAndGetVolatile(instance, offset, 1D);
+        return UNSAFE.getAndAddDouble(instance, offset, 1D) + 1D;
     }
 
     public static void incrementPlain(Object instance, long offset) {
-        addPlain(instance, offset, 1D);
+        UNSAFE.putDouble(instance, offset, UNSAFE.getDouble(instance, offset) + 1D);
     }
 
     public static void incrementPlainRelease(Object instance, long offset) {
-        addPlainRelease(instance, offset, 1D);
+        UNSAFE.getAndAddDoubleRelease(instance, offset, 1D);
     }
 
     public static void incrementAcquirePlain(Object instance, long offset) {
-        addAcquirePlain(instance, offset, 1D);
+        UNSAFE.getAndAddDoubleAcquire(instance, offset, 1D);
     }
 
     public static void incrementVolatile(Object instance, long offset) {
-        addVolatile(instance, offset, 1D);
+        UNSAFE.getAndAddDouble(instance, offset, 1D);
     }
 
     public static double decrementAndGetPlain(Object instance, long offset) {
-        return addAndGetPlain(instance, offset, -1D);
+        double newValue = UNSAFE.getDouble(instance, offset) - 1D;
+        UNSAFE.putDouble(instance, offset, newValue);
+        return newValue;
     }
 
     public static double decrementReleaseAndGetPlain(Object instance, long offset) {
-        return addReleaseAndGetPlain(instance, offset, -1D);
+        return UNSAFE.getAndAddDoubleRelease(instance, offset, -1D) - 1D;
     }
 
     public static double decrementPlainAndGetAcquire(Object instance, long offset) {
-        return addPlainAndGetAcquire(instance, offset, -1D);
+        return UNSAFE.getAndAddDoubleAcquire(instance, offset, -1D) - 1D;
     }
 
     public static double decrementAndGetVolatile(Object instance, long offset) {
-        return addAndGetVolatile(instance, offset, -1D);
+        return UNSAFE.getAndAddDouble(instance, offset, -1D) - 1D;
     }
 
     public static void decrementPlain(Object instance, long offset) {
-        addPlain(instance, offset, -1D);
+        UNSAFE.putDouble(instance, offset, UNSAFE.getDouble(instance, offset) - 1D);
     }
 
     public static void decrementPlainRelease(Object instance, long offset) {
-        addPlainRelease(instance, offset, -1D);
+        UNSAFE.getAndAddDoubleRelease(instance, offset, -1D);
     }
 
     public static void decrementAcquirePlain(Object instance, long offset) {
-        addAcquirePlain(instance, offset, -1D);
+        UNSAFE.getAndAddDoubleAcquire(instance, offset, -1D);
     }
 
     public static void decrementVolatile(Object instance, long offset) {
-        addVolatile(instance, offset, -1D);
+        UNSAFE.getAndAddDouble(instance, offset, -1D);
     }
 
     public static double getAndAddPlain(Object instance, long offset, double value) {
-        double oldValue = getPlain(instance, offset);
-        setPlain(instance, offset, oldValue + value);
+        double oldValue = UNSAFE.getDouble(instance, offset);
+        UNSAFE.putDouble(instance, offset, oldValue + value);
         return oldValue;
     }
 
@@ -173,25 +181,25 @@ public class AtomicDouble {
     }
 
     public static double addAndGetPlain(Object instance, long offset, double value) {
-        double newValue = getPlain(instance, offset) + value;
-        setPlain(instance, offset, newValue);
+        double newValue = UNSAFE.getDouble(instance, offset) + value;
+        UNSAFE.putDouble(instance, offset, newValue);
         return newValue;
     }
 
     public static double addReleaseAndGetPlain(Object instance, long offset, double value) {
-        return getPlainAndAddRelease(instance, offset, value) + value;
+        return UNSAFE.getAndAddDoubleRelease(instance, offset, value) + value;
     }
 
     public static double addPlainAndGetAcquire(Object instance, long offset, double value) {
-        return getAcquireAndAddPlain(instance, offset, value) + value;
+        return UNSAFE.getAndAddDoubleAcquire(instance, offset, value) + value;
     }
 
     public static double addAndGetVolatile(Object instance, long offset, double value) {
-        return getAndAddVolatile(instance, offset, value) + value;
+        return UNSAFE.getAndAddDouble(instance, offset, value) + value;
     }
 
     public static void addPlain(Object instance, long offset, double value) {
-        setPlain(instance, offset, getPlain(instance, offset) + value);
+        UNSAFE.putDouble(instance, offset, UNSAFE.getDouble(instance, offset) + value);
     }
 
     public static void addPlainRelease(Object instance, long offset, double value) {
@@ -231,46 +239,46 @@ public class AtomicDouble {
     }
 
     public static double getAndUpdate(Object instance, long offset, DoubleUnaryOperator updateFunction) {
-        double prev = getVolatile(instance, offset), next = 0D;
+        double prev = UNSAFE.getDoubleVolatile(instance, offset), next = 0D;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = updateFunction.applyAsDouble(prev);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetDouble(instance, offset, prev, next))
                 return prev;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getDoubleVolatile(instance, offset)));
         }
     }
 
     public static double updateAndGet(Object instance, long offset, DoubleUnaryOperator updateFunction) {
-        double prev = getVolatile(instance, offset), next = 0D;
+        double prev = UNSAFE.getDoubleVolatile(instance, offset), next = 0D;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = updateFunction.applyAsDouble(prev);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetDouble(instance, offset, prev, next))
                 return next;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getDoubleVolatile(instance, offset)));
         }
     }
 
     public static double getAndAccumulate(Object instance, long offset, double constant, DoubleBinaryOperator accumulatorFunction) {
-        double prev = getVolatile(instance, offset), next = 0D;
+        double prev = UNSAFE.getDoubleVolatile(instance, offset), next = 0D;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = accumulatorFunction.applyAsDouble(prev, constant);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetDouble(instance, offset, prev, next))
                 return prev;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getDoubleVolatile(instance, offset)));
         }
     }
 
     public static double accumulateAndGet(Object instance, long offset, double constant, DoubleBinaryOperator accumulatorFunction) {
-        double prev = getVolatile(instance, offset), next = 0D;
+        double prev = UNSAFE.getDoubleVolatile(instance, offset), next = 0D;
         for (boolean haveNext = false; ; ) {
             if (!haveNext)
                 next = accumulatorFunction.applyAsDouble(prev, constant);
-            if (weakCompareAndSetVolatile(instance, offset, prev, next))
+            if (UNSAFE.weakCompareAndSetDouble(instance, offset, prev, next))
                 return next;
-            haveNext = (prev == (prev = getVolatile(instance, offset)));
+            haveNext = (prev == (prev = UNSAFE.getDoubleVolatile(instance, offset)));
         }
     }
 }

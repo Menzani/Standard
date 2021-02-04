@@ -8,7 +8,7 @@ public class DirectAtomicBooleanArray {
     public static long allocate(long length, boolean initialValue) {
         long address = Unsafe.allocateMemory(length);
         for (long i = 0L; i < length; i++) {
-            setOpaque(address, i, initialValue);
+            UNSAFE.putBooleanOpaque(null, address + i, initialValue);
         }
         return address;
     }

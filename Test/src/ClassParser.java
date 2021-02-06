@@ -1,6 +1,6 @@
 package eu.menzani.test;
 
-import eu.menzani.lang.ControlFlowException;
+import eu.menzani.misc.EndVisit;
 import net.bytebuddy.jar.asm.ClassReader;
 import net.bytebuddy.jar.asm.ClassVisitor;
 import net.bytebuddy.jar.asm.Opcodes;
@@ -26,14 +26,5 @@ class ClassParser extends ClassVisitor {
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         parsed = new ParsedClassFile(name, superName, interfaces);
         throw EndVisit.INSTANCE;
-    }
-
-    private static class EndVisit extends ControlFlowException {
-        static final EndVisit INSTANCE = new EndVisit();
-
-        private static final long serialVersionUID = 0L;
-
-        private EndVisit() {
-        }
     }
 }

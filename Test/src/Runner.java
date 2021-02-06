@@ -40,6 +40,9 @@ class Runner {
     private FailedTests failedTests;
     private WorkerManager workerManager;
 
+    private Runner() {
+    }
+
     private void scan(Set<Path> paths) throws IOException {
         for (Path path : paths) {
             if (Paths.isWorkingDirectory(path)) continue;

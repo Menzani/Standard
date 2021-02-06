@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="Standard (sources)">
-    <output-path>R:/</output-path>
-    <root id="archive" name="Standard-sources.jar">
-      <element id="dir-copy" path="$PROJECT_DIR$/src" />
-    </root>
-  </artifact>
-</component>

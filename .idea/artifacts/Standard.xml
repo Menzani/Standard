@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="Standard">
-    <output-path>R:/</output-path>
-    <root id="archive" name="Standard.jar">
-      <element id="module-output" name="Standard" />
-    </root>
-  </artifact>
-</component>

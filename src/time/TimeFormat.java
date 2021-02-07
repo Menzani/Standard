@@ -43,7 +43,7 @@ public class TimeFormat {
         if (daysPart != 0L) text += daysPart + "d ";
         if (hoursPart != 0L) text += hoursPart + "h ";
         if (minutesPart != 0L) text += minutesPart + "m ";
-        if (secondsPart != 0L) text += secondsPart + 's';
+        if (secondsPart != 0L) text += Long.toString(secondsPart) + 's';
         return text;
     }
 }

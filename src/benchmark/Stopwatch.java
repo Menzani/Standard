@@ -6,6 +6,7 @@ import eu.menzani.time.TimeFormat;
 
 public class Stopwatch {
     private String prefix;
+    private long minimumToReport;
     private long start;
 
     public Stopwatch() {
@@ -21,9 +22,20 @@ public class Stopwatch {
         this.prefix = prefix;
     }
 
+    public void setMinimumToReport(long minimumToReport) {
+        this.minimumToReport = minimumToReport;
+    }
+
     public void stop() {
         final long end = System.nanoTime();
-        System.out.println(prefix + TimeFormat.formatExecutionTime(end - start));
+        long elapsed = end - start;
+        if (minimumToReport != 0L && elapsed < minimumToReport) {
+            return;
+        }
+        if (!prefix.isEmpty()) {
+            prefix += " in ";
+        }
+        System.out.println(prefix + TimeFormat.formatExecutionTime(elapsed));
     }
 
     public void sum() {

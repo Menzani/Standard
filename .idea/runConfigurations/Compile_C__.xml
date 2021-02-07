@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Compile C++" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="eu.menzani.build.CompileCpp" />
+    <module name="Standard" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

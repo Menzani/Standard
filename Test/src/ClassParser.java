@@ -1,6 +1,6 @@
 package eu.menzani.test;
 
-import eu.menzani.misc.EndVisit;
+import eu.menzani.lang.EndVisit;
 import net.bytebuddy.jar.asm.ClassReader;
 import net.bytebuddy.jar.asm.ClassVisitor;
 import net.bytebuddy.jar.asm.Opcodes;

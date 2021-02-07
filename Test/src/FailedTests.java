@@ -1,7 +1,7 @@
 package eu.menzani.test;
 
 import eu.menzani.io.ListFile;
-import eu.menzani.system.Paths;
+import eu.menzani.system.SystemPaths;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -10,7 +10,7 @@ class FailedTests {
     private final ListFile file;
 
     FailedTests(int id) throws IOException {
-        file = new ListFile(Paths.TEMP_FOLDER, "failed-tests_" + id, StandardCharsets.ISO_8859_1).deleteOnEmpty();
+        file = new ListFile(SystemPaths.TEMP_FOLDER, "failed-tests_" + id, StandardCharsets.ISO_8859_1).deleteOnEmpty();
         file.read();
     }
 

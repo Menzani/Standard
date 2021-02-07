@@ -1,5 +1,6 @@
 package eu.menzani.misc;
 
+import eu.menzani.lang.EndVisit;
 import eu.menzani.lang.UncaughtException;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;

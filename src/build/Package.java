@@ -1,7 +1,5 @@
 package eu.menzani.build;
 
-import eu.menzani.misc.XmlParser;
-import eu.menzani.system.Paths;
 import eu.menzani.system.Platform;
 
 import java.io.IOException;
@@ -9,35 +7,30 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-class Build {
+class Package {
     public static void main(String[] args) throws Exception {
-        Build build = new Build();
-        build.scan();
-        build.build();
+        Package package_ = new Package();
+        package_.package_();
     }
 
     private static final Path output = Path.of("R:");
 
-    private List<Module> modules;
+    private final Project project;
 
-    private Build() {
+    private Package() throws IOException {
+        project = new Project();
     }
 
-    private void scan() throws IOException {
-        ProjectDescriptorScanner projectDescriptorScanner = new ProjectDescriptorScanner();
-        XmlParser.parse(Path.of(".idea", "misc.xml"), projectDescriptorScanner);
-        Path projectOutputDirectory = projectDescriptorScanner.getOutputDirectory();
-
-        ModulesScanner modulesScanner = new ModulesScanner();
-        Files.walkFileTree(Paths.WORKING_DIRECTORY, modulesScanner);
-        modules = modulesScanner.getModules(projectOutputDirectory);
-    }
-
-    private void build() throws Exception {
-        for (Module module : modules) {
+    private void package_() throws Exception {
+        for (Module module : project.getModules()) {
+            Path productionOutputDirectory = module.getProductionOutputDirectory();
             String artifactName = module.getArtifactName();
-            createJar(JarSource.single(module.getProductionOutputDirectory()), artifactName);
-            createJar(module.getSourceFolders(), artifactName + "-sources");
+            if (Files.exists(productionOutputDirectory)) {
+                createJar(JarSource.single(productionOutputDirectory), artifactName);
+            } else {
+                System.out.println("Module has not been compiled (skipping): " + module.getName());
+            }
+            createJar(module.getJavaSourceFolders(), artifactName + "-sources");
         }
     }
 

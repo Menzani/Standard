@@ -3,21 +3,33 @@ package eu.menzani.system;
 import eu.menzani.SunUnsafe;
 
 public enum Platform {
-    LINUX_32(false, true, false, true),
-    LINUX_64(false, true, false, false),
-    WINDOWS_32(true, false, false, true),
-    WINDOWS_64(true, false, false, false),
-    MAC_32(false, false, true, true),
-    MAC_64(false, false, true, false);
+    LINUX_32(Family.LINUX, Architecture.BIT_32, false, true, false, true),
+    LINUX_64(Family.LINUX, Architecture.BIT_64, false, true, false, false),
+    WINDOWS_32(Family.WINDOWS, Architecture.BIT_32, true, false, false, true),
+    WINDOWS_64(Family.WINDOWS, Architecture.BIT_64, true, false, false, false),
+    MAC_32(Family.MAC, Architecture.BIT_32, false, false, true, true),
+    MAC_64(Family.MAC, Architecture.BIT_64, false, false, true, false);
 
+    private final Family family;
+    private final Architecture architecture;
     private final boolean isWindows, isLinux, isMac;
     private final boolean is32Bit;
 
-    Platform(boolean isWindows, boolean isLinux, boolean isMac, boolean is32Bit) {
+    Platform(Family family, Architecture architecture, boolean isWindows, boolean isLinux, boolean isMac, boolean is32Bit) {
+        this.family = family;
+        this.architecture = architecture;
         this.isWindows = isWindows;
         this.isLinux = isLinux;
         this.isMac = isMac;
         this.is32Bit = is32Bit;
+    }
+
+    public Family getFamily() {
+        return family;
+    }
+
+    public Architecture getArchitecture() {
+        return architecture;
     }
 
     public boolean isWindows() {
@@ -74,6 +86,17 @@ public enum Platform {
         } else {
             throw new AssertionError();
         }
+    }
+
+    public enum Family {
+        WINDOWS,
+        LINUX,
+        MAC
+    }
+
+    public enum Architecture {
+        BIT_32,
+        BIT_64
     }
 
     private static class OopsCompressed {

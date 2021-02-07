@@ -1,7 +1,6 @@
 package eu.menzani.build;
 
 import eu.menzani.misc.XmlParser;
-import eu.menzani.system.Paths;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -13,13 +12,16 @@ import java.util.Collections;
 import java.util.List;
 
 class ModulesScanner extends SimpleFileVisitor<Path> {
-    private static final String projectName = Paths.WORKING_DIRECTORY.getFileName().toString();
-
+    private final String projectName;
     private final List<Module> modules = new ArrayList<>();
 
-    List<Module> getModules(Path projectOutputDirectory) throws IOException {
+    ModulesScanner(String projectName) {
+        this.projectName = projectName;
+    }
+
+    List<Module> getModules(Path projectOutputDirectory) {
         for (Module module : modules) {
-            module.computeOutputDirectory(projectOutputDirectory);
+            module.computeOutputDirectories(projectOutputDirectory);
         }
         return Collections.unmodifiableList(modules);
     }
@@ -31,7 +33,7 @@ class ModulesScanner extends SimpleFileVisitor<Path> {
             case "res":
             case "test":
             case "unit-test":
-            case "native":
+            case Module.NATIVE_FOLDER_NAME:
             case "lib":
             case ".idea":
             case ".git":
@@ -55,9 +57,9 @@ class ModulesScanner extends SimpleFileVisitor<Path> {
 
             ModuleDescriptorScanner moduleDescriptorScanner = new ModuleDescriptorScanner();
             XmlParser.parse(file, moduleDescriptorScanner);
-            List<JarSource> sourceFolders = moduleDescriptorScanner.getSourceFolders(directory, name);
+            List<JarSource> javaSourceFolders = moduleDescriptorScanner.getSourceFolders(directory, name);
 
-            modules.add(new Module(directory, name, artifactName, sourceFolders));
+            modules.add(new Module(directory, name, artifactName, javaSourceFolders));
         }
         return FileVisitResult.CONTINUE;
     }

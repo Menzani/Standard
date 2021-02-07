@@ -50,6 +50,8 @@ public class SystemProperty extends RuntimeProperty {
     public static final Set<Path> CLASS_PATH = mapToPath(CLASS_PATH_STRING);
     public static final Set<Path> MODULE_PATH = mapToPath(MODULE_PATH_STRING);
 
+    public static final Path JAVA_HOME = new SystemProperty("java", "home").getAsPath();
+
     private static Set<Path> mapToPath(@Optional String string) {
         if (string == null) {
             return Collections.emptySet();

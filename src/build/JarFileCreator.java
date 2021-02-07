@@ -1,6 +1,6 @@
 package eu.menzani.build;
 
-import eu.menzani.system.Unsafe;
+import eu.menzani.InternalUnsafe;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -21,7 +21,7 @@ class JarFileCreator extends SimpleFileVisitor<Path> implements Closeable {
         fileSystem = FileSystems.newFileSystem(URI.create("jar:file:/" + fileToString), env);
 
         Field readOnly = fileSystem.getClass().getDeclaredField("readOnly");
-        Unsafe.setAccessible(readOnly);
+        InternalUnsafe.setAccessible(readOnly);
         readOnly.set(fileSystem, false);
     }
 

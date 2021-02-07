@@ -1,6 +1,6 @@
 package eu.menzani.build;
 
-import eu.menzani.misc.EndVisit;
+import eu.menzani.lang.EndVisit;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 

@@ -1,8 +1,10 @@
 package eu.menzani.test;
 
 import eu.menzani.benchmark.Stopwatch;
+import eu.menzani.build.Module;
 import eu.menzani.collection.ArrayBuilder;
-import eu.menzani.system.Paths;
+import eu.menzani.struct.Paths;
+import eu.menzani.system.SystemPaths;
 import eu.menzani.system.SystemProperty;
 
 import java.io.IOException;
@@ -29,7 +31,7 @@ class Runner {
         stopwatch.stop();
     }
 
-    private static final Path ideaProductionOutputPath = Path.of("production");
+    private static final Path ideaProductionOutputPath = Path.of(Module.PRODUCTION_FOLDER_NAME);
     private static final Path ideaTestOutputPath = Path.of("test");
 
     private static final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
@@ -45,7 +47,7 @@ class Runner {
 
     private void scan(Set<Path> paths) throws IOException {
         for (Path path : paths) {
-            if (Paths.isWorkingDirectory(path)) continue;
+            if (SystemPaths.isWorkingDirectory(path)) continue;
             int indexOfIdeaProductionOutputPath = Paths.indexOf(path, ideaProductionOutputPath);
             if (indexOfIdeaProductionOutputPath != -1) {
                 Path ideaModuleTestOutputPath = Paths.replace(path, indexOfIdeaProductionOutputPath, ideaTestOutputPath);

@@ -1,6 +1,4 @@
-package eu.menzani.misc;
-
-import eu.menzani.lang.ControlFlowException;
+package eu.menzani.lang;
 
 public class EndVisit extends ControlFlowException {
     public static final EndVisit INSTANCE = new EndVisit();

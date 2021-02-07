@@ -5,7 +5,6 @@ import eu.menzani.lang.Check;
 import eu.menzani.lang.Optional;
 
 import java.nio.file.Path;
-import java.util.function.Supplier;
 
 public abstract class RuntimeProperty {
     final String key;
@@ -51,10 +50,10 @@ public abstract class RuntimeProperty {
         return Path.of(value);
     }
 
-    public Path getAsPathOr(Supplier<? extends Path> defaultValue) {
+    public Path getAsPathOr(Path defaultValue) {
         String value = getOrNull();
         if (value == null) {
-            return defaultValue.get();
+            return defaultValue;
         }
         return Path.of(value);
     }

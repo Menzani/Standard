@@ -34,4 +34,12 @@ public class Nonblocking {
             throw new AssertionError();
         }
     }
+
+    public static void waitFor(Process process) {
+        try {
+            process.waitFor();
+        } catch (InterruptedException e) {
+            throw new AssertionError();
+        }
+    }
 }

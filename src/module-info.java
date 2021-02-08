@@ -12,6 +12,7 @@ module eu.menzani {
     exports eu.menzani.error;
     exports eu.menzani.io;
     exports eu.menzani.lang;
+    exports eu.menzani.lang.caller;
     exports eu.menzani.lang.mutable;
     exports eu.menzani.misc;
     exports eu.menzani.struct;

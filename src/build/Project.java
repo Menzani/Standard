@@ -9,7 +9,9 @@ import java.nio.file.Path;
 import java.util.List;
 
 class Project {
-    private final String name = SystemPaths.WORKING_DIRECTORY.getFileName().toString();
+    private static final Path directory = SystemPaths.WORKING_DIRECTORY;
+    private static final String name = directory.getFileName().toString();
+
     private final List<Module> modules;
 
     Project() throws IOException {
@@ -18,12 +20,8 @@ class Project {
         Path projectOutputDirectory = projectDescriptorScanner.getOutputDirectory();
 
         ModulesScanner modulesScanner = new ModulesScanner(name);
-        Files.walkFileTree(SystemPaths.WORKING_DIRECTORY, modulesScanner);
+        Files.walkFileTree(directory, modulesScanner);
         modules = modulesScanner.getModules(projectOutputDirectory);
-    }
-
-    String getName() {
-        return name;
     }
 
     List<Module> getModules() {

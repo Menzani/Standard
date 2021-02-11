@@ -1,5 +1,6 @@
 package eu.menzani.build;
 
+import eu.menzani.io.PrintToConsoleException;
 import eu.menzani.io.SimpleDirectoryStreamFilter;
 import eu.menzani.struct.FileExtension;
 import eu.menzani.system.Platform;
@@ -33,7 +34,7 @@ class CppCompiler {
         Files.createDirectories(outputFileWithoutExtension.getParent());
     }
 
-    void compile() throws CppCompilerException, IOException {
+    void compile() throws IOException {
         switch (Platform.current().getFamily()) {
             case WINDOWS:
                 compileWindows();
@@ -48,7 +49,7 @@ class CppCompiler {
         }
     }
 
-    private void compileWindows() throws CppCompilerException, IOException {
+    private void compileWindows() throws IOException {
         Set<Path> sources = findSources("windows");
         WindowsCppCompiler compiler = new WindowsCppCompiler(sources, outputFolder, outputFileWithoutExtension);
         compiler.invokeCl();
@@ -66,15 +67,18 @@ class CppCompiler {
                 sources.add(path);
             }
         }
+        if (sources.isEmpty()) {
+            throw new PrintToConsoleException("No sources found.");
+        }
         return Collections.unmodifiableSet(sources);
     }
 
     static String outputFileSuffixFor(Platform.Architecture architecture) {
         switch (architecture) {
             case BIT_32:
-                return "32";
+                return "_32";
             case BIT_64:
-                return "64";
+                return "_64";
             default:
                 throw new AssertionError();
         }

@@ -1,6 +1,6 @@
 package eu.menzani.error;
 
-import eu.menzani.misc.Patterns;
+import eu.menzani.struct.Patterns;
 import eu.menzani.swing.Swing;
 
 import java.io.PrintWriter;
@@ -9,6 +9,14 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
+    public static void addIgnored(Class<? extends Throwable> ignored) {
+        try {
+            instance.ignored.add(ignored);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void addAction(Action action) {
         try {
             instance.actions.add(action);
@@ -54,6 +62,7 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
         }
     }
 
+    private final List<Class<? extends Throwable>> ignored = new CopyOnWriteArrayList<>();
     private final List<Action> actions = new CopyOnWriteArrayList<>();
     private final List<SwingAction> swingActions = new CopyOnWriteArrayList<>();
 
@@ -72,6 +81,10 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
             }
             if (throwable instanceof ExceptionInInitializerError) {
                 throwable = throwable.getCause();
+            }
+
+            if (ignored.contains(throwable.getClass())) {
+                return;
             }
 
             StringWriter writer = new StringWriter();

@@ -1,7 +1,9 @@
 package eu.menzani.benchmark;
 
 import eu.menzani.atomic.AtomicLong;
+import eu.menzani.io.PrintToConsoleException;
 import eu.menzani.lang.Lang;
+import eu.menzani.lang.Optional;
 import eu.menzani.time.TimeFormat;
 
 public class Stopwatch {
@@ -10,16 +12,20 @@ public class Stopwatch {
     private long start;
 
     public Stopwatch() {
-        this("");
+        this(null);
     }
 
-    public Stopwatch(String prefix) {
-        this.prefix = prefix;
+    public Stopwatch(@Optional String prefix) {
+        setPrefix(prefix);
         start = System.nanoTime();
     }
 
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
+    public void setPrefix(@Optional String prefix) {
+        if (prefix == null) {
+            this.prefix = "";
+        } else {
+            this.prefix = prefix + " in ";
+        }
     }
 
     public void setMinimumToReport(long minimumToReport) {
@@ -28,19 +34,24 @@ public class Stopwatch {
 
     public void stop() {
         final long end = System.nanoTime();
-        long elapsed = end - start;
+        long elapsed = calculateElapsed(end);
         if (minimumToReport != 0L && elapsed < minimumToReport) {
             return;
-        }
-        if (!prefix.isEmpty()) {
-            prefix += " in ";
         }
         System.out.println(prefix + TimeFormat.formatExecutionTime(elapsed));
     }
 
     public void sum() {
         final long end = System.nanoTime();
-        Sum.INSTANCE.add(end - start);
+        Sum.INSTANCE.add(calculateElapsed(end));
+    }
+
+    private long calculateElapsed(long end) {
+        long elapsed = end - start;
+        if (elapsed < 300L) {
+            throw new PrintToConsoleException("Too little granularity.");
+        }
+        return elapsed;
     }
 
     private static class Sum extends Thread {

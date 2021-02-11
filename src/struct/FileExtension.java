@@ -8,6 +8,9 @@ public class FileExtension {
     public static final FileExtension DLL = new FileExtension("dll");
     public static final FileExtension C = new FileExtension("c");
     public static final FileExtension CPP = new FileExtension("cpp");
+    public static final FileExtension ZIP = new FileExtension("zip");
+    public static final FileExtension JAR = new FileExtension("jar");
+    public static final FileExtension PDF = new FileExtension("pdf");
 
     private final String suffix;
     private final String suffixWithDot;

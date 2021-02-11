@@ -1,5 +1,6 @@
 package eu.menzani.build;
 
+import eu.menzani.io.PrintToConsoleException;
 import eu.menzani.lang.UncaughtException;
 import eu.menzani.misc.NativeLibrary;
 import eu.menzani.system.Platform;
@@ -39,22 +40,16 @@ public class CompileCpp {
     }
 
     private static void main() throws IOException {
-        if (checkRequirements()) return;
+        checkRequirements();
 
         CompileCpp compileCpp = new CompileCpp();
-        try {
-            compileCpp.compile();
-        } catch (CppCompilerException e) {
-            System.err.println(e.getMessage());
-        }
+        compileCpp.compile();
     }
 
-    private static boolean checkRequirements() {
+    private static void checkRequirements() {
         if (!Platform.current().is64Bit()) {
-            System.err.println("Platform must be 64-bit.");
-            return true;
+            throw new PrintToConsoleException("Platform must be 64-bit.");
         }
-        return false;
     }
 
     private final Project project;
@@ -63,7 +58,7 @@ public class CompileCpp {
         project = new Project();
     }
 
-    private void compile() throws IOException, CppCompilerException {
+    private void compile() throws IOException {
         for (Module module : project.getModules()) {
             Path nativeSourceFolder = module.getNativeSourceFolder();
             if (Files.exists(nativeSourceFolder)) {

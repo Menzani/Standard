@@ -1,8 +1,10 @@
 package eu.menzani.build;
 
+import eu.menzani.lang.UncaughtException;
 import eu.menzani.system.Platform;
 
 import java.io.IOException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -13,7 +15,24 @@ class Package {
         package_.package_();
     }
 
-    private static final Path output = Path.of("R:");
+    private static final Path outputPath = findOutputPath();
+
+    private static Path findOutputPath() {
+        final Path ramdisk = Path.of("R:", Project.NAME);
+        try {
+            try {
+                Files.createDirectories(ramdisk);
+                return ramdisk;
+            } catch (FileSystemException e) {
+                if (e.getReason().equals("Unable to determine if root directory exists")) {
+                    return Project.DIRECTORY;
+                }
+                throw e;
+            }
+        } catch (IOException e) {
+            throw new UncaughtException(e);
+        }
+    }
 
     private final Project project;
 
@@ -35,7 +54,7 @@ class Package {
     }
 
     private void createJar(List<JarSource> sources, String fileName) throws Exception {
-        Path file = output.resolve(fileName + ".jar");
+        Path file = outputPath.resolve(fileName + ".jar");
         String fileToString = file.toString();
         if (Platform.current().isWindows()) {
             fileToString = fileToString.replace('\\', '/');

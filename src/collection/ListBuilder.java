@@ -29,11 +29,4 @@ public class ListBuilder<F, T> extends CollectionBuilder<F> {
     public List<T> buildUnmodifiable() {
         return Collections.unmodifiableList(to);
     }
-
-    @SafeVarargs
-    public static <T> ArrayList<T> fromArray(T... elements) {
-        ArrayList<T> list = new ArrayList<>(elements.length);
-        Collections.addAll(list, elements);
-        return list;
-    }
 }

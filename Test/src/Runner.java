@@ -62,11 +62,11 @@ class Runner {
     private void buildIndex() throws ReflectiveOperationException {
         scanner.loadClasses(getClass());
 
-        ArrayBuilder<ParsedClassFile, TestClass> indexBuilder = new ArrayBuilder<>(scanner.getTestClasses(), TestClass.class);
+        var indexBuilder = new ArrayBuilder<>(scanner.getTestClasses(), TestClass.class);
         for (ParsedClassFile classFile : indexBuilder) {
             Class<?> clazz = classFile.getLoadedClass();
 
-            ArrayBuilder<Method, TestMethod> testMethodsBuilder = new ArrayBuilder<>(clazz.getMethods(), TestMethod.class);
+            var testMethodsBuilder = new ArrayBuilder<>(clazz.getMethods(), TestMethod.class);
             for (Method method : testMethodsBuilder) {
                 if (method.getDeclaringClass() == Object.class) continue;
                 testMethodsBuilder.add(new TestMethod(method));

@@ -29,11 +29,4 @@ public class SetBuilder<F, T> extends CollectionBuilder<F> {
     public Set<T> buildUnmodifiable() {
         return Collections.unmodifiableSet(to);
     }
-
-    @SafeVarargs
-    public static <T> HashSet<T> fromArray(T... elements) {
-        HashSet<T> set = new HashSet<>(elements.length);
-        Collections.addAll(set, elements);
-        return set;
-    }
 }

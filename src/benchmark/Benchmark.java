@@ -1,6 +1,6 @@
 package eu.menzani.benchmark;
 
-import eu.menzani.collection.ListBuilder;
+import eu.menzani.collection.Lists;
 import eu.menzani.lang.Check;
 import eu.menzani.lang.Nonblocking;
 import eu.menzani.lang.UncaughtException;
@@ -74,7 +74,7 @@ public abstract class Benchmark {
             runBenchmark();
         } else {
             Class<?> clazz = getClass();
-            List<String> command = ListBuilder.fromArray(
+            List<String> command = Lists.fromArray(
                     getJavaRuntime().toString(),
                     launched.setAsBoolean(true).toString(),
                     "-Xms8g",

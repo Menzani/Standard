@@ -1,6 +1,6 @@
 package eu.menzani.test;
 
-import eu.menzani.misc.Arrays;
+import eu.menzani.struct.Arrays;
 import eu.menzani.system.Unsafe;
 
 import java.lang.reflect.Modifier;

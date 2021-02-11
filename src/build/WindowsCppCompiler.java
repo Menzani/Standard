@@ -1,5 +1,6 @@
 package eu.menzani.build;
 
+import eu.menzani.io.PrintToConsoleException;
 import eu.menzani.lang.Nonblocking;
 import eu.menzani.system.Platform;
 import eu.menzani.system.SystemProperty;
@@ -12,19 +13,9 @@ import java.util.List;
 import java.util.Set;
 
 class WindowsCppCompiler {
-    private final Path vcvarsallPath;
-    private final Set<Path> sources;
-    private final Path workingDirectory;
-    private final Path outputFileWithoutExtension;
+    private static final Path vcvarsallPath = findVcvarsallPath();
 
-    WindowsCppCompiler(Set<Path> sources, Path workingDirectory, Path outputFileWithoutExtension) throws CppCompilerException {
-        vcvarsallPath = findVcvarsallPath();
-        this.sources = sources;
-        this.workingDirectory = workingDirectory;
-        this.outputFileWithoutExtension = outputFileWithoutExtension;
-    }
-
-    private static Path findVcvarsallPath() throws CppCompilerException {
+    private static Path findVcvarsallPath() {
         final Path fromBuildTools = Path.of("C:", "Program Files (x86)", "Microsoft Visual Studio", "2019", "BuildTools", "VC", "Auxiliary", "Build", "vcvarsall.bat");
         if (Files.exists(fromBuildTools)) {
             return fromBuildTools;
@@ -37,7 +28,17 @@ class WindowsCppCompiler {
         if (Files.exists(fromProfessional)) {
             return fromProfessional;
         }
-        throw new CppCompilerException("Could not find vcvarsall.bat file.");
+        throw new PrintToConsoleException("Could not find vcvarsall.bat file.");
+    }
+
+    private final Set<Path> sources;
+    private final Path workingDirectory;
+    private final Path outputFileWithoutExtension;
+
+    WindowsCppCompiler(Set<Path> sources, Path workingDirectory, Path outputFileWithoutExtension) {
+        this.sources = sources;
+        this.workingDirectory = workingDirectory;
+        this.outputFileWithoutExtension = outputFileWithoutExtension;
     }
 
     void invokeCl() throws IOException {
@@ -51,7 +52,7 @@ class WindowsCppCompiler {
         builder.directory(workingDirectory.toFile());
         Process process = builder.start();
 
-        String outputFile = outputFileWithoutExtension.toAbsolutePath().toString() + '_' + CppCompiler.outputFileSuffixFor(architecture);
+        String outputFile = outputFileWithoutExtension.toAbsolutePath().toString() + CppCompiler.outputFileSuffixFor(architecture);
         try (OutputStreamWriter writer = new OutputStreamWriter(process.getOutputStream())) {
             writer.append("call \"");
             writer.append(vcvarsallPath.toString());

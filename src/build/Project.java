@@ -9,8 +9,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 class Project {
-    private static final Path directory = SystemPaths.WORKING_DIRECTORY;
-    private static final String name = directory.getFileName().toString();
+    static final Path DIRECTORY = SystemPaths.WORKING_DIRECTORY;
+    static final String NAME = DIRECTORY.getFileName().toString();
 
     private final List<Module> modules;
 
@@ -19,8 +19,8 @@ class Project {
         XmlParser.parse(Path.of(".idea", "misc.xml"), projectDescriptorScanner);
         Path projectOutputDirectory = projectDescriptorScanner.getOutputDirectory();
 
-        ModulesScanner modulesScanner = new ModulesScanner(name);
-        Files.walkFileTree(directory, modulesScanner);
+        ModulesScanner modulesScanner = new ModulesScanner(NAME);
+        Files.walkFileTree(DIRECTORY, modulesScanner);
         modules = modulesScanner.getModules(projectOutputDirectory);
     }
 

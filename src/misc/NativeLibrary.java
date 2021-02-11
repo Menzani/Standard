@@ -5,6 +5,7 @@ import eu.menzani.lang.Assert;
 import eu.menzani.lang.UncaughtException;
 import eu.menzani.struct.FileExtension;
 import eu.menzani.struct.Paths;
+import eu.menzani.struct.Strings;
 import eu.menzani.system.ApplicationProperty;
 import eu.menzani.system.Platform;
 import eu.menzani.system.PlatformNotSupportedException;

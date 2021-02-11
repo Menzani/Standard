@@ -1,4 +1,4 @@
-package eu.menzani.misc;
+package eu.menzani.struct;
 
 public class Strings {
     public static String firstLetterToUppercase(String string) {

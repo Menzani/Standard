@@ -48,7 +48,7 @@ public class ResizableArray<T> implements Iterable<T> {
     }
 
     public ArrayView<T> view() {
-        return new ArrayView<>(array);
+        return new ArrayView<>(asFixedArray());
     }
 
     @Override

@@ -7,8 +7,8 @@ import eu.menzani.struct.FileExtension;
 import eu.menzani.struct.Paths;
 import eu.menzani.struct.Strings;
 import eu.menzani.system.ApplicationProperty;
-import eu.menzani.system.Platform;
-import eu.menzani.system.PlatformNotSupportedException;
+import eu.menzani.system.PlatformDependantValue;
+import eu.menzani.system.PlatformFamilyDependantValue;
 import eu.menzani.system.SystemPaths;
 
 import java.io.IOException;
@@ -31,9 +31,8 @@ public class NativeLibrary {
     }
 
     public void load() {
-        String name = libraryName();
-        FileExtension fileExtension = libraryFileExtension();
-        String extension = fileExtension.getSuffixWithDot();
+        String name = new LibraryName().get();
+        String extension = new LibraryFileExtension().get().getSuffixWithDot();
         Path path = libraryDirectory().resolve(name + '_' + versionId + extension);
 
         String resourceName = FOLDER_IN_ARTIFACT + '/' + name + extension;
@@ -64,34 +63,37 @@ public class NativeLibrary {
         }
     }
 
-    private String libraryName() {
-        switch (Platform.current()) {
-            case LINUX_32:
-                return "lib" + lowercaseModuleName + "_32";
-            case LINUX_64:
-                return "lib" + lowercaseModuleName + "_64";
-            case WINDOWS_32:
-                return Strings.firstLetterToUppercase(lowercaseModuleName) + "_32";
-            case WINDOWS_64:
-                return Strings.firstLetterToUppercase(lowercaseModuleName) + "_64";
-            case MAC_32:
-            case MAC_64:
-                throw new PlatformNotSupportedException();
-            default:
-                throw new AssertionError();
+    private class LibraryName extends PlatformDependantValue<String> {
+        @Override
+        protected String onWindows32() {
+            return Strings.firstLetterToUppercase(lowercaseModuleName) + "_32";
+        }
+
+        @Override
+        protected String onWindows64() {
+            return Strings.firstLetterToUppercase(lowercaseModuleName) + "_64";
+        }
+
+        @Override
+        protected String onLinux32() {
+            return "lib" + lowercaseModuleName + "_32";
+        }
+
+        @Override
+        protected String onLinux64() {
+            return "lib" + lowercaseModuleName + "_64";
         }
     }
 
-    private static FileExtension libraryFileExtension() {
-        switch (Platform.current().getFamily()) {
-            case WINDOWS:
-                return FileExtension.DLL;
-            case LINUX:
-                return FileExtension.SO;
-            case MAC:
-                throw new PlatformNotSupportedException();
-            default:
-                throw new AssertionError();
+    private static class LibraryFileExtension extends PlatformFamilyDependantValue<FileExtension> {
+        @Override
+        protected FileExtension onWindows() {
+            return FileExtension.DLL;
+        }
+
+        @Override
+        protected FileExtension onLinux() {
+            return FileExtension.SO;
         }
     }
 

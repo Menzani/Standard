@@ -65,12 +65,7 @@ public class ThreadSpreader {
         }
 
         public Builder skipHyperthreads() {
-            increment(2);
-            return this;
-        }
-
-        public Builder skipFourWayHyperthreads() {
-            increment(4);
+            increment(Platform.getNumberOfHardwareThreadsPerCore());
             return this;
         }
 
@@ -95,7 +90,7 @@ public class ThreadSpreader {
                 throw new IllegalStateException("You must call fromCPU() or fromFirstCPU().");
             }
             if (increment == -1) {
-                throw new IllegalStateException("You must call increment(), skipHyperthreads() or skipFourWayHyperthreads().");
+                throw new IllegalStateException("You must call increment() or skipHyperthreads().");
             }
             if (lastCPU == -1) {
                 throw new IllegalStateException("You must call toCPU() or toLastCPU().");

@@ -1,6 +1,13 @@
 package eu.menzani.system;
 
 import eu.menzani.SunUnsafe;
+import eu.menzani.io.IOStreams;
+import eu.menzani.lang.Nonblocking;
+import eu.menzani.misc.ParseException;
+import eu.menzani.struct.Patterns;
+
+import java.io.IOException;
+import java.util.List;
 
 public enum Platform {
     LINUX_32(Family.LINUX, Architecture.BIT_32, false, true, false, true),
@@ -62,9 +69,21 @@ public enum Platform {
         return OopsCompressed.value;
     }
 
+    public static int getNumberOfCores() {
+        return CPUInfo.numberOfCores;
+    }
+
+    public static int getNumberOfHardwareThreads() {
+        return CPUInfo.numberOfHardwareThreads;
+    }
+
+    public static int getNumberOfHardwareThreadsPerCore() {
+        return CPUInfo.numberOfHardwareThreadsPerCore;
+    }
+
     static {
-        String osName = new SystemProperty("os.name").get();
-        boolean is32Bit = new SystemProperty("sun.arch.data.model").get().equals("32");
+        String osName = new SystemProperty("os", "name").get();
+        boolean is32Bit = new SystemProperty("sun", "arch", "data", "model").get().equals("32");
         if (osName.contains("Windows")) {
             if (is32Bit) {
                 current = WINDOWS_32;
@@ -116,6 +135,50 @@ public enum Platform {
             } else {
                 throw new AssertionError();
             }
+        }
+    }
+
+    private static class CPUInfo extends PlatformFamilyDependant {
+        static final int numberOfCores;
+        static final int numberOfHardwareThreads;
+        static final int numberOfHardwareThreadsPerCore;
+
+        static {
+            CPUInfo cpuInfo = new CPUInfo();
+            numberOfCores = cpuInfo._numberOfCores;
+            numberOfHardwareThreads = cpuInfo._numberOfHardwareThreads;
+            numberOfHardwareThreadsPerCore = numberOfHardwareThreads * numberOfCores;
+        }
+
+        private int _numberOfCores = -1;
+        private int _numberOfHardwareThreads = -1;
+
+        @Override
+        protected void onWindows() throws IOException {
+            ProcessBuilder builder = new ProcessBuilder(List.of(
+                    "wmic", "CPU", "Get", "NumberOfCores,NumberOfLogicalProcessors", "/Format:List"));
+            Process process = builder.start();
+            Nonblocking.waitFor(process);
+            String output = IOStreams.toString(process.getInputStream());
+            String[] lines = Patterns.SPLIT_BY_NEWLINE.split(output);
+            for (String line : lines) {
+                if (line.isEmpty()) continue;
+                int indexOfEquals = line.indexOf('=');
+                String key = line.substring(0, indexOfEquals);
+                int value = Integer.parseInt(line.substring(indexOfEquals + 1));
+                switch (key) {
+                    case "NumberOfCores":
+                        _numberOfCores = value;
+                        break;
+                    case "NumberOfLogicalProcessors":
+                        _numberOfHardwareThreads = value;
+                        break;
+                    default:
+                        throw new ParseException();
+                }
+            }
+            if (_numberOfCores == -1) throw new ParseException();
+            if (_numberOfHardwareThreads == -1) throw new ParseException();
         }
     }
 }

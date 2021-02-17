@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 class Project {
+    static final String IDEA_FOLDER_NAME = ".idea";
     static final Path DIRECTORY = SystemPaths.WORKING_DIRECTORY;
     static final String NAME = DIRECTORY.getFileName().toString();
 
@@ -16,7 +17,7 @@ class Project {
 
     Project() throws IOException {
         ProjectDescriptorScanner projectDescriptorScanner = new ProjectDescriptorScanner();
-        XmlParser.parse(Path.of(".idea", "misc.xml"), projectDescriptorScanner);
+        XmlParser.parse(Path.of(IDEA_FOLDER_NAME, "misc.xml"), projectDescriptorScanner);
         Path projectOutputDirectory = projectDescriptorScanner.getOutputDirectory();
 
         ModulesScanner modulesScanner = new ModulesScanner(NAME);

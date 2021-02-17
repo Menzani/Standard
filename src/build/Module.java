@@ -4,8 +4,9 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class Module {
-    static final String NATIVE_FOLDER_NAME = "native";
-    public static final String PRODUCTION_FOLDER_NAME = "production";
+    public static final Path PRODUCTION_OUTPUT_FOLDER = Path.of("production");
+    static final String NATIVE_OUTPUT_FOLDER_NAME = "native";
+    private static final Path nativeOutputFolder = Path.of(NATIVE_OUTPUT_FOLDER_NAME);
 
     private final String name;
     private final String artifactName;
@@ -18,12 +19,12 @@ public class Module {
         this.name = name;
         this.artifactName = artifactName;
         this.javaSourceFolders = javaSourceFolders;
-        nativeSourceFolder = directory.resolve(NATIVE_FOLDER_NAME);
+        nativeSourceFolder = directory.resolve(nativeOutputFolder);
     }
 
     void computeOutputDirectories(Path projectOutputDirectory) {
-        productionOutputDirectory = projectOutputDirectory.resolve(PRODUCTION_FOLDER_NAME).resolve(name);
-        nativeOutputDirectory = projectOutputDirectory.resolve(NATIVE_FOLDER_NAME).resolve(name);
+        productionOutputDirectory = projectOutputDirectory.resolve(PRODUCTION_OUTPUT_FOLDER).resolve(name);
+        nativeOutputDirectory = projectOutputDirectory.resolve(nativeOutputFolder).resolve(name);
     }
 
     String getName() {

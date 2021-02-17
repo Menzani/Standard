@@ -27,23 +27,19 @@ import java.nio.file.Path;
  * }</pre>
  */
 public class CompileCpp {
+    public static void main(String[] args) {
+        run();
+    }
+
     public static void run() {
+        checkRequirements();
+
         try {
-            main();
+            CompileCpp compileCpp = new CompileCpp();
+            compileCpp.compile();
         } catch (IOException e) {
             throw new UncaughtException(e);
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        main();
-    }
-
-    private static void main() throws IOException {
-        checkRequirements();
-
-        CompileCpp compileCpp = new CompileCpp();
-        compileCpp.compile();
     }
 
     private static void checkRequirements() {
@@ -62,8 +58,10 @@ public class CompileCpp {
         for (Module module : project.getModules()) {
             Path nativeSourceFolder = module.getNativeSourceFolder();
             if (Files.exists(nativeSourceFolder)) {
-                Path outputFileWithoutExtension = module.getProductionOutputDirectory().resolve(NativeLibrary.FOLDER_IN_ARTIFACT).resolve(module.getName());
-                CppCompiler cppCompiler = new CppCompiler(nativeSourceFolder, module.getNativeOutputDirectory(), outputFileWithoutExtension);
+                Path outputFileWithoutExtension = module.getProductionOutputDirectory()
+                        .resolve(NativeLibrary.FOLDER_IN_ARTIFACT).resolve(module.getName());
+                CppCompiler cppCompiler = new CppCompiler(
+                        nativeSourceFolder, module.getNativeOutputDirectory(), outputFileWithoutExtension);
                 cppCompiler.createOutputFolders();
                 cppCompiler.compile();
             }

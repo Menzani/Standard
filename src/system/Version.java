@@ -26,7 +26,7 @@ public enum Version {
     }
 
     static {
-        switch (new SystemProperty("java.version").get().charAt(1)) {
+        switch (new SystemProperty("java", "version").get().charAt(1)) {
             case '1':
                 current = JAVA_11;
                 break;

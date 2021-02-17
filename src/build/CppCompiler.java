@@ -4,7 +4,7 @@ import eu.menzani.io.PrintToConsoleException;
 import eu.menzani.io.SimpleDirectoryStreamFilter;
 import eu.menzani.struct.FileExtension;
 import eu.menzani.system.Platform;
-import eu.menzani.system.PlatformNotSupportedException;
+import eu.menzani.system.PlatformFamilyDependant;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -34,43 +34,31 @@ class CppCompiler {
         Files.createDirectories(outputFileWithoutExtension.getParent());
     }
 
-    void compile() throws IOException {
-        switch (Platform.current().getFamily()) {
-            case WINDOWS:
-                compileWindows();
-                break;
-            case LINUX:
-                compileLinux();
-                break;
-            case MAC:
-                throw new PlatformNotSupportedException();
-            default:
-                throw new AssertionError();
+    void compile() {
+        new Compile();
+    }
+
+    private class Compile extends PlatformFamilyDependant {
+        @Override
+        protected void onWindows() throws IOException {
+            Set<Path> sources = findSources("windows");
+            WindowsCppCompiler compiler = new WindowsCppCompiler(sources, outputFolder, outputFileWithoutExtension);
+            compiler.invokeCl();
         }
-    }
 
-    private void compileWindows() throws IOException {
-        Set<Path> sources = findSources("windows");
-        WindowsCppCompiler compiler = new WindowsCppCompiler(sources, outputFolder, outputFileWithoutExtension);
-        compiler.invokeCl();
-    }
-
-    private void compileLinux() {
-
-    }
-
-    private Set<Path> findSources(String fileNameSuffix) throws IOException {
-        SimpleDirectoryStreamFilter filter = filterBuilder.orMustEndWith('_' + fileNameSuffix).build();
-        Set<Path> sources = new HashSet<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(sourcesFolder, filter)) {
-            for (Path path : stream) {
-                sources.add(path);
+        private Set<Path> findSources(String fileNameSuffix) throws IOException {
+            SimpleDirectoryStreamFilter filter = filterBuilder.orMustEndWith('_' + fileNameSuffix).build();
+            Set<Path> sources = new HashSet<>();
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(sourcesFolder, filter)) {
+                for (Path path : stream) {
+                    sources.add(path);
+                }
             }
+            if (sources.isEmpty()) {
+                throw new PrintToConsoleException("No sources found.");
+            }
+            return Collections.unmodifiableSet(sources);
         }
-        if (sources.isEmpty()) {
-            throw new PrintToConsoleException("No sources found.");
-        }
-        return Collections.unmodifiableSet(sources);
     }
 
     static String outputFileSuffixFor(Platform.Architecture architecture) {

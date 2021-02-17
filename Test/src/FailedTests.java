@@ -1,6 +1,6 @@
 package eu.menzani.test;
 
-import eu.menzani.io.ListFile;
+import eu.menzani.struct.ListFile;
 import eu.menzani.system.SystemPaths;
 
 import java.io.IOException;

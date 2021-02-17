@@ -33,9 +33,9 @@ class ModulesScanner extends SimpleFileVisitor<Path> {
             case "res":
             case "test":
             case "unit-test":
-            case Module.NATIVE_FOLDER_NAME:
+            case Module.NATIVE_OUTPUT_FOLDER_NAME:
             case "lib":
-            case ".idea":
+            case Project.IDEA_FOLDER_NAME:
             case ".git":
                 return FileVisitResult.SKIP_SUBTREE;
         }

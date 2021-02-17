@@ -1,6 +1,4 @@
-package eu.menzani.io;
-
-import eu.menzani.struct.Patterns;
+package eu.menzani.struct;
 
 import java.io.Closeable;
 import java.io.IOException;

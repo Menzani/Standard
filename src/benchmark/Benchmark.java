@@ -10,7 +10,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -56,10 +55,6 @@ public abstract class Benchmark {
                         .build());
     }
 
-    protected Path getJavaRuntime() {
-        return Path.of("java");
-    }
-
     protected boolean shouldAutoProfile() {
         return true;
     }
@@ -75,7 +70,7 @@ public abstract class Benchmark {
         } else {
             Class<?> clazz = getClass();
             List<String> command = Lists.fromArray(
-                    getJavaRuntime().toString(),
+                    SystemPaths.JAVA_RUNTIME.toString(),
                     launched.setAsBoolean(true).toString(),
                     "-Xms8g",
                     "-Xmx8g",

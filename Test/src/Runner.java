@@ -32,8 +32,7 @@ class Runner {
         stopwatch.stop();
     }
 
-    private static final Path ideaProductionOutputPath = Path.of(Module.PRODUCTION_FOLDER_NAME);
-    private static final Path ideaTestOutputPath = Path.of("test");
+    private static final Path testOutputFolder = Path.of("test");
 
     private static final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
     private static final MethodType emptyConstructorMethodType = MethodType.methodType(void.class);
@@ -49,11 +48,11 @@ class Runner {
     private void scan(Set<Path> paths) throws IOException {
         for (Path path : paths) {
             if (SystemPaths.isWorkingDirectory(path)) continue;
-            int indexOfIdeaProductionOutputPath = Paths.indexOf(path, ideaProductionOutputPath);
-            if (indexOfIdeaProductionOutputPath != -1) {
-                Path ideaModuleTestOutputPath = Paths.replace(path, indexOfIdeaProductionOutputPath, ideaTestOutputPath);
-                if (Files.exists(ideaModuleTestOutputPath)) {
-                    Files.walkFileTree(ideaModuleTestOutputPath, scanner);
+            int indexOfProductionOutputFolder = Paths.indexOf(path, Module.PRODUCTION_OUTPUT_FOLDER);
+            if (indexOfProductionOutputFolder != -1) {
+                Path moduleTestOutputFolder = Paths.replace(path, indexOfProductionOutputFolder, testOutputFolder);
+                if (Files.exists(moduleTestOutputFolder)) {
+                    Files.walkFileTree(moduleTestOutputFolder, scanner);
                 }
             }
         }

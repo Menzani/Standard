@@ -1,5 +1,4 @@
 .idea/*
-!.idea/artifacts
 !.idea/libraries
 !.idea/runConfigurations
 !.idea/modules.xml

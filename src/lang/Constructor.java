@@ -2,6 +2,8 @@ package eu.menzani.lang;
 
 import eu.menzani.InternalUnsafe;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class Constructor<T> implements Invokable<T> {
     private final java.lang.reflect.Constructor<T> constructor;
 
@@ -27,11 +29,18 @@ public class Constructor<T> implements Invokable<T> {
     }
 
     @Override
+    public T call() {
+        return call(Method.noArgs);
+    }
+
+    @Override
     public T call(Object... arguments) {
         try {
             return constructor.newInstance(arguments);
-        } catch (ReflectiveOperationException e) {
+        } catch (IllegalAccessException | InstantiationException e) {
             throw new UncaughtException(e);
+        } catch (InvocationTargetException e) {
+            throw new UncaughtException(e.getCause());
         }
     }
 }

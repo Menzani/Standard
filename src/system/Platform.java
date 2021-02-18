@@ -147,11 +147,17 @@ public enum Platform {
             CPUInfo cpuInfo = new CPUInfo();
             numberOfCores = cpuInfo._numberOfCores;
             numberOfHardwareThreads = cpuInfo._numberOfHardwareThreads;
-            numberOfHardwareThreadsPerCore = numberOfHardwareThreads * numberOfCores;
+            numberOfHardwareThreadsPerCore = numberOfHardwareThreads / numberOfCores;
         }
 
-        private int _numberOfCores = -1;
-        private int _numberOfHardwareThreads = -1;
+        private int _numberOfCores;
+        private int _numberOfHardwareThreads;
+
+        @Override
+        protected void init() {
+            _numberOfCores = -1;
+            _numberOfHardwareThreads = -1;
+        }
 
         @Override
         protected void onWindows() throws IOException {

@@ -9,6 +9,8 @@ public interface Invokable<T> {
 
     void forceAccessible();
 
+    T call();
+
     T call(Object... arguments);
 
     @SuppressWarnings("unchecked")

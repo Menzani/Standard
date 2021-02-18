@@ -16,9 +16,9 @@ public abstract class ObjectToggle<T> {
     }
 
     public T ensureSet(String exceptionMessage) {
-        if (!toggleNotSet()) {
-            throw new IllegalStateException(exceptionMessage);
+        if (toggleNotSet()) {
+            return get();
         }
-        return get();
+        throw new IllegalStateException(exceptionMessage);
     }
 }

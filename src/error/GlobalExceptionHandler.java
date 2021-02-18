@@ -1,5 +1,6 @@
 package eu.menzani.error;
 
+import eu.menzani.lang.Optional;
 import eu.menzani.struct.Patterns;
 import eu.menzani.swing.Swing;
 
@@ -76,16 +77,8 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
     @Override
     public void uncaughtException(Thread thread, Throwable throwable) {
         try {
-            if (throwable instanceof ThreadDeath) {
-                return;
-            }
-            if (throwable instanceof ExceptionInInitializerError) {
-                throwable = throwable.getCause();
-            }
-
-            if (ignored.contains(throwable.getClass())) {
-                return;
-            }
+            throwable = process(throwable);
+            if (throwable == null) return;
 
             StringWriter writer = new StringWriter();
             throwable.printStackTrace(new PrintWriter(writer));
@@ -117,5 +110,19 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
         } catch (Throwable e) {
             e.printStackTrace();
         }
+    }
+
+    public static @Optional Throwable process(Throwable throwable) {
+        if (throwable instanceof ThreadDeath) {
+            return null;
+        }
+        if (throwable instanceof ExceptionInInitializerError) {
+            throwable = throwable.getCause();
+        }
+
+        if (instance.ignored.contains(throwable.getClass())) {
+            return null;
+        }
+        return throwable;
     }
 }

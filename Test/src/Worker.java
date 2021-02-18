@@ -1,7 +1,5 @@
 package eu.menzani.test;
 
-import java.lang.reflect.InvocationTargetException;
-
 class Worker extends Thread {
     private final WorkerManager manager;
 
@@ -26,28 +24,17 @@ class Worker extends Thread {
                 manager.willNotCancel();
             } catch (Throwable e) {
                 manager.cancel(testClass);
-
-                if (e instanceof ExceptionInInitializerError) {
-                    e = e.getCause();
-                }
-                synchronized (System.err) {
-                    System.err.println(testClass);
-                    e.printStackTrace();
-                }
-                manager.addFailedTest(testClass);
+                manager.onFailure(e, testClass);
                 continue;
             }
 
+            if (manager.shouldPrintCurrentTestMethod()) {
+                System.out.println(testMethod);
+            }
             try {
-                testMethod.getReflected().invoke(instance);
-            } catch (InvocationTargetException e) {
-                synchronized (System.err) {
-                    System.err.println(testMethod);
-                    e.getCause().printStackTrace();
-                }
-                manager.addFailedTest(testMethod);
-            } catch (IllegalAccessException e) {
-                throw new AssertionError();
+                testMethod.runTest(instance);
+            } catch (Throwable e) {
+                manager.onFailure(e, testMethod);
             }
         }
     }

@@ -1,5 +1,7 @@
 package eu.menzani.test;
 
+import eu.menzani.lang.Invokable;
+
 import java.lang.reflect.Method;
 
 class TestMethod extends TestElement {
@@ -15,8 +17,10 @@ class TestMethod extends TestElement {
         return testClass;
     }
 
-    Method getReflected() {
-        return method;
+    void runTest(Object instance) {
+        eu.menzani.lang.Method<?> invokable = Invokable.of(method);
+        invokable.setTargetInstance(instance);
+        invokable.call();
     }
 
     void initTestClass(TestClass testClass) {

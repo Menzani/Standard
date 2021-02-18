@@ -19,7 +19,6 @@ import java.util.Set;
 class Runner {
     public static void main(String[] args) throws Exception {
         Stopwatch stopwatch = new Stopwatch();
-        stopwatch.setMinimumToReport(1_000_000_000L * 5L);
 
         Runner runner = new Runner();
         runner.scan(SystemProperty.CLASS_PATH);
@@ -113,7 +112,13 @@ class Runner {
             for (TestClass testClass : index.getTestClasses()) {
                 enqueue(testClass);
             }
-            stopwatch.setPrefix(failedTests.shouldExecuteOnlyFailed() ? "Re-ran failed tests" : "Completed");
+
+            if (failedTests.shouldExecuteOnlyFailed()) {
+                stopwatch.disableReport();
+            } else {
+                stopwatch.setMinimumToReport(1_000_000_000L * 5L);
+                stopwatch.setPrefix("Completed");
+            }
         } else {
             for (TestClass testClass : index.getTestClasses()) {
                 if (testClass.shouldExecuteOnlyThis()) {
@@ -126,7 +131,9 @@ class Runner {
                     }
                 }
             }
-            stopwatch.setPrefix("Executed some");
+
+            stopwatch.disableReport();
+            workerManager.setPrintCurrentTestMethod(true);
         }
 
         workerManager.run(Runtime.getRuntime().availableProcessors());

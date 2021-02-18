@@ -15,7 +15,7 @@ public class Stopwatch {
         this(null);
     }
 
-    public Stopwatch(@Optional String prefix) {
+    public Stopwatch(String prefix) {
         setPrefix(prefix);
         start = System.nanoTime();
     }
@@ -32,13 +32,16 @@ public class Stopwatch {
         this.minimumToReport = minimumToReport;
     }
 
+    public void disableReport() {
+        minimumToReport = Long.MAX_VALUE;
+    }
+
     public void stop() {
         final long end = System.nanoTime();
         long elapsed = calculateElapsed(end);
-        if (minimumToReport != 0L && elapsed < minimumToReport) {
-            return;
+        if (elapsed >= minimumToReport) {
+            System.out.println(prefix + TimeFormat.formatExecutionTime(elapsed));
         }
-        System.out.println(prefix + TimeFormat.formatExecutionTime(elapsed));
     }
 
     public void sum() {

@@ -2,9 +2,12 @@ package eu.menzani.lang;
 
 import eu.menzani.InternalUnsafe;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
 public class Method<T> implements Invokable<T> {
+    static final Object[] noArgs = new Object[0];
+
     private final java.lang.reflect.Method method;
     private Object targetInstance;
 
@@ -38,12 +41,19 @@ public class Method<T> implements Invokable<T> {
     }
 
     @Override
+    public T call() {
+        return call(noArgs);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public T call(Object... arguments) {
         try {
             return (T) method.invoke(targetInstance, arguments);
-        } catch (ReflectiveOperationException e) {
+        } catch (IllegalAccessException e) {
             throw new UncaughtException(e);
+        } catch (InvocationTargetException e) {
+            throw new UncaughtException(e.getCause());
         }
     }
 }

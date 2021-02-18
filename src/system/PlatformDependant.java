@@ -5,6 +5,7 @@ import eu.menzani.lang.UncaughtException;
 public abstract class PlatformDependant {
     protected PlatformDependant() {
         try {
+            init();
             switch (Platform.current()) {
                 case LINUX_32:
                     onLinux32();
@@ -30,6 +31,9 @@ public abstract class PlatformDependant {
         } catch (Exception e) {
             throw new UncaughtException(e);
         }
+    }
+
+    protected void init() throws Exception {
     }
 
     protected void onWindows32() throws Exception {

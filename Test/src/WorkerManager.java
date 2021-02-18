@@ -1,5 +1,6 @@
 package eu.menzani.test;
 
+import eu.menzani.error.GlobalExceptionHandler;
 import eu.menzani.lang.Nonblocking;
 import eu.menzani.lang.Optional;
 
@@ -19,12 +20,18 @@ class WorkerManager {
     private final List<TestClass> cancelled = new ArrayList<>();
     private final Lock cancelLock = new ReentrantLock();
 
+    private boolean printCurrentTestMethod;
+
     WorkerManager(FailedTests failedTests) {
         this.failedTests = failedTests;
     }
 
     void enqueue(TestMethod testMethod) {
         testMethodsBuilder.add(testMethod);
+    }
+
+    void setPrintCurrentTestMethod(boolean printCurrentTestMethod) {
+        this.printCurrentTestMethod = printCurrentTestMethod;
     }
 
     void run(int parallelism) {
@@ -59,7 +66,19 @@ class WorkerManager {
         cancelLock.unlock();
     }
 
-    void addFailedTest(TestElement testElement) {
+    void onFailure(Throwable throwable, TestElement testElement) {
+        throwable = GlobalExceptionHandler.process(throwable);
+        if (throwable == null) return;
+
+        synchronized (System.err) {
+            System.err.println(testElement);
+            throwable.printStackTrace();
+        }
+
         failedTests.add(testElement);
+    }
+
+    boolean shouldPrintCurrentTestMethod() {
+        return printCurrentTestMethod;
     }
 }

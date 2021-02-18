@@ -43,7 +43,15 @@ public class ConcurrentObjectToggle<T> extends ObjectToggle<T> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public T get() {
-        return Atomic.getAcquire(this, LAST_SET_VALUE);
+        Object value;
+        do {
+            value = Atomic.getAcquire(this, VALUE);
+        } while (value == placeholder);
+        if (value == null) {
+            return Atomic.getAcquire(this, LAST_SET_VALUE);
+        }
+        return (T) value;
     }
 }

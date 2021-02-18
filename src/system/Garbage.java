@@ -4,6 +4,7 @@ import com.sun.management.GarbageCollectionNotificationInfo;
 import com.sun.management.GcInfo;
 import eu.menzani.InternalUnsafe;
 import eu.menzani.lang.StreamBuffer;
+import eu.menzani.lang.UncaughtException;
 import eu.menzani.struct.ConcurrentObjectToggle;
 import eu.menzani.struct.ObjectToggle;
 
@@ -21,12 +22,56 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 public class Garbage {
+    private static final ValuesSumAction valuesSumAction = new ValuesSumAction();
+    private static final ObjectToggle<JVMListener> jvmListener = new ConcurrentObjectToggle<>();
+
     public static void freeMemory(long address) {
         InternalUnsafe.UNSAFE.freeMemory(address);
     }
 
     public static void freeMemory(Object object, long... addresses) {
         Cleaner.value.register(object, new FreeMemory(addresses));
+    }
+
+    public static void logGCs() {
+        addGCListener(new LoggerGCListener());
+    }
+
+    public static long sumValuesToMB(Map<String, MemoryUsage> memoryUsage) {
+        return sumValues(memoryUsage) / (1024L * 1024L);
+    }
+
+    public static long sumValues(Map<String, MemoryUsage> memoryUsage) {
+        synchronized (valuesSumAction) {
+            valuesSumAction.total = 0L;
+            memoryUsage.values().forEach(valuesSumAction); // Should create no garbage
+            return valuesSumAction.total;
+        }
+    }
+
+    public static void addGCListener(GCListener listener) {
+        if (jvmListener.toggleSet()) {
+            MBeanServer platformServer = ManagementFactory.getPlatformMBeanServer();
+            JVMListener jvmListener = new JVMListener();
+            try {
+                for (GarbageCollectorMXBean garbageCollectorMX : ManagementFactory.getGarbageCollectorMXBeans()) {
+                    platformServer.addNotificationListener(garbageCollectorMX.getObjectName(), jvmListener, null, null);
+                }
+            } catch (InstanceNotFoundException e) {
+                throw new UncaughtException(e);
+            }
+            Garbage.jvmListener.set(jvmListener);
+        }
+        jvmListener.get().addUserListener(listener);
+    }
+
+    private static class ValuesSumAction implements Consumer<MemoryUsage> {
+        long total;
+
+        @Override
+        public void accept(MemoryUsage memoryUsage) {
+            total += memoryUsage.getUsed();
+        }
     }
 
     private static class Cleaner {
@@ -48,15 +93,11 @@ public class Garbage {
         }
     }
 
-    public static void logGCs() {
-        addGCListener(new Logger());
-    }
-
-    private static class Logger implements Listener {
+    private static class LoggerGCListener implements GCListener {
         private static final StreamBuffer buffer = StreamBuffer.standardOutput(128);
 
         @Override
-        public void onEvent(GarbageCollectionNotificationInfo notification, GcInfo info) {
+        public void onTriggered(GarbageCollectionNotificationInfo notification, GcInfo info) {
             buffer.reset();
             buffer.builder.append('[');
             buffer.builder.append(notification.getGcName());
@@ -73,56 +114,10 @@ public class Garbage {
         }
     }
 
-    public static long sumValuesToMB(Map<String, MemoryUsage> memoryUsage) {
-        return sumValues(memoryUsage) / (1024L * 1024L);
-    }
-
-    private static final ValuesSumAction valuesSumAction = new ValuesSumAction();
-
-    private static class ValuesSumAction implements Consumer<MemoryUsage> {
-        long total;
-
-        @Override
-        public void accept(MemoryUsage memoryUsage) {
-            total += memoryUsage.getUsed();
-        }
-    }
-
-    public static long sumValues(Map<String, MemoryUsage> memoryUsage) {
-        synchronized (valuesSumAction) {
-            valuesSumAction.total = 0L;
-            memoryUsage.values().forEach(valuesSumAction); // Should create no garbage
-            return valuesSumAction.total;
-        }
-    }
-
-    private static final ObjectToggle<JVMListener> jvmListener = new ConcurrentObjectToggle<>();
-
-    public static void addGCListener(Listener listener) {
-        if (jvmListener.toggleNotSet()) {
-            MBeanServer platformServer = ManagementFactory.getPlatformMBeanServer();
-            JVMListener jvmListener = new JVMListener();
-            try {
-                for (GarbageCollectorMXBean garbageCollectorMX : ManagementFactory.getGarbageCollectorMXBeans()) {
-                    platformServer.addNotificationListener(garbageCollectorMX.getObjectName(), jvmListener, null, null);
-                }
-            } catch (InstanceNotFoundException e) {
-                e.printStackTrace();
-                return;
-            }
-            Garbage.jvmListener.set(jvmListener);
-        }
-        jvmListener.get().addUserListener(listener);
-    }
-
-    public interface Listener {
-        void onEvent(GarbageCollectionNotificationInfo notification, GcInfo info);
-    }
-
     private static class JVMListener implements NotificationListener {
-        private final List<Listener> userListeners = new CopyOnWriteArrayList<>();
+        private final List<GCListener> userListeners = new CopyOnWriteArrayList<>();
 
-        void addUserListener(Listener userListener) {
+        void addUserListener(GCListener userListener) {
             userListeners.add(userListener);
         }
 
@@ -131,7 +126,7 @@ public class Garbage {
             GarbageCollectionNotificationInfo notificationInfo = GarbageCollectionNotificationInfo.from((CompositeData) notification.getUserData());
             GcInfo gcInfo = notificationInfo.getGcInfo();
             for (int i = 0; i < userListeners.size(); i++) {
-                userListeners.get(i).onEvent(notificationInfo, gcInfo);
+                userListeners.get(i).onTriggered(notificationInfo, gcInfo);
             }
         }
     }

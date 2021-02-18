@@ -5,6 +5,7 @@ import eu.menzani.lang.UncaughtException;
 public abstract class PlatformFamilyDependant {
     protected PlatformFamilyDependant() {
         try {
+            init();
             switch (Platform.current().getFamily()) {
                 case WINDOWS:
                     onWindows();
@@ -21,6 +22,9 @@ public abstract class PlatformFamilyDependant {
         } catch (Exception e) {
             throw new UncaughtException(e);
         }
+    }
+
+    protected void init() throws Exception {
     }
 
     protected void onWindows() throws Exception {

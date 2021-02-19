@@ -1,6 +1,6 @@
 package eu.menzani.lang.caller;
 
-import eu.menzani.lang.UncaughtException;
+import eu.menzani.lang.Lang;
 import eu.menzani.struct.ConcurrentKeyedCounter;
 import eu.menzani.struct.KeyedCounter;
 import eu.menzani.system.Unsafe;
@@ -49,10 +49,6 @@ class GeneratedClass<T> {
     @SuppressWarnings("unchecked")
     T createInstance() {
         Class<?> generated = Unsafe.defineClass(callerClassName, writer.toByteArray(), sibling);
-        try {
-            return (T) generated.getConstructor().newInstance();
-        } catch (ReflectiveOperationException e) {
-            throw new UncaughtException(e);
-        }
+        return (T) Lang.newInstance(generated);
     }
 }

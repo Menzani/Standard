@@ -6,8 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
 public class Method<T> implements Invokable<T> {
-    static final Object[] noArgs = new Object[0];
-
     private final java.lang.reflect.Method method;
     private Object targetInstance;
 
@@ -42,7 +40,7 @@ public class Method<T> implements Invokable<T> {
 
     @Override
     public T call() {
-        return call(noArgs);
+        return call(Lang.NO_ARGS);
     }
 
     @Override

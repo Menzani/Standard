@@ -1,34 +1,28 @@
 package eu.menzani.system;
 
-import eu.menzani.lang.UncaughtException;
-
 public abstract class PlatformFamilyDependantValue<T> {
     public T get() {
-        try {
-            switch (Platform.current().getFamily()) {
-                case WINDOWS:
-                    return onWindows();
-                case LINUX:
-                    return onLinux();
-                case MAC:
-                    return onMac();
-                default:
-                    throw new AssertionError();
-            }
-        } catch (Exception e) {
-            throw new UncaughtException(e);
+        switch (Platform.current().getFamily()) {
+            case WINDOWS:
+                return onWindows();
+            case LINUX:
+                return onLinux();
+            case MAC:
+                return onMac();
+            default:
+                throw new AssertionError();
         }
     }
 
-    protected T onWindows() throws Exception {
+    protected T onWindows() {
         throw new PlatformNotSupportedException();
     }
 
-    protected T onLinux() throws Exception {
+    protected T onLinux() {
         throw new PlatformNotSupportedException();
     }
 
-    protected T onMac() throws Exception {
+    protected T onMac() {
         throw new PlatformNotSupportedException();
     }
 }

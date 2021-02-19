@@ -10,6 +10,9 @@ public class Lang {
     public static final Module JAVA_BASE_MODULE = IllegalArgumentException.class.getModule();
     public static final Module EU_MENZANI_MODULE = Lang.class.getModule();
 
+    static final Object[] NO_ARGS = new Object[0];
+    private static final Class<?>[] noParameterTypes = new Class<?>[0];
+
     public static Field getField(Class<?> clazz, String name) {
         try {
             return clazz.getDeclaredField(name);
@@ -41,5 +44,13 @@ public class Lang {
     public static StaticFieldOffset staticFieldOffset(Class<?> clazz, String fieldName) {
         Field field = getField(clazz, fieldName);
         return new StaticFieldOffset(InternalUnsafe.UNSAFE.staticFieldBase(field), InternalUnsafe.UNSAFE.staticFieldOffset(field));
+    }
+
+    public static <T> T newInstance(Class<T> clazz) {
+        try {
+            return clazz.getConstructor(noParameterTypes).newInstance(NO_ARGS);
+        } catch (ReflectiveOperationException e) {
+            throw new UncaughtException(e);
+        }
     }
 }

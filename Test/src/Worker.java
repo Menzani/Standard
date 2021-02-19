@@ -4,7 +4,6 @@ class Worker extends Thread {
     private final WorkerManager manager;
 
     Worker(WorkerManager manager) {
-        super("tester");
         this.manager = manager;
     }
 

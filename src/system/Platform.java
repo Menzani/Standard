@@ -1,13 +1,8 @@
 package eu.menzani.system;
 
 import eu.menzani.SunUnsafe;
-import eu.menzani.io.IOStreams;
-import eu.menzani.lang.Nonblocking;
+import eu.menzani.io.ProcessLauncher;
 import eu.menzani.misc.ParseException;
-import eu.menzani.struct.Patterns;
-
-import java.io.IOException;
-import java.util.List;
 
 public enum Platform {
     LINUX_32(Family.LINUX, Architecture.BIT_32, false, true, false, true),
@@ -160,14 +155,10 @@ public enum Platform {
         }
 
         @Override
-        protected void onWindows() throws IOException {
-            ProcessBuilder builder = new ProcessBuilder(List.of(
-                    "wmic", "CPU", "Get", "NumberOfCores,NumberOfLogicalProcessors", "/Format:List"));
-            Process process = builder.start();
-            Nonblocking.waitFor(process);
-            String output = IOStreams.toString(process.getInputStream());
-            String[] lines = Patterns.SPLIT_BY_NEWLINE.split(output);
-            for (String line : lines) {
+        protected void onWindows() {
+            ProcessLauncher launcher = new ProcessLauncher("wmic");
+            launcher.addArguments("CPU", "Get", "NumberOfCores,NumberOfLogicalProcessors", "/Format:List");
+            for (String line : launcher.start().readOutputLines()) {
                 if (line.isEmpty()) continue;
                 int indexOfEquals = line.indexOf('=');
                 String key = line.substring(0, indexOfEquals);

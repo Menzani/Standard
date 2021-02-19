@@ -27,6 +27,14 @@ public class Assert {
         assert left.equals(right) : left + " " + right;
     }
 
+    public static void same(Object left, Object right) {
+        assert left == right : left;
+    }
+
+    public static void sameTo(Object left, Object right) {
+        assert left == right : left + " " + right;
+    }
+
     public static void notEqual(int left, int right) {
         assert left != right;
     }
@@ -49,6 +57,14 @@ public class Assert {
 
     public static void notEqualTo(Object left, Object right) {
         assert !left.equals(right) : left;
+    }
+
+    public static void notSame(Object left, Object right) {
+        assert left != right;
+    }
+
+    public static void notSameTo(Object left, Object right) {
+        assert left != right : left;
     }
 
     public static void lesser(int value, int cap) {

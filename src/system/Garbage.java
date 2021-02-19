@@ -94,7 +94,7 @@ public class Garbage {
     }
 
     private static class LoggerGCListener implements GCListener {
-        private static final StreamBuffer buffer = StreamBuffer.standardOutput(128);
+        private static final StreamBuffer buffer = StreamBuffer.standardOutput();
 
         @Override
         public void onTriggered(GarbageCollectionNotificationInfo notification, GcInfo info) {

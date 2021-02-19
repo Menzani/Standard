@@ -30,7 +30,7 @@ public class Constructor<T> implements Invokable<T> {
 
     @Override
     public T call() {
-        return call(Method.noArgs);
+        return call(Lang.NO_ARGS);
     }
 
     @Override

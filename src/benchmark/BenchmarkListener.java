@@ -9,5 +9,9 @@ public interface BenchmarkListener {
 
     void updateOutput(String output);
 
+    void onErrorLineAdded(String line);
+
+    void updateError(String error);
+
     void onEnd();
 }

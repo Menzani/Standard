@@ -10,7 +10,7 @@ Features:
 - Alternative to `MethodHandle` using bytecode generation
 - Meaningful condition checking
 - Class copying to inline polymorphic calls
-- Nullable annotation
+- Nullable and immutable annotation
 - Use `Method` and `Constructor` interchangeably
 - Write to `PrintStream` without generating garbage
 - Find next power of two of number, mix two `int`s into a `long`

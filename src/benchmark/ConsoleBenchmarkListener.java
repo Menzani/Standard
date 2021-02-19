@@ -21,6 +21,15 @@ class ConsoleBenchmarkListener implements BenchmarkListener {
     }
 
     @Override
+    public void onErrorLineAdded(String line) {
+        System.err.println(line);
+    }
+
+    @Override
+    public void updateError(String error) {
+    }
+
+    @Override
     public void onEnd() {
     }
 }

@@ -21,13 +21,13 @@ public class Nonblocking {
 
     public static void sleep(long milliseconds) {
         try {
-            Thread.sleep(milliseconds);
+            java.lang.Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
             throw new AssertionError();
         }
     }
 
-    public static void join(Thread thread) {
+    public static void join(java.lang.Thread thread) {
         try {
             thread.join();
         } catch (InterruptedException e) {

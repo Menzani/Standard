@@ -1,15 +1,14 @@
 package eu.menzani.build;
 
 import eu.menzani.io.PrintToConsoleException;
-import eu.menzani.lang.Nonblocking;
+import eu.menzani.io.ProcessLauncher;
 import eu.menzani.system.Platform;
 import eu.menzani.system.SystemProperty;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Set;
 
 class WindowsCppCompiler {
@@ -47,43 +46,33 @@ class WindowsCppCompiler {
     }
 
     private void invokeCl(Platform.Architecture architecture) throws IOException {
-        ProcessBuilder builder = new ProcessBuilder(List.of("cmd.exe"));
-        builder.redirectError(ProcessBuilder.Redirect.INHERIT);
-        builder.directory(workingDirectory.toFile());
-        Process process = builder.start();
+        ProcessLauncher launcher = new ProcessLauncher("cmd");
+        launcher.inheritOutput();
+        launcher.setWorkingDirectory(workingDirectory);
+        launcher.start();
+        launcher.beginWrite(StandardCharsets.ISO_8859_1);
 
-        String outputFile = outputFileWithoutExtension.toAbsolutePath().toString() + CppCompiler.outputFileSuffixFor(architecture);
-        try (OutputStreamWriter writer = new OutputStreamWriter(process.getOutputStream())) {
-            writer.append("call \"");
-            writer.append(vcvarsallPath.toString());
-            writer.append("\" ");
-            writer.append(architecture == Platform.Architecture.BIT_32 ? "x86" : "x64");
-            writer.append('\n');
-            writer.flush();
+        launcher.writeLine("call \"" + vcvarsallPath + "\" " + (architecture == Platform.Architecture.BIT_32 ? "x86" : "x64"));
 
-            writer.append("cl.exe /I \"");
-            Path includeFolder = SystemProperty.JAVA_HOME.resolve("include");
-            writer.append(includeFolder.toString());
-            writer.append("\" /I \"");
-            writer.append(includeFolder.resolve("win32").toString());
-            writer.append("\" /Fe\"");
-            writer.append(outputFile);
-            writer.append("\" /LD");
-            for (Path source : sources) {
-                writer.append(' ');
-                writer.append(source.toAbsolutePath().toString());
-            }
-            writer.append('\n');
+        Path includeFolder = SystemProperty.JAVA_HOME.resolve("include");
+        String outputFile = outputFileWithoutExtension.toAbsolutePath() + CppCompiler.outputFileSuffixFor(architecture);
+        StringBuilder builder = new StringBuilder(
+                "cl.exe /I \"" + includeFolder + "\" /I \"" + includeFolder.resolve("win32") + "\" /Fe\"" + outputFile + "\" /LD");
+        for (Path source : sources) {
+            builder.append(' ');
+            builder.append(source.toAbsolutePath().toString());
         }
-        Nonblocking.waitFor(process);
+        launcher.writeLine(builder.toString());
 
+        launcher.endWrite();
+        launcher.await();
         removeUnneededOutput(outputFile);
     }
 
     private static void removeUnneededOutput(String outputFile) throws IOException {
         Path expFile = Path.of(outputFile + ".exp");
         Path libFile = Path.of(outputFile + ".lib");
-        Files.delete(expFile);
-        Files.delete(libFile);
+        Files.deleteIfExists(expFile);
+        Files.deleteIfExists(libFile);
     }
 }

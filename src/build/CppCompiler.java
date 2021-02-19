@@ -2,6 +2,7 @@ package eu.menzani.build;
 
 import eu.menzani.io.PrintToConsoleException;
 import eu.menzani.io.SimpleDirectoryStreamFilter;
+import eu.menzani.lang.UncaughtException;
 import eu.menzani.struct.FileExtension;
 import eu.menzani.system.Platform;
 import eu.menzani.system.PlatformFamilyDependant;
@@ -40,10 +41,14 @@ class CppCompiler {
 
     private class Compile extends PlatformFamilyDependant {
         @Override
-        protected void onWindows() throws IOException {
-            Set<Path> sources = findSources("windows");
-            WindowsCppCompiler compiler = new WindowsCppCompiler(sources, outputFolder, outputFileWithoutExtension);
-            compiler.invokeCl();
+        protected void onWindows() {
+            try {
+                Set<Path> sources = findSources("windows");
+                WindowsCppCompiler compiler = new WindowsCppCompiler(sources, outputFolder, outputFileWithoutExtension);
+                compiler.invokeCl();
+            } catch (IOException e) {
+                throw new UncaughtException(e);
+            }
         }
 
         private Set<Path> findSources(String fileNameSuffix) throws IOException {

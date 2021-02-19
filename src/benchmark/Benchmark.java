@@ -1,17 +1,13 @@
 package eu.menzani.benchmark;
 
-import eu.menzani.collection.Lists;
+import eu.menzani.io.JavaProcessLauncher;
 import eu.menzani.lang.Check;
 import eu.menzani.lang.Nonblocking;
-import eu.menzani.lang.UncaughtException;
+import eu.menzani.struct.JVMOption;
+import eu.menzani.struct.MemorySize;
 import eu.menzani.system.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public abstract class Benchmark {
@@ -68,28 +64,27 @@ public abstract class Benchmark {
         if (launched.getAsBoolean()) {
             runBenchmark();
         } else {
-            Class<?> clazz = getClass();
-            List<String> command = Lists.fromArray(
-                    SystemPaths.JAVA_RUNTIME.toString(),
-                    launched.setAsBoolean(true).toString(),
-                    "-Xms8g",
-                    "-Xmx8g",
-                    "-XX:+UseLargePages",
-                    "-XX:+AlwaysPreTouch",
-                    "-XX:+UnlockExperimentalVMOptions",
-                    "-XX:+UseEpsilonGC",
-                    "-XX:-RestrictContended",
-                    "-XX:-UseBiasedLocking"
+            JavaProcessLauncher launcher = new JavaProcessLauncher();
+            launcher.addProperty(launched.setAsBoolean(true));
+            launcher.setFixedHeap(MemorySize.ofGigabytes(8));
+            launcher.addJVMOptions(
+                    JVMOption.USE_LARGE_PAGES,
+                    JVMOption.ALWAYS_PRE_TOUCH,
+                    JVMOption.UNLOCK_EXPERIMENTAL_VM_OPTIONS,
+                    JVMOption.USE_EPSILON_GC,
+                    JVMOption.DO_NOT_RESTRICT_CONTENDED,
+                    JVMOption.DO_NOT_USE_BIASED_LOCKING
             );
 
+            Class<?> clazz = getClass();
             if (SystemProperty.MODULE_PATH_STRING == null) {
-                Collections.addAll(command,
+                launcher.addArguments(
                         "-cp",
                         SystemProperty.CLASS_PATH_STRING,
                         clazz.getName()
                 );
             } else {
-                Collections.addAll(command,
+                launcher.addArguments(
                         "-p",
                         SystemProperty.MODULE_PATH_STRING,
                         "-m",
@@ -97,27 +92,12 @@ public abstract class Benchmark {
                 );
             }
 
-            ProcessBuilder builder = new ProcessBuilder(command);
-            builder.redirectErrorStream(true);
-            try {
-                listener.beginProcessCreate();
-                Process process = builder.start();
-                listener.onProcessCreated(process);
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.ISO_8859_1))) {
-                    StringBuilder output = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        output.append(line);
-                        output.append('\n');
+            listener.beginProcessCreate();
+            launcher.start();
+            listener.onProcessCreated(launcher.getProcess());
 
-                        listener.onOutputLineAdded(line);
-                        listener.updateOutput(output.toString());
-                    }
-                    listener.onEnd();
-                }
-            } catch (IOException e) {
-                throw new UncaughtException(e);
-            }
+            new OutputOrErrorIteratorThread(launcher, listener, true).start();
+            new OutputOrErrorIteratorThread(launcher, listener, false).doRun();
         }
     }
 

@@ -1,7 +1,7 @@
 package eu.menzani.test;
 
 import eu.menzani.benchmark.Stopwatch;
-import eu.menzani.build.Module;
+import eu.menzani.build.IdeaModule;
 import eu.menzani.collection.ArrayBuilder;
 import eu.menzani.struct.Paths;
 import eu.menzani.system.SystemPaths;
@@ -47,7 +47,7 @@ class Runner {
     private void scan(Set<Path> paths) throws IOException {
         for (Path path : paths) {
             if (SystemPaths.isWorkingDirectory(path)) continue;
-            int indexOfProductionOutputFolder = Paths.indexOf(path, Module.PRODUCTION_OUTPUT_FOLDER);
+            int indexOfProductionOutputFolder = Paths.indexOf(path, IdeaModule.PRODUCTION_OUTPUT_FOLDER);
             if (indexOfProductionOutputFolder != -1) {
                 Path moduleTestOutputFolder = Paths.replace(path, indexOfProductionOutputFolder, testOutputFolder);
                 if (Files.exists(moduleTestOutputFolder)) {

@@ -18,14 +18,15 @@ class Package {
     private static final Path outputPath = findOutputPath();
 
     private static Path findOutputPath() {
-        final Path ramdisk = Path.of("R:", Project.NAME);
+        IdeaProject project = IdeaProject.current();
+        final Path ramdisk = Path.of("R:", project.getName());
         try {
             try {
                 Files.createDirectories(ramdisk);
                 return ramdisk;
             } catch (FileSystemException e) {
                 if (e.getReason().equals("Unable to determine if root directory exists")) {
-                    return Project.DIRECTORY;
+                    return project.getDirectory();
                 }
                 throw e;
             }
@@ -34,14 +35,12 @@ class Package {
         }
     }
 
-    private final Project project;
-
-    private Package() throws IOException {
-        project = new Project();
+    private Package() {
     }
 
     private void package_() throws Exception {
-        for (Module module : project.getModules()) {
+        IdeaProject project = IdeaProject.current();
+        for (IdeaModule module : project.getModules()) {
             Path productionOutputDirectory = module.getProductionOutputDirectory();
             String artifactName = module.getArtifactName();
             if (Files.exists(productionOutputDirectory)) {

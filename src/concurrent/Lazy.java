@@ -12,7 +12,11 @@ public class Lazy<T> {
 
     private T value;
 
-    public Lazy(Supplier<? extends T> initializer) {
+    public static <T> Lazy<T> of(Supplier<? extends T> initializer) {
+        return new Lazy<>(initializer);
+    }
+
+    private Lazy(Supplier<? extends T> initializer) {
         this.initializer = initializer;
     }
 

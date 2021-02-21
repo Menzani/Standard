@@ -1,6 +1,9 @@
 package eu.menzani.misc;
 
 import eu.menzani.build.CompileCpp;
+import eu.menzani.build.IdeaProject;
+import eu.menzani.build.IdeaProjectException;
+import eu.menzani.concurrent.Lazy;
 import eu.menzani.lang.Assert;
 import eu.menzani.lang.UncaughtException;
 import eu.menzani.struct.FileExtension;
@@ -19,14 +22,23 @@ import java.nio.file.Path;
 
 public class NativeLibrary {
     public static final String FOLDER_IN_ARTIFACT = "native";
+    private static final Lazy<Boolean> isNotLibrary = Lazy.of(() -> {
+        IdeaProject project;
+        try {
+            project = IdeaProject.current();
+        } catch (IdeaProjectException e) {
+            throw couldNotCompile(e, null);
+        }
+        return project.isNotLibrary();
+    });
 
     private final long versionId;
-    private final Class<?> clazz;
+    private final Module module;
     private final String lowercaseModuleName;
 
-    public NativeLibrary(long versionId, Class<?> clazz, String lowercaseModuleName) {
+    public NativeLibrary(long versionId, Module module, String lowercaseModuleName) {
         this.versionId = versionId;
-        this.clazz = clazz;
+        this.module = module;
         this.lowercaseModuleName = lowercaseModuleName;
     }
 
@@ -39,8 +51,12 @@ public class NativeLibrary {
         URL resource = ClassLoader.getSystemResource(resourceName);
         boolean isIDE = (resource == null);
         if (isIDE) {
-            CompileCpp.run();
-            resource = ClassLoader.getSystemResource(resourceName);
+            if (isNotLibrary.get()) {
+                CompileCpp.run();
+                resource = ClassLoader.getSystemResource(resourceName);
+            } else {
+                throw couldNotCompile(null, module);
+            }
         }
         String protocol = resource.getProtocol();
         if (!isIDE && protocol.equals("jar")) {
@@ -51,6 +67,10 @@ public class NativeLibrary {
         }
 
         System.load(path.toAbsolutePath().toString());
+    }
+
+    private static NativeLibraryException couldNotCompile(Throwable cause, Module module) {
+        return new NativeLibraryException("Could not compile", cause, module);
     }
 
     private static void extractFromJar(Path path, URL url) {
@@ -98,6 +118,6 @@ public class NativeLibrary {
     }
 
     private Path libraryDirectory() {
-        return new ApplicationProperty(clazz, "nativeLibrary", "directory").getAsPathOr(SystemPaths.TEMP_FOLDER);
+        return new ApplicationProperty(module, "nativeLibrary", "directory").getAsPathOr(SystemPaths.TEMP_FOLDER);
     }
 }

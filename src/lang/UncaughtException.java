@@ -3,81 +3,85 @@ package eu.menzani.lang;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
-public class UncaughtException extends RuntimeException {
+public class UncaughtException extends RuntimeException implements Runnable {
     private static final long serialVersionUID = 0L;
 
-    private final Throwable delegate;
+    private final Throwable uncaught;
 
-    public UncaughtException(Throwable throwable) {
-        if (throwable instanceof Error) {
-            throw (Error) throwable;
+    public UncaughtException(Throwable uncaught) {
+        super(null, null, true, false);
+        if (uncaught instanceof Error) {
+            throw (Error) uncaught;
         }
-        if (throwable instanceof RuntimeException) {
-            throw (RuntimeException) throwable;
+        if (uncaught instanceof RuntimeException) {
+            throw (RuntimeException) uncaught;
         }
-        delegate = throwable;
-        fillInStackTrace();
+        this.uncaught = uncaught;
     }
 
-    public Throwable getThrowable() {
-        return delegate;
+    public Throwable getUncaught() {
+        return uncaught;
     }
 
     @Override
     public String getMessage() {
-        return delegate.getMessage();
+        return uncaught.getMessage();
     }
 
     @Override
     public String getLocalizedMessage() {
-        return delegate.getLocalizedMessage();
+        return uncaught.getLocalizedMessage();
     }
 
     @Override
     public Throwable getCause() {
-        return delegate.getCause();
+        return uncaught.getCause();
     }
 
     @Override
     public Throwable initCause(Throwable cause) {
-        return delegate.initCause(cause);
+        return uncaught.initCause(cause);
     }
 
     @Override
     public String toString() {
-        return delegate.toString();
+        return uncaught.toString();
     }
 
     @Override
     public void printStackTrace() {
-        delegate.printStackTrace();
+        uncaught.printStackTrace();
     }
 
     @Override
     public void printStackTrace(PrintStream s) {
-        delegate.printStackTrace(s);
+        uncaught.printStackTrace(s);
     }
 
     @Override
     public void printStackTrace(PrintWriter s) {
-        delegate.printStackTrace(s);
+        uncaught.printStackTrace(s);
     }
 
     @Override
     public Throwable fillInStackTrace() {
-        if (delegate == null) {
-            return null;
-        }
-        return super.fillInStackTrace();
+        throw new AssertionError();
     }
 
     @Override
     public StackTraceElement[] getStackTrace() {
-        return delegate.getStackTrace();
+        return uncaught.getStackTrace();
     }
 
     @Override
     public void setStackTrace(StackTraceElement[] stackTrace) {
-        delegate.setStackTrace(stackTrace);
+        uncaught.setStackTrace(stackTrace);
+    }
+
+    @Override
+    public void run() {
+        for (Throwable suppressed : getSuppressed()) {
+            uncaught.addSuppressed(suppressed);
+        }
     }
 }

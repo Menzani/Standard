@@ -2,6 +2,7 @@ package eu.menzani.benchmark;
 
 import eu.menzani.io.JavaProcessLauncher;
 import eu.menzani.lang.Check;
+import eu.menzani.lang.Module;
 import eu.menzani.lang.Nonblocking;
 import eu.menzani.struct.JVMOption;
 import eu.menzani.struct.MemorySize;
@@ -88,7 +89,7 @@ public abstract class Benchmark {
                         "-p",
                         SystemProperty.MODULE_PATH_STRING,
                         "-m",
-                        clazz.getModule().getName() + '/' + clazz.getName()
+                        Module.of(clazz).getNameEmptyOrWithSlash() + clazz.getName()
                 );
             }
 

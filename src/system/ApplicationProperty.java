@@ -1,6 +1,10 @@
 package eu.menzani.system;
 
 public class ApplicationProperty extends RuntimeProperty {
+    public ApplicationProperty(Module module, String first, String... more) {
+        this(module.getName(), first, more);
+    }
+
     public ApplicationProperty(Class<?> clazz, String first, String... more) {
         this(clazz.getPackageName(), first, more);
     }

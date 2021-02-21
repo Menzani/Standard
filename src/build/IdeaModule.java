@@ -3,7 +3,7 @@ package eu.menzani.build;
 import java.nio.file.Path;
 import java.util.List;
 
-public class Module {
+public class IdeaModule {
     public static final Path PRODUCTION_OUTPUT_FOLDER = Path.of("production");
     static final String NATIVE_OUTPUT_FOLDER_NAME = "native";
     private static final Path nativeOutputFolder = Path.of(NATIVE_OUTPUT_FOLDER_NAME);
@@ -15,7 +15,7 @@ public class Module {
     private Path productionOutputDirectory;
     private Path nativeOutputDirectory;
 
-    Module(Path directory, String name, String artifactName, List<JarSource> javaSourceFolders) {
+    IdeaModule(Path directory, String name, String artifactName, List<JarSource> javaSourceFolders) {
         this.name = name;
         this.artifactName = artifactName;
         this.javaSourceFolders = javaSourceFolders;

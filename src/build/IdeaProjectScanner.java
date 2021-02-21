@@ -11,16 +11,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-class ModulesScanner extends SimpleFileVisitor<Path> {
+class IdeaProjectScanner extends SimpleFileVisitor<Path> {
     private final String projectName;
-    private final List<Module> modules = new ArrayList<>();
+    private final List<IdeaModule> modules = new ArrayList<>();
 
-    ModulesScanner(String projectName) {
+    IdeaProjectScanner(String projectName) {
         this.projectName = projectName;
     }
 
-    List<Module> getModules(Path projectOutputDirectory) {
-        for (Module module : modules) {
+    List<IdeaModule> getModules(Path projectOutputDirectory) {
+        for (IdeaModule module : modules) {
             module.computeOutputDirectories(projectOutputDirectory);
         }
         return Collections.unmodifiableList(modules);
@@ -33,9 +33,9 @@ class ModulesScanner extends SimpleFileVisitor<Path> {
             case "res":
             case "test":
             case "unit-test":
-            case Module.NATIVE_OUTPUT_FOLDER_NAME:
+            case IdeaModule.NATIVE_OUTPUT_FOLDER_NAME:
             case "lib":
-            case Project.IDEA_FOLDER_NAME:
+            case IdeaProject.IDEA_FOLDER_NAME:
             case ".git":
                 return FileVisitResult.SKIP_SUBTREE;
         }
@@ -55,11 +55,11 @@ class ModulesScanner extends SimpleFileVisitor<Path> {
                 artifactName = projectName + '-' + name;
             }
 
-            ModuleDescriptorScanner moduleDescriptorScanner = new ModuleDescriptorScanner();
+            IdeaModuleDescriptorScanner moduleDescriptorScanner = new IdeaModuleDescriptorScanner();
             XmlParser.parse(file, moduleDescriptorScanner);
             List<JarSource> javaSourceFolders = moduleDescriptorScanner.getSourceFolders(directory, name);
 
-            modules.add(new Module(directory, name, artifactName, javaSourceFolders));
+            modules.add(new IdeaModule(directory, name, artifactName, javaSourceFolders));
         }
         return FileVisitResult.CONTINUE;
     }

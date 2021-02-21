@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
+    public static void register() {
+    }
+
     public static void addIgnored(Class<? extends Throwable> ignored) {
         try {
             instance.ignored.add(ignored);
@@ -50,12 +53,12 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
         }
     }
 
-    private static final GlobalExceptionHandler instance = createInstance();
+    private static final GlobalExceptionHandler instance = registerInstance();
 
-    private static GlobalExceptionHandler createInstance() {
+    private static GlobalExceptionHandler registerInstance() {
         try {
             GlobalExceptionHandler instance = new GlobalExceptionHandler();
-            instance.register();
+            Thread.setDefaultUncaughtExceptionHandler(instance);
             return instance;
         } catch (Throwable e) {
             e.printStackTrace();
@@ -68,10 +71,6 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
     private final List<SwingAction> swingActions = new CopyOnWriteArrayList<>();
 
     private GlobalExceptionHandler() {
-    }
-
-    private void register() {
-        Thread.setDefaultUncaughtExceptionHandler(this);
     }
 
     @Override
@@ -120,6 +119,9 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
             throwable = throwable.getCause();
         }
 
+        if (throwable instanceof Runnable) {
+            ((Runnable) throwable).run();
+        }
         if (instance.ignored.contains(throwable.getClass())) {
             return null;
         }

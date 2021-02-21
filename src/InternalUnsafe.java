@@ -40,7 +40,7 @@ public class InternalUnsafe {
         SunUnsafe.UNSAFE.putBoolean(accessibleObject, OVERRIDE, true);
     }
 
-    public static void addOpens(Module from, Module to, String packageName) {
+    public static void addOpens(java.lang.Module from, java.lang.Module to, String packageName) {
         if (!from.isOpen(packageName, to)) {
             implAddOpens.setTargetInstance(from);
             implAddOpens.call(packageName, to);

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-class ModuleDescriptorScanner extends DefaultHandler {
+class IdeaModuleDescriptorScanner extends DefaultHandler {
     private final List<JarSource> sourceFolders = new ArrayList<>();
 
     List<JarSource> getSourceFolders(Path modulePath, String moduleName) {

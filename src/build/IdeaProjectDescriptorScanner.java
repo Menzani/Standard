@@ -6,7 +6,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import java.nio.file.Path;
 
-class ProjectDescriptorScanner extends DefaultHandler {
+class IdeaProjectDescriptorScanner extends DefaultHandler {
     private Path outputDirectory;
 
     Path getOutputDirectory() {

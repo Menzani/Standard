@@ -48,14 +48,12 @@ public class CompileCpp {
         }
     }
 
-    private final Project project;
-
-    private CompileCpp() throws IOException {
-        project = new Project();
+    private CompileCpp() {
     }
 
     private void compile() throws IOException {
-        for (Module module : project.getModules()) {
+        IdeaProject project = IdeaProject.current();
+        for (IdeaModule module : project.getModules()) {
             Path nativeSourceFolder = module.getNativeSourceFolder();
             if (Files.exists(nativeSourceFolder)) {
                 Path outputFileWithoutExtension = module.getProductionOutputDirectory()

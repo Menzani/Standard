@@ -70,9 +70,13 @@ class WorkerManager {
         throwable = GlobalExceptionHandler.process(throwable);
         if (throwable == null) return;
 
-        synchronized (System.err) {
-            System.err.println(testElement);
+        if (printCurrentTestMethod && testElement instanceof TestMethod) {
             throwable.printStackTrace();
+        } else {
+            synchronized (System.err) {
+                System.err.println(testElement);
+                throwable.printStackTrace();
+            }
         }
 
         failedTests.add(testElement);

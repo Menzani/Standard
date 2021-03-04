@@ -13,14 +13,6 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
     public static void register() {
     }
 
-    public static void addIgnored(Class<? extends Throwable> ignored) {
-        try {
-            instance.ignored.add(ignored);
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void addAction(Action action) {
         try {
             instance.actions.add(action);
@@ -66,7 +58,6 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
         }
     }
 
-    private final List<Class<? extends Throwable>> ignored = new CopyOnWriteArrayList<>();
     private final List<Action> actions = new CopyOnWriteArrayList<>();
     private final List<SwingAction> swingActions = new CopyOnWriteArrayList<>();
 
@@ -119,12 +110,14 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
             throwable = throwable.getCause();
         }
 
-        if (throwable instanceof Runnable) {
-            ((Runnable) throwable).run();
+        if (throwable instanceof HandledThrowable) {
+            HandledThrowable handled = (HandledThrowable) throwable;
+            handled.run();
+            if (handled.shouldBeIgnored()) {
+                return null;
+            }
         }
-        if (instance.ignored.contains(throwable.getClass())) {
-            return null;
-        }
+
         return throwable;
     }
 }

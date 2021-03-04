@@ -1,11 +1,12 @@
 package eu.menzani.io;
 
 import eu.menzani.error.GlobalExceptionHandler;
+import eu.menzani.error.HandledThrowable;
 import eu.menzani.lang.ControlFlowException;
 
-public class PrintToConsoleException extends ControlFlowException implements Runnable {
+public class PrintToConsoleException extends ControlFlowException implements HandledThrowable {
     static {
-        GlobalExceptionHandler.addIgnored(PrintToConsoleException.class);
+        GlobalExceptionHandler.register();
     }
 
     private static final long serialVersionUID = 0L;
@@ -24,5 +25,10 @@ public class PrintToConsoleException extends ControlFlowException implements Run
     @Override
     public void run() {
         printStackTrace();
+    }
+
+    @Override
+    public boolean shouldBeIgnored() {
+        return true;
     }
 }

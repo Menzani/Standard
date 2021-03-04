@@ -1,9 +1,16 @@
 package eu.menzani.lang;
 
+import eu.menzani.error.GlobalExceptionHandler;
+import eu.menzani.error.HandledThrowable;
+
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
-public class UncaughtException extends RuntimeException implements Runnable {
+public class UncaughtException extends RuntimeException implements HandledThrowable {
+    static {
+        GlobalExceptionHandler.register();
+    }
+
     private static final long serialVersionUID = 0L;
 
     private final Throwable uncaught;

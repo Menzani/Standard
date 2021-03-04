@@ -3,14 +3,13 @@ package eu.menzani.test;
 import eu.menzani.benchmark.Stopwatch;
 import eu.menzani.build.IdeaModule;
 import eu.menzani.collection.ArrayBuilder;
+import eu.menzani.lang.Lang;
 import eu.menzani.struct.Paths;
 import eu.menzani.system.SystemPaths;
 import eu.menzani.system.SystemProperty;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,9 +31,6 @@ class Runner {
     }
 
     private static final Path testOutputFolder = Path.of("test");
-
-    private static final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
-    private static final MethodType emptyConstructorMethodType = MethodType.methodType(void.class);
 
     private final Scanner scanner = new Scanner();
     private Index index;
@@ -70,7 +66,7 @@ class Runner {
                 testMethodsBuilder.add(new TestMethod(method));
             }
 
-            MethodHandle constructor = lookup.findConstructor(clazz, emptyConstructorMethodType);
+            MethodHandle constructor = Lang.PUBLIC_LOOKUP.findConstructor(clazz, Lang.VOID_VOID_METHOD_TYPE);
             TestClass testClass = new TestClass(clazz, constructor, testMethodsBuilder.build());
             testClass.initTestMethods();
             indexBuilder.add(testClass);

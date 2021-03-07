@@ -23,7 +23,7 @@ class BenchmarkThread extends Thread {
         long memoryCap = this.memoryCap;
 
         if (benchmark.shouldAutoProfile()) {
-            Profiler profiler = new Profiler(benchmark, numIterations);
+            Profiler profiler = new Profiler(benchmark, benchmark.getAutoProfileDivideBy());
             long start = System.nanoTime();
             do {
                 profiler.start();

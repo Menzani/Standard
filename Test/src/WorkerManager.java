@@ -1,7 +1,7 @@
 package eu.menzani.test;
 
+import eu.menzani.concurrent.ThreadGroup;
 import eu.menzani.error.GlobalExceptionHandler;
-import eu.menzani.lang.Nonblocking;
 import eu.menzani.lang.Optional;
 
 import java.util.ArrayList;
@@ -37,15 +37,8 @@ class WorkerManager {
     void run(int parallelism) {
         testMethods = new ConcurrentLinkedQueue<>(testMethodsBuilder);
 
-        Thread[] workers = new Thread[parallelism];
-        for (int i = 0; i < parallelism; i++) {
-            Thread worker = new Worker(this);
-            worker.start();
-            workers[i] = worker;
-        }
-        for (Thread worker : workers) {
-            Nonblocking.join(worker);
-        }
+        ThreadGroup workers = new ThreadGroup(parallelism);
+        workers.run(() -> new Worker(this));
     }
 
     @Optional TestMethod next() {

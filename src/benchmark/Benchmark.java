@@ -1,15 +1,16 @@
 package eu.menzani.benchmark;
 
+import eu.menzani.concurrent.ThreadGroup;
 import eu.menzani.io.JavaProcessLauncher;
 import eu.menzani.lang.Check;
 import eu.menzani.lang.Module;
-import eu.menzani.lang.Nonblocking;
 import eu.menzani.struct.JVMOption;
 import eu.menzani.struct.MemorySize;
 import eu.menzani.system.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public abstract class Benchmark {
     static Benchmark current;
@@ -52,8 +53,20 @@ public abstract class Benchmark {
                         .build());
     }
 
+    protected int getAutoProfileDivideBy() {
+        return getNumIterations();
+    }
+
     protected boolean shouldAutoProfile() {
         return true;
+    }
+
+    protected boolean shouldPrintCompilation() {
+        return false;
+    }
+
+    protected boolean shouldPrintInlining() {
+        return false;
     }
 
     public void launchBenchmark() {
@@ -76,6 +89,15 @@ public abstract class Benchmark {
                     JVMOption.DO_NOT_RESTRICT_CONTENDED,
                     JVMOption.DO_NOT_USE_BIASED_LOCKING
             );
+            if (shouldPrintCompilation()) {
+                launcher.addJVMOption(JVMOption.PRINT_COMPILATION);
+            }
+            if (shouldPrintInlining()) {
+                launcher.addJVMOptions(
+                        JVMOption.UNLOCK_DIAGNOSTIC_VM_OPTIONS,
+                        JVMOption.PRINT_INLINING
+                );
+            }
 
             Class<?> clazz = getClass();
             if (SystemProperty.MODULE_PATH_STRING == null) {
@@ -105,20 +127,22 @@ public abstract class Benchmark {
     protected void runBenchmark() {
         int concurrency = getConcurrency();
         Check.notLesser(concurrency, 1);
+
+        int numIterations = getNumIterations();
         Runtime runtime = Runtime.getRuntime();
         long warmupMemoryCap = runtime.totalMemory() / 2L;
-        int numIterations = getNumIterations();
 
         long startMemory = runtime.freeMemory();
         test(numIterations);
         long endMemory = runtime.freeMemory();
-        long testMemoryCap = (startMemory - endMemory) * 3L;
+        long testMemoryCap = (startMemory - endMemory) * 2L;
 
         if (concurrency == 1) {
             getThreadManipulation().applyToCurrentThread();
 
             if (shouldAutoProfile()) {
-                Profiler profiler = new Profiler(this, numIterations);
+                int autoProfileDivideBy = getAutoProfileDivideBy();
+                Profiler profiler = new Profiler(this, autoProfileDivideBy);
                 long start = System.nanoTime();
                 do {
                     profiler.start();
@@ -128,7 +152,7 @@ public abstract class Benchmark {
                 synchronized (this) {
                     results.clear();
                 }
-                profiler = new Profiler(this, numIterations);
+                profiler = new Profiler(this, autoProfileDivideBy);
                 start = System.nanoTime();
                 do {
                     profiler.start();
@@ -149,30 +173,15 @@ public abstract class Benchmark {
                 } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > testMemoryCap);
             }
         } else {
-            Thread[] threads = new Thread[concurrency];
-            ThreadManipulationSpread threadManipulation = getConcurrentThreadManipulation();
-            for (int i = 0; i < concurrency; i++) {
-                threads[i] = new BenchmarkThread(threadManipulation, this, warmupMemoryCap);
-            }
-            for (Thread thread : threads) {
-                thread.start();
-            }
-            for (Thread thread : threads) {
-                Nonblocking.join(thread);
-            }
+            ThreadGroup threads = new ThreadGroup(concurrency);
+            BenchmarkThreadFactory factory = new BenchmarkThreadFactory(getConcurrentThreadManipulation());
+            factory.setMemoryCap(warmupMemoryCap);
+            threads.run(factory);
             synchronized (this) {
                 results.clear();
             }
-            threadManipulation.reset();
-            for (int i = 0; i < concurrency; i++) {
-                threads[i] = new BenchmarkThread(threadManipulation, this, testMemoryCap);
-            }
-            for (Thread thread : threads) {
-                thread.start();
-            }
-            for (Thread thread : threads) {
-                Nonblocking.join(thread);
-            }
+            factory.setMemoryCap(testMemoryCap);
+            threads.run(factory);
         }
 
         synchronized (this) {
@@ -183,4 +192,23 @@ public abstract class Benchmark {
     }
 
     protected abstract void test(int i);
+
+    private class BenchmarkThreadFactory implements Supplier<Thread> {
+        private final ThreadManipulationSpread threadManipulation;
+        private long memoryCap;
+
+        BenchmarkThreadFactory(ThreadManipulationSpread threadManipulation) {
+            this.threadManipulation = threadManipulation;
+        }
+
+        void setMemoryCap(long memoryCap) {
+            this.memoryCap = memoryCap;
+            threadManipulation.reset();
+        }
+
+        @Override
+        public Thread get() {
+            return new BenchmarkThread(threadManipulation, Benchmark.this, memoryCap);
+        }
+    }
 }

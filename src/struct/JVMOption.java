@@ -15,6 +15,9 @@ public class JVMOption {
     public static final JVMOption DO_NOT_RESTRICT_CONTENDED = xx("RestrictContended").setAsBoolean(false).view();
     public static final JVMOption DO_NOT_USE_BIASED_LOCKING = xx("UseBiasedLocking").setAsBoolean(false).view();
 
+    public static final JVMOption PRINT_COMPILATION = xx("PrintCompilation").setAsBoolean(true).view();
+    public static final JVMOption PRINT_INLINING = xx("PrintInlining").setAsBoolean(true).view();
+
     private final Type type;
     private final String key;
     private Freeze freeze = Freeze.no();

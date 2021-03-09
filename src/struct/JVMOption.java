@@ -14,9 +14,13 @@ public class JVMOption {
 
     public static final JVMOption DO_NOT_RESTRICT_CONTENDED = xx("RestrictContended").setAsBoolean(false).view();
     public static final JVMOption DO_NOT_USE_BIASED_LOCKING = xx("UseBiasedLocking").setAsBoolean(false).view();
+    public static final JVMOption DISABLE_TIERED_COMPILATION = xx("TieredCompilation").setAsBoolean(false).view();
 
     public static final JVMOption PRINT_COMPILATION = xx("PrintCompilation").setAsBoolean(true).view();
     public static final JVMOption PRINT_INLINING = xx("PrintInlining").setAsBoolean(true).view();
+    public static final JVMOption PRINT_ASSEMBLY = xx("PrintAssembly").setAsBoolean(true).view();
+
+    public static final JVMOption BATCH = x("batch").view();
 
     private final Type type;
     private final String key;
@@ -79,12 +83,17 @@ public class JVMOption {
 
     @Override
     public String toString() {
-        Ensure.notNull(value);
         assert type != null;
         switch (type) {
-            case X:
-                return "-X" + key + value;
+            case X: {
+                String result = "-X" + key;
+                if (value != null) {
+                    result += value;
+                }
+                return result;
+            }
             case XX:
+                Ensure.notNull(value);
                 String result = "-XX:";
                 if (value == Boolean.TRUE) {
                     result += '+';

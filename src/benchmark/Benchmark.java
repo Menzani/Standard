@@ -69,6 +69,10 @@ public abstract class Benchmark {
         return false;
     }
 
+    protected boolean shouldPrintAssembly() {
+        return false;
+    }
+
     public void launchBenchmark() {
         launchBenchmark(ConsoleBenchmarkListener.INSTANCE);
     }
@@ -92,11 +96,20 @@ public abstract class Benchmark {
             if (shouldPrintCompilation()) {
                 launcher.addJVMOption(JVMOption.PRINT_COMPILATION);
             }
-            if (shouldPrintInlining()) {
-                launcher.addJVMOptions(
-                        JVMOption.UNLOCK_DIAGNOSTIC_VM_OPTIONS,
-                        JVMOption.PRINT_INLINING
-                );
+            boolean shouldPrintInlining = shouldPrintInlining();
+            boolean shouldPrintAssembly = shouldPrintAssembly();
+            if (shouldPrintInlining || shouldPrintAssembly) {
+                launcher.addJVMOption(JVMOption.UNLOCK_DIAGNOSTIC_VM_OPTIONS);
+                if (shouldPrintInlining) {
+                    launcher.addJVMOption(JVMOption.PRINT_INLINING);
+                }
+                if (shouldPrintAssembly) {
+                    launcher.addJVMOptions(
+                            JVMOption.PRINT_ASSEMBLY,
+                            JVMOption.DISABLE_TIERED_COMPILATION,
+                            JVMOption.BATCH
+                    );
+                }
             }
 
             Class<?> clazz = getClass();

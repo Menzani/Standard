@@ -1,22 +1,22 @@
 package eu.menzani.struct;
 
 public abstract class ObjectToggle<T> {
-    public abstract boolean toggleSet();
+    public abstract boolean set();
 
     public abstract void set(T value);
 
-    public abstract boolean toggleNotSet();
+    public abstract boolean unset();
 
     public abstract T get();
 
     public void ensureNotSet(String exceptionMessage) {
-        if (!toggleSet()) {
+        if (!set()) {
             throw new IllegalStateException(exceptionMessage);
         }
     }
 
     public T ensureSet(String exceptionMessage) {
-        if (toggleNotSet()) {
+        if (unset()) {
             return get();
         }
         throw new IllegalStateException(exceptionMessage);

@@ -53,12 +53,16 @@ public class Unsafe {
         ARRAY_OBJECT_INDEX_SCALE = jdk.internal.misc.Unsafe.ARRAY_OBJECT_INDEX_SCALE;
     }
 
-    public static void setAccessible(AccessibleObject accessibleObject) {
-        InternalUnsafe.setAccessible(accessibleObject);
+    public static void forceAccessible(AccessibleObject accessibleObject) {
+        InternalUnsafe.forceAccessible(accessibleObject);
     }
 
     public static void addOpens(Module from, Module to, String packageName) {
         InternalUnsafe.addOpens(from, to, packageName);
+    }
+
+    public static void addExports(Module from, Module to, String packageName) {
+        InternalUnsafe.addExports(from, to, packageName);
     }
 
     public static long getAddress(Object o, long offset) {

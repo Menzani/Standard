@@ -30,14 +30,12 @@ public class Field<T> {
         return Modifier.isStatic(field.getModifiers());
     }
 
-    public void ensureAccessible() {
-        if (!field.canAccess(targetInstance)) {
-            field.setAccessible(true);
-        }
+    public void setAccessible() {
+        field.setAccessible(true);
     }
 
     public void forceAccessible() {
-        InternalUnsafe.setAccessible(field);
+        InternalUnsafe.forceAccessible(field);
     }
 
     public void setTargetInstance(Object targetInstance) {

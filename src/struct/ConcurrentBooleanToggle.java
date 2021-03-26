@@ -9,12 +9,17 @@ public class ConcurrentBooleanToggle extends BooleanToggle {
     private boolean value;
 
     @Override
-    public boolean toggleTrue() {
-        return AtomicBoolean.compareAndSetVolatile(this, VALUE, false, true);
+    public boolean setTrue() {
+        return !AtomicBoolean.compareAndSetVolatile(this, VALUE, false, true);
     }
 
     @Override
-    public boolean toggleFalse() {
-        return AtomicBoolean.compareAndSetVolatile(this, VALUE, true, false);
+    public boolean setFalse() {
+        return !AtomicBoolean.compareAndSetVolatile(this, VALUE, true, false);
+    }
+
+    @Override
+    public boolean get() {
+        return AtomicBoolean.getOpaque(this, VALUE);
     }
 }

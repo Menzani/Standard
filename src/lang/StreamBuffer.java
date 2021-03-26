@@ -1,17 +1,33 @@
 package eu.menzani.lang;
 
+import java.io.BufferedWriter;
+import java.io.InterruptedIOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.lang.invoke.MethodHandle;
 
-public class StreamBuffer {
-    private static final int defaultInitialCapacity = 512;
+public class StreamBuffer extends BuildableCharArray {
+    private static final Field<BufferedWriter> PrintStream_textOut;
+    private static final Field<OutputStreamWriter> PrintStream_charOut;
+    private static final MethodHandle BufferedWriter_flushBuffer =
+            MethodHandles.ofVirtualPrivate(BufferedWriter.class, "flushBuffer", MethodHandles.VOID_VOID_METHOD_TYPE);
+    private static final MethodHandle OutputStreamWriter_flushBuffer =
+            MethodHandles.ofVirtualPrivate(OutputStreamWriter.class, "flushBuffer", MethodHandles.VOID_VOID_METHOD_TYPE);
 
-    private final PrintStream stream;
-    private char[] buffer;
+    static {
+        final Class<?> clazz = PrintStream.class;
+        PrintStream_textOut = Field.of(clazz, "textOut");
+        PrintStream_charOut = Field.of(clazz, "charOut");
+        PrintStream_textOut.setAccessible();
+        PrintStream_charOut.setAccessible();
+    }
 
-    public final StringBuilder builder;
+    private final Object stream;
+    private final BufferedWriter stream_textOut;
+    private final OutputStreamWriter stream_charOut;
 
     public static StreamBuffer standardOutput() {
-        return standardOutput(defaultInitialCapacity);
+        return standardOutput(DEFAULT_INITIAL_CAPACITY);
     }
 
     public static StreamBuffer standardOutput(int initialCapacity) {
@@ -19,7 +35,7 @@ public class StreamBuffer {
     }
 
     public static StreamBuffer standardError() {
-        return standardError(defaultInitialCapacity);
+        return standardError(DEFAULT_INITIAL_CAPACITY);
     }
 
     public static StreamBuffer standardError(int initialCapacity) {
@@ -27,31 +43,32 @@ public class StreamBuffer {
     }
 
     public StreamBuffer(PrintStream stream) {
-        this(stream, defaultInitialCapacity);
+        this(stream, DEFAULT_INITIAL_CAPACITY);
     }
 
     public StreamBuffer(PrintStream stream, int initialCapacity) {
+        super(initialCapacity);
         this.stream = stream;
-        buffer = new char[initialCapacity];
-        builder = new StringBuilder(initialCapacity);
-    }
-
-    public void reset() {
-        builder.setLength(0);
-    }
-
-    public void println() {
-        builder.append(System.lineSeparator());
-        print();
-    }
-
-    public void print() {
-        int capacity = builder.capacity();
-        if (buffer.length != capacity) {
-            buffer = new char[capacity];
+        synchronized (PrintStream_textOut) {
+            PrintStream_textOut.setTargetInstance(stream);
+            PrintStream_charOut.setTargetInstance(stream);
+            stream_textOut = PrintStream_textOut.getValue();
+            stream_charOut = PrintStream_charOut.getValue();
         }
-        builder.getChars(0, builder.length(), buffer, 0);
+    }
 
-        stream.print(buffer);
+    @Override
+    protected void flush(char[] buffer, int end) {
+        try {
+            synchronized (stream) {
+                stream_textOut.write(buffer, 0, end);
+                BufferedWriter_flushBuffer.invokeExact(stream_textOut);
+                OutputStreamWriter_flushBuffer.invokeExact(stream_charOut);
+            }
+        } catch (InterruptedIOException e) {
+            Thread.currentThread().interrupt();
+        } catch (Throwable e) {
+            throw new UncaughtException(e);
+        }
     }
 }

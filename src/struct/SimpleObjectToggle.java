@@ -4,7 +4,7 @@ public class SimpleObjectToggle<T> extends ObjectToggle<T> {
     private T value;
 
     @Override
-    public boolean toggleSet() {
+    public boolean set() {
         return value == null;
     }
 
@@ -14,7 +14,7 @@ public class SimpleObjectToggle<T> extends ObjectToggle<T> {
     }
 
     @Override
-    public boolean toggleNotSet() {
+    public boolean unset() {
         return value != null;
     }
 

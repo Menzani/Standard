@@ -50,7 +50,7 @@ public class Garbage {
     }
 
     public static void addGCListener(GCListener listener) {
-        if (jvmListener.toggleSet()) {
+        if (jvmListener.set()) {
             MBeanServer platformServer = ManagementFactory.getPlatformMBeanServer();
             JVMListener jvmListener = new JVMListener();
             try {
@@ -98,7 +98,6 @@ public class Garbage {
 
         @Override
         public void onTriggered(GarbageCollectionNotificationInfo notification, GcInfo info) {
-            buffer.reset();
             buffer.builder.append('[');
             buffer.builder.append(notification.getGcName());
             buffer.builder.append("] ");

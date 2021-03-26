@@ -17,15 +17,13 @@ public class Constructor<T> implements Invokable<T> {
     }
 
     @Override
-    public void ensureAccessible() {
-        if (!constructor.canAccess(null)) {
-            constructor.setAccessible(true);
-        }
+    public void setAccessible() {
+        constructor.setAccessible(true);
     }
 
     @Override
     public void forceAccessible() {
-        InternalUnsafe.setAccessible(constructor);
+        InternalUnsafe.forceAccessible(constructor);
     }
 
     @Override

@@ -18,7 +18,7 @@ public class ConcurrentObjectToggle<T> extends ObjectToggle<T> {
     private T lastSetValue;
 
     @Override
-    public boolean toggleSet() {
+    public boolean set() {
         return Atomic.compareAndSetVolatile(this, VALUE, null, placeholder);
     }
 
@@ -28,7 +28,7 @@ public class ConcurrentObjectToggle<T> extends ObjectToggle<T> {
     }
 
     @Override
-    public boolean toggleNotSet() {
+    public boolean unset() {
         Object value = Atomic.getAndSetVolatile(this, VALUE, null);
         if (value == null) {
             return false;

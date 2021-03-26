@@ -2,8 +2,6 @@ package eu.menzani.lang;
 
 import eu.menzani.InternalUnsafe;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -14,9 +12,6 @@ public class Lang {
 
     static final Object[] NO_ARGS = new Object[0];
     private static final Class<?>[] noParameterTypes = new Class<?>[0];
-
-    public static final MethodHandles.Lookup PUBLIC_LOOKUP = MethodHandles.publicLookup();
-    public static final MethodType VOID_VOID_METHOD_TYPE = MethodType.methodType(void.class);
 
     public static Field getField(Class<?> clazz, String name) {
         try {

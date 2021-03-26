@@ -3,7 +3,7 @@ package eu.menzani.test;
 import eu.menzani.benchmark.Stopwatch;
 import eu.menzani.build.IdeaModule;
 import eu.menzani.collection.ArrayBuilder;
-import eu.menzani.lang.Lang;
+import eu.menzani.lang.MethodHandles;
 import eu.menzani.struct.Paths;
 import eu.menzani.system.SystemPaths;
 import eu.menzani.system.SystemProperty;
@@ -66,7 +66,7 @@ class Runner {
                 testMethodsBuilder.add(new TestMethod(method));
             }
 
-            MethodHandle constructor = Lang.PUBLIC_LOOKUP.findConstructor(clazz, Lang.VOID_VOID_METHOD_TYPE);
+            MethodHandle constructor = MethodHandles.PUBLIC_LOOKUP.findConstructor(clazz, MethodHandles.VOID_VOID_METHOD_TYPE);
             TestClass testClass = new TestClass(clazz, constructor, testMethodsBuilder.build());
             testClass.initTestMethods();
             indexBuilder.add(testClass);

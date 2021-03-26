@@ -5,7 +5,7 @@ import java.lang.reflect.Executable;
 public interface Invokable<T> {
     Executable getExecutable();
 
-    void ensureAccessible();
+    void setAccessible();
 
     void forceAccessible();
 

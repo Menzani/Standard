@@ -23,15 +23,13 @@ public class Method<T> implements Invokable<T> {
     }
 
     @Override
-    public void ensureAccessible() {
-        if (!method.canAccess(targetInstance)) {
-            method.setAccessible(true);
-        }
+    public void setAccessible() {
+        method.setAccessible(true);
     }
 
     @Override
     public void forceAccessible() {
-        InternalUnsafe.setAccessible(method);
+        InternalUnsafe.forceAccessible(method);
     }
 
     public void setTargetInstance(Object targetInstance) {

@@ -13,6 +13,7 @@ public class InternalUnsafe {
 
     private static final long OVERRIDE;
     private static final Method<?> implAddOpens;
+    private static final Method<?> implAddExports;
 
     public static void init() {
     }
@@ -28,22 +29,36 @@ public class InternalUnsafe {
             OVERRIDE = 16L;
         }
 
-        final Class<?> clazz = Module.class;
-        implAddOpens = Invokable.ofMethod(clazz, "implAddOpens", String.class, clazz);
+        final Class<?> moduleClass = Module.class;
+        final Class<?> stringClass = String.class;
+        implAddOpens = Invokable.ofMethod(moduleClass, "implAddOpens", stringClass, moduleClass);
         implAddOpens.forceAccessible();
+        implAddExports = Invokable.ofMethod(moduleClass, "implAddExports", stringClass, moduleClass);
+        implAddExports.forceAccessible();
 
         addOpens(Lang.JAVA_BASE_MODULE, Lang.EU_MENZANI_MODULE, "jdk.internal.misc");
         UNSAFE = jdk.internal.misc.Unsafe.getUnsafe();
     }
 
-    public static void setAccessible(AccessibleObject accessibleObject) {
+    public static void forceAccessible(AccessibleObject accessibleObject) {
         SunUnsafe.UNSAFE.putBoolean(accessibleObject, OVERRIDE, true);
     }
 
-    public static void addOpens(java.lang.Module from, java.lang.Module to, String packageName) {
+    public static void addOpens(Module from, Module to, String packageName) {
         if (!from.isOpen(packageName, to)) {
-            implAddOpens.setTargetInstance(from);
-            implAddOpens.call(packageName, to);
+            synchronized (implAddOpens) {
+                implAddOpens.setTargetInstance(from);
+                implAddOpens.call(packageName, to);
+            }
+        }
+    }
+
+    public static void addExports(Module from, Module to, String packageName) {
+        if (!from.isExported(packageName, to)) {
+            synchronized (implAddExports) {
+                implAddExports.setTargetInstance(from);
+                implAddExports.call(packageName, to);
+            }
         }
     }
 }

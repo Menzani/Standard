@@ -9,7 +9,7 @@ public class SunUnsafe {
 
     static {
         Field<Unsafe> field = Field.of(Unsafe.class, "theUnsafe");
-        field.ensureAccessible();
+        field.setAccessible();
         UNSAFE = field.getValue();
     }
 

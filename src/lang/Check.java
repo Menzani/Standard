@@ -1,6 +1,18 @@
 package eu.menzani.lang;
 
 public class Check {
+    public static void equal(char left, char right) {
+        if (left != right) {
+            throw new AssertionError(left);
+        }
+    }
+
+    public static void equalTo(char left, char right) {
+        if (left != right) {
+            throw new CharAssertionError(left, right);
+        }
+    }
+
     public static void equal(int left, int right) {
         if (left != right) {
             throw new AssertionError(left);
@@ -260,6 +272,17 @@ public class Check {
     }
 
     static final String exceptionClassName = AssertionError.class.getName() + ": ";
+
+    private static class CharAssertionError extends AssertionError {
+        CharAssertionError(char one, char two) {
+            super(exceptionClassName + one + " " + two);
+        }
+
+        @Override
+        public String toString() {
+            return getMessage();
+        }
+    }
 
     private static class IntAssertionError extends AssertionError {
         IntAssertionError(int one, int two) {

@@ -3,6 +3,14 @@ package eu.menzani.lang;
 import java.util.function.Supplier;
 
 public class Assert {
+    public static void equal(char left, char right) {
+        assert left == right : left;
+    }
+
+    public static void equalTo(char left, char right) {
+        assert left == right : left + " " + right;
+    }
+
     public static void equal(int left, int right) {
         assert left == right : left;
     }

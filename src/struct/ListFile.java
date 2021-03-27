@@ -26,7 +26,7 @@ public class ListFile implements Closeable {
     }
 
     public ListFile(Path folder, String name, Charset charset, OpenOption... writeOptions) {
-        this(folder.resolve(name + ".lst"), charset, writeOptions);
+        this(folder.resolve(name + FileExtension.LST.getSuffixWithDot()), charset, writeOptions);
     }
 
     public ListFile(Path file) {
@@ -93,8 +93,8 @@ public class ListFile implements Closeable {
     }
 
     public boolean contains(String line) {
-        for (String _line : lines) {
-            if (_line.equals(line)) {
+        for (String fileLine : lines) {
+            if (fileLine.equals(line)) {
                 return true;
             }
         }

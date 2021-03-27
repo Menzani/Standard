@@ -23,7 +23,13 @@ public class AppInfo {
         AppInfo.projectName = projectName;
     }
 
-    public static @Optional String getProjectName() {
+    public static @Optional String getProjectNameOrNull() {
         return AppInfo.projectName;
+    }
+
+    public static String getProjectName() {
+        String projectName = AppInfo.projectName;
+        Ensure.notNull(projectName);
+        return projectName;
     }
 }

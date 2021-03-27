@@ -12,9 +12,10 @@ public class JVMOption {
 
     public static final JVMOption USE_EPSILON_GC = xx("UseEpsilonGC").setAsBoolean(true).view();
 
-    public static final JVMOption DO_NOT_RESTRICT_CONTENDED = xx("RestrictContended").setAsBoolean(false).view();
-    public static final JVMOption DO_NOT_USE_BIASED_LOCKING = xx("UseBiasedLocking").setAsBoolean(false).view();
+    public static final JVMOption ENABLE_CONTENDED_ANNOTATION = xx("RestrictContended").setAsBoolean(false).view();
+    public static final JVMOption DISABLE_BIASED_LOCKING = xx("UseBiasedLocking").setAsBoolean(false).view();
     public static final JVMOption DISABLE_TIERED_COMPILATION = xx("TieredCompilation").setAsBoolean(false).view();
+    public static final JVMOption DISABLE_PERF_DATA = xx("UsePerfData").setAsBoolean(false).view();
 
     public static final JVMOption PRINT_COMPILATION = xx("PrintCompilation").setAsBoolean(true).view();
     public static final JVMOption PRINT_INLINING = xx("PrintInlining").setAsBoolean(true).view();

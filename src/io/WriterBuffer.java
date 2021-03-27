@@ -1,4 +1,7 @@
-package eu.menzani.lang;
+package eu.menzani.io;
+
+import eu.menzani.lang.BuildableCharArray;
+import eu.menzani.lang.UncaughtException;
 
 import java.io.IOException;
 import java.io.Writer;

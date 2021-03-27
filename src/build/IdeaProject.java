@@ -66,6 +66,6 @@ public class IdeaProject {
     }
 
     public boolean isNotLibrary() {
-        return name.equals(AppInfo.getProjectName());
+        return name.equals(AppInfo.getProjectNameOrNull());
     }
 }

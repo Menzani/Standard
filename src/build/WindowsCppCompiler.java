@@ -2,16 +2,20 @@ package eu.menzani.build;
 
 import eu.menzani.io.PrintToConsoleException;
 import eu.menzani.io.ProcessLauncher;
+import eu.menzani.struct.FileExtension;
 import eu.menzani.system.Platform;
 import eu.menzani.system.SystemProperty;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Set;
+import java.util.Collection;
 
 class WindowsCppCompiler {
     private static final Path vcvarsallPath = findVcvarsallPath();
+    private static final String cppFileErrorLineContains = FileExtension.CPP.getSuffixWithDot() + '(';
+    private static final String cFileErrorLineContains = FileExtension.C.getSuffixWithDot() + '(';
+    private static final String hFileErrorLineContains = FileExtension.H.getSuffixWithDot() + '(';
 
     private static Path findVcvarsallPath() {
         final Path fromBuildTools = Path.of("C:", "Program Files (x86)", "Microsoft Visual Studio", "2019", "BuildTools", "VC", "Auxiliary", "Build", "vcvarsall.bat");
@@ -29,11 +33,11 @@ class WindowsCppCompiler {
         throw new PrintToConsoleException("Could not find vcvarsall.bat file.");
     }
 
-    private final Set<Path> sources;
+    private final Collection<Path> sources;
     private final Path workingDirectory;
     private final Path outputFileWithoutExtension;
 
-    WindowsCppCompiler(Set<Path> sources, Path workingDirectory, Path outputFileWithoutExtension) {
+    WindowsCppCompiler(Collection<Path> sources, Path workingDirectory, Path outputFileWithoutExtension) {
         this.sources = sources;
         this.workingDirectory = workingDirectory;
         this.outputFileWithoutExtension = outputFileWithoutExtension;
@@ -66,15 +70,21 @@ class WindowsCppCompiler {
 
         boolean errorsOccurred = false;
         for (String line : launcher.outputIterator()) {
-            int indexOfCppExtension = line.indexOf(".cpp(");
-            int indexOfCExtension = line.indexOf(".c(");
-            if (indexOfCppExtension == -1 && indexOfCExtension == -1) continue;
+            int indexOfCppExtension = line.indexOf(cppFileErrorLineContains);
+            int indexOfCExtension = line.indexOf(cFileErrorLineContains);
+            int indexOfHExtension = line.indexOf(hFileErrorLineContains);
+            if (indexOfCppExtension == -1 && indexOfCExtension == -1 && indexOfHExtension == -1) continue;
             int indexOfExtension;
             int extensionLength;
             if (indexOfCppExtension == -1) {
-                indexOfExtension = indexOfCExtension;
+                if (indexOfCExtension == -1) {
+                    indexOfExtension = indexOfHExtension;
+                } else {
+                    indexOfExtension = indexOfCExtension;
+                }
                 extensionLength = 3;
             } else {
+                assert indexOfCExtension == -1 && indexOfHExtension == -1;
                 indexOfExtension = indexOfCppExtension;
                 extensionLength = 5;
             }

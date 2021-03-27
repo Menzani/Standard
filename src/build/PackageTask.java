@@ -9,10 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-class Package {
+class PackageTask {
     public static void main(String[] args) throws Exception {
-        Package package_ = new Package();
-        package_.package_();
+        PackageTask packageTask = new PackageTask();
+        packageTask.packageCurrentProject();
     }
 
     private static final Path outputPath = findOutputPath();
@@ -35,10 +35,10 @@ class Package {
         }
     }
 
-    private Package() {
+    private PackageTask() {
     }
 
-    private void package_() throws Exception {
+    private void packageCurrentProject() throws Exception {
         IdeaProject project = IdeaProject.current();
         for (IdeaModule module : project.getModules()) {
             Path productionOutputDirectory = module.getProductionOutputDirectory();

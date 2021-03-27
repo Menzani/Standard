@@ -9,7 +9,7 @@ import eu.menzani.data.*;
 import java.io.Reader;
 import java.util.Map;
 
-public class CompactJsonMarshaller extends Marshaller {
+public class CompactJsonMarshaller implements Marshaller {
     @Override
     public void marshal(Element element, StringBuilder builder) {
         if (element == null) {

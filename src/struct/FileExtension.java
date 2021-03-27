@@ -6,11 +6,14 @@ import java.nio.file.Path;
 public class FileExtension {
     public static final FileExtension SO = new FileExtension("so");
     public static final FileExtension DLL = new FileExtension("dll");
+    public static final FileExtension H = new FileExtension("h");
     public static final FileExtension C = new FileExtension("c");
     public static final FileExtension CPP = new FileExtension("cpp");
     public static final FileExtension ZIP = new FileExtension("zip");
     public static final FileExtension JAR = new FileExtension("jar");
     public static final FileExtension PDF = new FileExtension("pdf");
+    public static final FileExtension LST = new FileExtension("lst");
+    public static final FileExtension MD5 = new FileExtension("md5");
 
     private final String suffix;
     private final String suffixWithDot;

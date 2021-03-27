@@ -1,11 +1,9 @@
 package eu.menzani.build;
 
 import eu.menzani.io.PrintToConsoleException;
-import eu.menzani.lang.UncaughtException;
 import eu.menzani.misc.NativeLibrary;
 import eu.menzani.system.Platform;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -26,42 +24,31 @@ import java.nio.file.Path;
  * Windows 10 SDK
  * }</pre>
  */
-public class CompileCpp {
-    public static void main(String[] args) {
-        run();
+public class CompileCppTask {
+    public static void run(boolean shouldRebuild) {
+        CompileCppTask compileCppTask = new CompileCppTask();
+        compileCppTask.checkRequirements();
+        compileCppTask.compileCppInCurrentProject(shouldRebuild);
     }
 
-    public static void run() {
-        checkRequirements();
-
-        System.out.println("Compiling native sources...");
-        try {
-            CompileCpp compileCpp = new CompileCpp();
-            compileCpp.compile();
-        } catch (IOException e) {
-            throw new UncaughtException(e);
-        }
+    private CompileCppTask() {
     }
 
-    private static void checkRequirements() {
+    private void checkRequirements() {
         if (!Platform.current().is64Bit()) {
             throw new PrintToConsoleException("Platform must be 64-bit.");
         }
     }
 
-    private CompileCpp() {
-    }
-
-    private void compile() throws IOException {
+    private void compileCppInCurrentProject(boolean shouldRebuild) {
         IdeaProject project = IdeaProject.current();
         for (IdeaModule module : project.getModules()) {
             Path nativeSourceFolder = module.getNativeSourceFolder();
             if (Files.exists(nativeSourceFolder)) {
                 Path outputFileWithoutExtension = module.getProductionOutputDirectory()
                         .resolve(NativeLibrary.FOLDER_IN_ARTIFACT).resolve(module.getName());
-                CppCompiler cppCompiler = new CppCompiler(
-                        nativeSourceFolder, module.getNativeOutputDirectory(), outputFileWithoutExtension);
-                cppCompiler.createOutputFolders();
+                CppCompiler cppCompiler = new CppCompiler(nativeSourceFolder,
+                        module.getNativeOutputDirectory(), outputFileWithoutExtension, shouldRebuild);
                 cppCompiler.compile();
             }
         }

@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Package" type="Application" factoryName="Application" nameIsGenerated="true">
-    <option name="MAIN_CLASS_NAME" value="eu.menzani.build.Package" />
+  <configuration default="false" name="Package" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="eu.menzani.build.PackageTask" />
     <module name="Standard" />
     <method v="2">
       <option name="Make" enabled="true" />

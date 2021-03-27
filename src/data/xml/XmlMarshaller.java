@@ -1,11 +1,11 @@
-package eu.menzani.data.yaml;
+package eu.menzani.data.xml;
 
 import eu.menzani.data.Element;
 import eu.menzani.data.Marshaller;
 
 import java.io.Reader;
 
-public class YamlMarshaller implements Marshaller {
+public class XmlMarshaller implements Marshaller {
     @Override
     public void marshal(Element element, StringBuilder builder) {
 

@@ -1,6 +1,6 @@
 package eu.menzani.misc;
 
-import eu.menzani.build.CompileCpp;
+import eu.menzani.build.CompileCppTask;
 import eu.menzani.build.IdeaProject;
 import eu.menzani.build.IdeaProjectException;
 import eu.menzani.concurrent.Lazy;
@@ -49,20 +49,23 @@ public class NativeLibrary {
 
         String resourceName = FOLDER_IN_ARTIFACT + '/' + name + extension;
         URL resource = ClassLoader.getSystemResource(resourceName);
-        boolean isIDE = (resource == null);
-        if (isIDE) {
+        boolean isIDEForSure = (resource == null);
+        if (isIDEForSure) {
             if (isNotLibrary.get()) {
-                CompileCpp.run();
+                CompileCppTask.run(true);
                 resource = ClassLoader.getSystemResource(resourceName);
             } else {
                 throw couldNotCompile(null, module);
             }
         }
         String protocol = resource.getProtocol();
-        if (!isIDE && protocol.equals("jar")) {
+        if (!isIDEForSure && protocol.equals("jar")) {
             extractFromJar(path, resource);
         } else {
             Assert.equal(protocol, "file");
+            if (!isIDEForSure && isNotLibrary.get()) {
+                CompileCppTask.run(false);
+            }
             path = Paths.fromURL(resource);
         }
 

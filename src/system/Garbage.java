@@ -3,7 +3,7 @@ package eu.menzani.system;
 import com.sun.management.GarbageCollectionNotificationInfo;
 import com.sun.management.GcInfo;
 import eu.menzani.InternalUnsafe;
-import eu.menzani.lang.StreamBuffer;
+import eu.menzani.io.PrintStreamBuffer;
 import eu.menzani.lang.UncaughtException;
 import eu.menzani.struct.ConcurrentObjectToggle;
 import eu.menzani.struct.ObjectToggle;
@@ -94,7 +94,7 @@ public class Garbage {
     }
 
     private static class LoggerGCListener implements GCListener {
-        private static final StreamBuffer buffer = StreamBuffer.standardOutput();
+        private static final PrintStreamBuffer buffer = PrintStreamBuffer.standardOutput();
 
         @Override
         public void onTriggered(GarbageCollectionNotificationInfo notification, GcInfo info) {

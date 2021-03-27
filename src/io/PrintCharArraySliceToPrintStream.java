@@ -1,4 +1,8 @@
-package eu.menzani.lang;
+package eu.menzani.io;
+
+import eu.menzani.lang.Field;
+import eu.menzani.lang.MethodHandles;
+import eu.menzani.lang.UncaughtException;
 
 import java.io.BufferedWriter;
 import java.io.InterruptedIOException;
@@ -6,7 +10,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.lang.invoke.MethodHandle;
 
-public class StreamBuffer extends BuildableCharArray {
+public class PrintCharArraySliceToPrintStream {
     private static final Field<BufferedWriter> PrintStream_textOut;
     private static final Field<OutputStreamWriter> PrintStream_charOut;
     private static final MethodHandle BufferedWriter_flushBuffer =
@@ -26,28 +30,7 @@ public class StreamBuffer extends BuildableCharArray {
     private final BufferedWriter stream_textOut;
     private final OutputStreamWriter stream_charOut;
 
-    public static StreamBuffer standardOutput() {
-        return standardOutput(DEFAULT_INITIAL_CAPACITY);
-    }
-
-    public static StreamBuffer standardOutput(int initialCapacity) {
-        return new StreamBuffer(System.out, initialCapacity);
-    }
-
-    public static StreamBuffer standardError() {
-        return standardError(DEFAULT_INITIAL_CAPACITY);
-    }
-
-    public static StreamBuffer standardError(int initialCapacity) {
-        return new StreamBuffer(System.err, initialCapacity);
-    }
-
-    public StreamBuffer(PrintStream stream) {
-        this(stream, DEFAULT_INITIAL_CAPACITY);
-    }
-
-    public StreamBuffer(PrintStream stream, int initialCapacity) {
-        super(initialCapacity);
+    public PrintCharArraySliceToPrintStream(PrintStream stream) {
         this.stream = stream;
         synchronized (PrintStream_textOut) {
             PrintStream_textOut.setTargetInstance(stream);
@@ -57,11 +40,10 @@ public class StreamBuffer extends BuildableCharArray {
         }
     }
 
-    @Override
-    protected void flush(char[] buffer, int end) {
+    public void print(char[] cbuf, int off, int len) {
         try {
             synchronized (stream) {
-                stream_textOut.write(buffer, 0, end);
+                stream_textOut.write(cbuf, off, len);
                 BufferedWriter_flushBuffer.invokeExact(stream_textOut);
                 OutputStreamWriter_flushBuffer.invokeExact(stream_charOut);
             }

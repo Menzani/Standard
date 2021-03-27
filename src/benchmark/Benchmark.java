@@ -90,8 +90,9 @@ public abstract class Benchmark {
                     JVMOption.ALWAYS_PRE_TOUCH,
                     JVMOption.UNLOCK_EXPERIMENTAL_VM_OPTIONS,
                     JVMOption.USE_EPSILON_GC,
-                    JVMOption.DO_NOT_RESTRICT_CONTENDED,
-                    JVMOption.DO_NOT_USE_BIASED_LOCKING
+                    JVMOption.ENABLE_CONTENDED_ANNOTATION,
+                    JVMOption.DISABLE_BIASED_LOCKING,
+                    JVMOption.DISABLE_PERF_DATA
             );
             if (shouldPrintCompilation()) {
                 launcher.addJVMOption(JVMOption.PRINT_COMPILATION);

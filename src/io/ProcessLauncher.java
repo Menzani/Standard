@@ -5,10 +5,10 @@ import eu.menzani.lang.UncaughtException;
 import eu.menzani.struct.Patterns;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,6 +63,10 @@ public class ProcessLauncher {
         return process;
     }
 
+    public void beginWrite() {
+        beginWrite(StandardCharsets.ISO_8859_1);
+    }
+
     public void beginWrite(Charset charset) {
         inputWriter = new OutputStreamWriter(process.getOutputStream(), charset);
     }
@@ -85,8 +89,16 @@ public class ProcessLauncher {
         }
     }
 
+    public Iterable<String> outputIterator() {
+        return outputIterator(StandardCharsets.ISO_8859_1);
+    }
+
     public Iterable<String> outputIterator(Charset charset) {
         return new InputStreamIterator(process.getInputStream(), charset);
+    }
+
+    public Iterable<String> errorIterator() {
+        return errorIterator(StandardCharsets.ISO_8859_1);
     }
 
     public Iterable<String> errorIterator(Charset charset) {
@@ -94,24 +106,35 @@ public class ProcessLauncher {
     }
 
     public String readOutput() {
-        return read(process.getInputStream());
+        return readOutput(StandardCharsets.ISO_8859_1);
+    }
+
+    public String readOutput(Charset charset) {
+        return IOStreams.toString(process.getInputStream(), charset);
     }
 
     public String readError() {
-        return read(process.getErrorStream());
+        return readError(StandardCharsets.ISO_8859_1);
     }
 
-    private String read(InputStream stream) {
-        await();
-        return IOStreams.toString(stream);
+    public String readError(Charset charset) {
+        return IOStreams.toString(process.getErrorStream(), charset);
     }
 
     public String[] readOutputLines() {
-        return Patterns.SPLIT_BY_NEWLINE.split(readOutput());
+        return readOutputLines(StandardCharsets.ISO_8859_1);
+    }
+
+    public String[] readOutputLines(Charset charset) {
+        return Patterns.SPLIT_BY_NEWLINE.split(readOutput(charset));
     }
 
     public String[] readErrorLines() {
-        return Patterns.SPLIT_BY_NEWLINE.split(readError());
+        return readErrorLines(StandardCharsets.ISO_8859_1);
+    }
+
+    public String[] readErrorLines(Charset charset) {
+        return Patterns.SPLIT_BY_NEWLINE.split(readError(charset));
     }
 
     public void await() {

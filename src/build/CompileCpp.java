@@ -34,6 +34,7 @@ public class CompileCpp {
     public static void run() {
         checkRequirements();
 
+        System.out.println("Compiling native sources...");
         try {
             CompileCpp compileCpp = new CompileCpp();
             compileCpp.compile();

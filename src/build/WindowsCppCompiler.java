@@ -6,7 +6,6 @@ import eu.menzani.system.Platform;
 import eu.menzani.system.SystemProperty;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Set;
@@ -41,16 +40,15 @@ class WindowsCppCompiler {
     }
 
     void invokeCl() throws IOException {
-        invokeCl(Platform.Architecture.BIT_32);
+        if (invokeCl(Platform.Architecture.BIT_32)) return;
         invokeCl(Platform.Architecture.BIT_64);
     }
 
-    private void invokeCl(Platform.Architecture architecture) throws IOException {
+    private boolean invokeCl(Platform.Architecture architecture) throws IOException {
         ProcessLauncher launcher = new ProcessLauncher("cmd");
-        launcher.inheritOutput();
         launcher.setWorkingDirectory(workingDirectory);
         launcher.start();
-        launcher.beginWrite(StandardCharsets.ISO_8859_1);
+        launcher.beginWrite();
 
         launcher.writeLine("call \"" + vcvarsallPath + "\" " + (architecture == Platform.Architecture.BIT_32 ? "x86" : "x64"));
 
@@ -65,8 +63,33 @@ class WindowsCppCompiler {
         launcher.writeLine(builder.toString());
 
         launcher.endWrite();
-        launcher.await();
+
+        boolean errorsOccurred = false;
+        for (String line : launcher.outputIterator()) {
+            int indexOfCppExtension = line.indexOf(".cpp(");
+            int indexOfCExtension = line.indexOf(".c(");
+            if (indexOfCppExtension == -1 && indexOfCExtension == -1) continue;
+            int indexOfExtension;
+            int extensionLength;
+            if (indexOfCppExtension == -1) {
+                indexOfExtension = indexOfCExtension;
+                extensionLength = 3;
+            } else {
+                indexOfExtension = indexOfCppExtension;
+                extensionLength = 5;
+            }
+            int indexOfClosingBracket = line.indexOf("):", indexOfExtension);
+            try {
+                Integer.parseInt(line, indexOfExtension + extensionLength, indexOfClosingBracket, 10);
+            } catch (NumberFormatException e) {
+                continue;
+            }
+            System.err.println(line);
+            errorsOccurred = true;
+        }
+
         removeUnneededOutput(outputFile);
+        return errorsOccurred;
     }
 
     private static void removeUnneededOutput(String outputFile) throws IOException {

@@ -6,7 +6,6 @@ public abstract class BuildableCharArray implements GarbageCollected {
     protected static final int DEFAULT_INITIAL_CAPACITY = 512;
 
     private final int initialCapacity;
-    private int autoFlushThreshold;
     private char[] buffer;
 
     @View
@@ -17,19 +16,9 @@ public abstract class BuildableCharArray implements GarbageCollected {
         gc();
     }
 
-    public void setAutoFlushThreshold(int autoFlushThreshold) {
-        this.autoFlushThreshold = autoFlushThreshold;
-    }
-
     public void println() {
         builder.append(System.lineSeparator());
         flush();
-    }
-
-    public void checkAutoFlush() {
-        if (builder.length() > autoFlushThreshold) {
-            flush();
-        }
     }
 
     public void flush() {

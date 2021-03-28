@@ -1,8 +1,8 @@
 package eu.menzani.lang;
 
-import eu.menzani.object.GarbageCollected;
+import eu.menzani.object.GarbageCollectionAware;
 
-public abstract class BuildableCharArray implements GarbageCollected {
+public abstract class BuildableCharArray implements GarbageCollectionAware {
     protected static final int DEFAULT_INITIAL_CAPACITY = 512;
 
     private final int initialCapacity;

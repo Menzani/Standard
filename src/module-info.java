@@ -20,6 +20,7 @@ module eu.menzani {
     exports eu.menzani.lang.caller;
     exports eu.menzani.lang.mutable;
     exports eu.menzani.misc;
+    exports eu.menzani.object;
     exports eu.menzani.struct;
     exports eu.menzani.swing;
     exports eu.menzani.system;

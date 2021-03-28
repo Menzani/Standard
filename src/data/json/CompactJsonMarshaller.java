@@ -43,6 +43,8 @@ public class CompactJsonMarshaller implements Marshaller {
             builder.append(((Decimal) element).asDouble());
         } else if (element instanceof Boolean) {
             builder.append(((Boolean) element).asPrimitive());
+        } else {
+            throw new AssertionError();
         }
     }
 

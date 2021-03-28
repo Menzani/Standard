@@ -1,5 +1,5 @@
 package eu.menzani.object;
 
-public interface PoolObject extends GarbageCollected {
-    void reconstruct();
+public interface PoolObject extends GarbageCollectionAware {
+    void deallocate();
 }

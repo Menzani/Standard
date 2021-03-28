@@ -2,14 +2,12 @@ package eu.menzani.object;
 
 import eu.menzani.struct.Arrays;
 
-import java.util.function.Supplier;
-
 public class EmptyObjectPool<T extends PoolObject> implements ObjectPool<T> {
     private final T[] objects;
-    private final Supplier<? extends T> factory;
+    private final ObjectFactory<T> factory;
     private int index;
 
-    public EmptyObjectPool(int capacity, Supplier<? extends T> factory) {
+    public EmptyObjectPool(int capacity, ObjectFactory<T> factory) {
         objects = Arrays.allocateGeneric(capacity);
         this.factory = factory;
     }
@@ -17,11 +15,9 @@ public class EmptyObjectPool<T extends PoolObject> implements ObjectPool<T> {
     @Override
     public T release() {
         if (index == 0) {
-            return factory.get();
+            return factory.newInstance();
         }
-        T object = objects[--index];
-        object.reconstruct();
-        return object;
+        return objects[--index];
     }
 
     @Override

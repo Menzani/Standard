@@ -4,13 +4,13 @@ import eu.menzani.concurrent.ThreadGroup;
 import eu.menzani.io.JavaProcessLauncher;
 import eu.menzani.lang.Check;
 import eu.menzani.lang.Module;
+import eu.menzani.object.ObjectFactory;
 import eu.menzani.struct.JVMOption;
 import eu.menzani.struct.MemorySize;
 import eu.menzani.system.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 public abstract class Benchmark {
     static Benchmark current;
@@ -207,7 +207,7 @@ public abstract class Benchmark {
 
     protected abstract void test(int i);
 
-    private class BenchmarkThreadFactory implements Supplier<Thread> {
+    private class BenchmarkThreadFactory implements ObjectFactory<Thread> {
         private final ThreadManipulationSpread threadManipulation;
         private long memoryCap;
 
@@ -221,7 +221,7 @@ public abstract class Benchmark {
         }
 
         @Override
-        public Thread get() {
+        public Thread newInstance() {
             return new BenchmarkThread(threadManipulation, Benchmark.this, memoryCap);
         }
     }

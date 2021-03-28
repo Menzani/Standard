@@ -2,13 +2,11 @@ package eu.menzani.object;
 
 import eu.menzani.struct.Arrays;
 
-import java.util.function.Supplier;
-
 public class PrefilledObjectPool<T extends PoolObject> implements ObjectPool<T> {
     private final T[] objects;
     private int index;
 
-    public PrefilledObjectPool(int capacity, Supplier<? extends T> filler) {
+    public PrefilledObjectPool(int capacity, ObjectFactory<T> filler) {
         objects = Arrays.allocateGeneric(capacity);
         Arrays.fill(objects, filler);
         index = capacity;
@@ -16,9 +14,7 @@ public class PrefilledObjectPool<T extends PoolObject> implements ObjectPool<T> 
 
     @Override
     public T release() {
-        T object = objects[--index];
-        object.reconstruct();
-        return object;
+        return objects[--index];
     }
 
     @Override

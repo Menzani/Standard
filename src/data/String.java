@@ -1,20 +1,33 @@
 package eu.menzani.data;
 
 import eu.menzani.lang.View;
+import eu.menzani.object.Allocator;
 
-public class String extends Element {
+public class String extends Element implements Comparable<String> {
+    private static final Allocator<String> allocator = Allocator.create(String::new);
+
     private StringBuilder value;
 
-    public String() {
-        value = new StringBuilder();
+    public static String allocate() {
+        String instance = allocator.allocate();
+        instance.value.setLength(0);
+        return instance;
     }
 
-    public String(java.lang.String value) {
-        this.value = new StringBuilder(value);
+    public static String allocate(java.lang.String value) {
+        String instance = allocate();
+        instance.value.append(value);
+        return instance;
     }
 
-    public String(CharSequence value) {
-        this.value = new StringBuilder(value);
+    public static String allocate(CharSequence value) {
+        String instance = allocate();
+        instance.value.append(value);
+        return instance;
+    }
+
+    private String() {
+        gc();
     }
 
     public java.lang.String asJavaString() {
@@ -31,12 +44,17 @@ public class String extends Element {
     }
 
     @Override
-    public void reconstruct() {
-        value.setLength(0);
+    public int compareTo(String other) {
+        return value.compareTo(other.value);
     }
 
     @Override
     public void gc() {
         value = new StringBuilder();
+    }
+
+    @Override
+    public void deallocate() {
+        allocator.deallocate(this);
     }
 }

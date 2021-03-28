@@ -1,7 +1,8 @@
 package eu.menzani.struct;
 
+import eu.menzani.object.ObjectFactory;
+
 import java.util.Objects;
-import java.util.function.Supplier;
 
 public class Arrays {
     public static int orderIndependentHashCode(Object[] array) {
@@ -30,9 +31,9 @@ public class Arrays {
         return (T[]) new Object[length];
     }
 
-    public static <T> void fill(T[] array, Supplier<? extends T> filler) {
+    public static <T> void fill(T[] array, ObjectFactory<T> filler) {
         for (int i = 0; i < array.length; i++) {
-            array[i] = filler.get();
+            array[i] = filler.newInstance();
         }
     }
 }

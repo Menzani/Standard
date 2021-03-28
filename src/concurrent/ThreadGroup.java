@@ -1,8 +1,7 @@
 package eu.menzani.concurrent;
 
 import eu.menzani.lang.Nonblocking;
-
-import java.util.function.Supplier;
+import eu.menzani.object.ObjectFactory;
 
 public class ThreadGroup {
     private final Thread[] threads;
@@ -11,9 +10,9 @@ public class ThreadGroup {
         threads = new Thread[size];
     }
 
-    public void create(Supplier<? extends Thread> factory) {
+    public void create(ObjectFactory<Thread> factory) {
         for (int i = 0; i < threads.length; i++) {
-            threads[i] = factory.get();
+            threads[i] = factory.newInstance();
         }
     }
 
@@ -29,7 +28,7 @@ public class ThreadGroup {
         }
     }
 
-    public void run(Supplier<? extends Thread> factory) {
+    public void run(ObjectFactory<Thread> factory) {
         create(factory);
         start();
         join();

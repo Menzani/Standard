@@ -1,5 +1,5 @@
 package eu.menzani.object;
 
-public interface GarbageCollected {
+public interface GarbageCollectionAware {
     void gc();
 }

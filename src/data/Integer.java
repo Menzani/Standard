@@ -1,23 +1,36 @@
 package eu.menzani.data;
 
-public class Integer extends Element {
-    private long value;
+import eu.menzani.object.Allocator;
+
+public class Integer extends Number {
+    private static final Allocator<Integer> allocator = Allocator.create(Integer::new);
+
+    long value;
     private NumberSize size;
 
-    public Integer() {
-        set(0);
+    public static Integer allocate() {
+        return allocate(0);
     }
 
-    public Integer(short value) {
-        set(value);
+    public static Integer allocate(short value) {
+        Integer instance = allocator.allocate();
+        instance.set(value);
+        return instance;
     }
 
-    public Integer(int value) {
-        set(value);
+    public static Integer allocate(int value) {
+        Integer instance = allocator.allocate();
+        instance.set(value);
+        return instance;
     }
 
-    public Integer(long value) {
-        set(value);
+    public static Integer allocate(long value) {
+        Integer instance = allocator.allocate();
+        instance.set(value);
+        return instance;
+    }
+
+    private Integer() {
     }
 
     public short asShort() {
@@ -54,11 +67,45 @@ public class Integer extends Element {
     }
 
     @Override
-    public void reconstruct() {
-        set(0);
+    public boolean equals(java.lang.Object object) {
+        if (this == object) return true;
+
+        if (object instanceof Integer) {
+            return ((Integer) object).value == value;
+        }
+        if (object instanceof Decimal) {
+            return ((Decimal) object).value == value;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Long.hashCode(value);
+    }
+
+    @Override
+    public java.lang.String toString() {
+        return Long.toString(value);
+    }
+
+    @Override
+    public int compareTo(Number other) {
+        if (other instanceof Integer) {
+            return Long.compare(((Integer) other).value, value);
+        }
+        if (other instanceof Decimal) {
+            return Double.compare(((Decimal) other).value, value);
+        }
+        throw new AssertionError();
     }
 
     @Override
     public void gc() {
+    }
+
+    @Override
+    public void deallocate() {
+        allocator.deallocate(this);
     }
 }

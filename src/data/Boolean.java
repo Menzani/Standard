@@ -9,6 +9,10 @@ public final class Boolean extends Element {
 
     private final boolean value;
 
+    public static Boolean allocate(boolean value) {
+        return value ? TRUE : FALSE;
+    }
+
     private Boolean(boolean value) {
         this.value = value;
     }
@@ -18,10 +22,10 @@ public final class Boolean extends Element {
     }
 
     @Override
-    public void reconstruct() {
+    public void gc() {
     }
 
     @Override
-    public void gc() {
+    public void deallocate() {
     }
 }

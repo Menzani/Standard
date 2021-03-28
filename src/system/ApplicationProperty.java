@@ -6,7 +6,7 @@ public class ApplicationProperty extends RuntimeProperty {
     }
 
     public ApplicationProperty(Class<?> clazz, String first, String... more) {
-        this(clazz.getPackageName(), first, more);
+        this(clazz.getName(), first, more);
     }
 
     private ApplicationProperty(String initialValue, String first, String[] more) {

@@ -2,29 +2,22 @@ package eu.menzani.object;
 
 import eu.menzani.struct.Arrays;
 
-import java.util.function.Supplier;
-
 public class ConcurrentEmptyObjectPool<T extends PoolObject> implements ObjectPool<T> {
     private final T[] objects;
-    private final Supplier<? extends T> factory;
+    private final ObjectFactory<T> factory;
     private int index;
 
-    public ConcurrentEmptyObjectPool(int capacity, Supplier<? extends T> factory) {
+    public ConcurrentEmptyObjectPool(int capacity, ObjectFactory<T> factory) {
         objects = Arrays.allocateGeneric(capacity);
         this.factory = factory;
     }
 
     @Override
-    public T release() {
-        T object;
-        synchronized (this) {
-            if (index == 0) {
-                return factory.get();
-            }
-            object = objects[--index];
+    public synchronized T release() {
+        if (index == 0) {
+            return factory.newInstance();
         }
-        object.reconstruct();
-        return object;
+        return objects[--index];
     }
 
     @Override

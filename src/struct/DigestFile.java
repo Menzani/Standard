@@ -46,18 +46,20 @@ public class DigestFile {
         md5.update(Files.readAllBytes(file));
     }
 
-    public byte[] save() throws IOException {
+    public void save() throws IOException {
         byte[] digest = md5.digest();
         Files.write(file, digest);
-        return digest;
     }
 
     public boolean wereChanged() throws IOException {
-        byte[] digest = save();
+        byte[] digest = md5.digest();
         if (Files.exists(file)) {
             byte[] oldDigest = Files.readAllBytes(file);
-            return !Arrays.equals(oldDigest, digest);
+            if (Arrays.equals(oldDigest, digest)) {
+                return false;
+            }
         }
+        Files.write(file, digest);
         return true;
     }
 }

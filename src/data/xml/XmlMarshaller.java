@@ -1,9 +1,8 @@
 package eu.menzani.data.xml;
 
+import eu.menzani.lang.CharBuffer;
 import eu.menzani.data.Element;
 import eu.menzani.data.Marshaller;
-
-import java.io.Reader;
 
 public class XmlMarshaller implements Marshaller {
     @Override
@@ -12,7 +11,7 @@ public class XmlMarshaller implements Marshaller {
     }
 
     @Override
-    public Element unmarshal(Reader reader) {
+    public Element unmarshal(CharBuffer buffer) {
         return null;
     }
 }

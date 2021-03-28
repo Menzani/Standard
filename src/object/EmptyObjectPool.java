@@ -8,7 +8,7 @@ public class EmptyObjectPool<T extends PoolObject> implements ObjectPool<T> {
     private int index;
 
     public EmptyObjectPool(int capacity, ObjectFactory<T> factory) {
-        objects = Arrays.allocateGeneric(capacity);
+        objects = Arrays.allocateGeneric(PoolObject.class, capacity);
         this.factory = factory;
     }
 

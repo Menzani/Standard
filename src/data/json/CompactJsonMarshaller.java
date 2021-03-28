@@ -5,8 +5,10 @@ import eu.menzani.data.Integer;
 import eu.menzani.data.Object;
 import eu.menzani.data.String;
 import eu.menzani.data.*;
+import eu.menzani.lang.CharBuffer;
+import eu.menzani.data.ParseException;
+import eu.menzani.lang.NoGarbageParseDouble;
 
-import java.io.Reader;
 import java.util.Map;
 
 public class CompactJsonMarshaller implements Marshaller {
@@ -22,22 +24,30 @@ public class CompactJsonMarshaller implements Marshaller {
             builder.append(((Integer) element).asLong());
         } else if (element instanceof Object) {
             builder.append('{');
+            boolean commaAdded = false;
             for (Map.Entry<java.lang.String, Element> keyWithValue : ((Object) element).getKeysWithValues()) {
                 builder.append('"');
                 builder.append(keyWithValue.getKey());
                 builder.append("\":");
                 marshal(keyWithValue.getValue(), builder);
                 builder.append(',');
+                commaAdded = true;
             }
-            builder.setLength(builder.length() - 1);
+            if (commaAdded) {
+                builder.setLength(builder.length() - 1);
+            }
             builder.append('}');
         } else if (element instanceof Array) {
             builder.append('[');
+            boolean commaAdded = false;
             for (Element arrayElement : ((Array) element).asList()) {
                 marshal(arrayElement, builder);
                 builder.append(',');
+                commaAdded = true;
             }
-            builder.setLength(builder.length() - 1);
+            if (commaAdded) {
+                builder.setLength(builder.length() - 1);
+            }
             builder.append(']');
         } else if (element instanceof Decimal) {
             builder.append(((Decimal) element).asDouble());
@@ -48,8 +58,126 @@ public class CompactJsonMarshaller implements Marshaller {
         }
     }
 
+    private final String key = String.allocate();
+    private final NoGarbageParseDouble noGarbageParseDouble = new NoGarbageParseDouble();
+
     @Override
-    public Element unmarshal(Reader reader) {
-        return null;
+    public Element unmarshal(CharBuffer buffer) {
+        switch (buffer.next()) {
+            case 'n':
+                if (buffer.nextIs('u') &&
+                        buffer.nextIs('l') &&
+                        buffer.nextIs('l')) {
+                    return null;
+                }
+                throw new ParseException();
+            case 't':
+                if (buffer.nextIs('r') &&
+                        buffer.nextIs('u') &&
+                        buffer.nextIs('e')) {
+                    return Boolean.TRUE;
+                }
+                throw new ParseException();
+            case 'f':
+                if (buffer.nextIs('a') &&
+                        buffer.nextIs('l') &&
+                        buffer.nextIs('s') &&
+                        buffer.nextIs('e')) {
+                    return Boolean.FALSE;
+                }
+                throw new ParseException();
+            case '"': {
+                int start = buffer.position();
+                while (buffer.nextIsNot('"')) ;
+                String string = String.allocate();
+                string.set().append(buffer, start, buffer.position() - 1);
+                return string;
+            }
+            case '[': {
+                Array array = Array.allocate();
+                while (true) {
+                    if (buffer.peekIs(']')) {
+                        buffer.advance();
+                        return array;
+                    }
+                    array.add(unmarshal(buffer));
+                    if (buffer.peekIs(',')) {
+                        buffer.advance();
+                    }
+                }
+            }
+            case '{':
+                Object object = Object.allocate();
+                while (true) {
+                    if (buffer.peekIs('}')) {
+                        buffer.advance();
+                        return object;
+                    }
+
+                    if (buffer.nextIsNot('"')) {
+                        throw new ParseException();
+                    }
+                    int start = buffer.position();
+                    while (buffer.nextIsNot('"')) ;
+                    key.clear();
+                    key.set().append(buffer, start, buffer.position() - 1);
+
+                    if (buffer.nextIsNot(':')) {
+                        throw new ParseException();
+                    }
+                    object.set(key.asJavaString(), unmarshal(buffer));
+                    if (buffer.peekIs(',')) {
+                        buffer.advance();
+                    }
+                }
+            case '+':
+            case '-':
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                int start = buffer.position() - 1;
+                boolean isDecimal = false;
+                outer:
+                while (buffer.hasNext()) {
+                    switch (buffer.peek()) {
+                        case ',':
+                        case ']':
+                        case '}':
+                            break outer;
+                        case '.':
+                            isDecimal = true;
+                        case '0':
+                        case '1':
+                        case '2':
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7':
+                        case '8':
+                        case '9':
+                            buffer.advance();
+                            break;
+                        default:
+                            throw new ParseException();
+                    }
+                }
+
+                if (isDecimal) {
+                    noGarbageParseDouble.reset();
+                    noGarbageParseDouble.put(buffer, start, buffer.position());
+                    return Decimal.allocate(noGarbageParseDouble.parse());
+                }
+                return Integer.allocate(Long.parseLong(buffer, start, buffer.position(), 10));
+            default:
+                throw new ParseException();
+        }
     }
 }

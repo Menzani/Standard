@@ -18,6 +18,8 @@ import java.util.*;
 
 class CppCompiler {
     private static final SimpleDirectoryStreamFilter.Builder filterBuilder = SimpleDirectoryStreamFilter.builder()
+            .excludeDirectories()
+            .orMustEndWith("_share")
             .orHasExtension(FileExtension.CPP)
             .orHasExtension(FileExtension.C);
 

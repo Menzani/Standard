@@ -22,6 +22,25 @@ public final class Boolean extends Element {
     }
 
     @Override
+    public boolean equals(java.lang.Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+
+        Boolean that = (Boolean) object;
+        return value == that.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return java.lang.Boolean.hashCode(value);
+    }
+
+    @Override
+    public java.lang.String toString() {
+        return java.lang.Boolean.toString(value);
+    }
+
+    @Override
     public void gc() {
     }
 

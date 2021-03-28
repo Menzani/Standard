@@ -1,3 +1,5 @@
+#define NDEBUG
+
 #include <jni.h>
 
 #ifndef _Included_eu_menzani_Native
@@ -21,6 +23,9 @@ JNIEXPORT jint JNICALL Java_eu_menzani_system_Threads_bindCurrentThread
 
 JNIEXPORT jint JNICALL Java_eu_menzani_system_Threads_setCurrentThreadPriority
   (JNIEnv *, jclass);
+
+JNIEXPORT jdouble JNICALL Java_eu_menzani_lang_NoGarbageParseDouble_parse
+  (JNIEnv *, jclass, jlong, jint);
 
 #ifdef __cplusplus
 }

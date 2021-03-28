@@ -8,7 +8,7 @@ public class ConcurrentEmptyObjectPool<T extends PoolObject> implements ObjectPo
     private int index;
 
     public ConcurrentEmptyObjectPool(int capacity, ObjectFactory<T> factory) {
-        objects = Arrays.allocateGeneric(capacity);
+        objects = Arrays.allocateGeneric(PoolObject.class, capacity);
         this.factory = factory;
     }
 

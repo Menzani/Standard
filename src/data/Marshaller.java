@@ -1,9 +1,9 @@
 package eu.menzani.data;
 
-import java.io.Reader;
+import eu.menzani.lang.CharBuffer;
 
 public interface Marshaller {
     void marshal(Element element, StringBuilder builder);
 
-    Element unmarshal(Reader reader);
+    Element unmarshal(CharBuffer buffer);
 }

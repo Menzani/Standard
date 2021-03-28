@@ -2,7 +2,7 @@ package eu.menzani.system;
 
 import eu.menzani.SunUnsafe;
 import eu.menzani.io.ProcessLauncher;
-import eu.menzani.misc.ParseException;
+import eu.menzani.data.ParseException;
 
 public enum Platform {
     LINUX_32(Family.LINUX, Architecture.BIT_32, false, true, false, true),

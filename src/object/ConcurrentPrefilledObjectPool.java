@@ -7,7 +7,7 @@ public class ConcurrentPrefilledObjectPool<T extends PoolObject> implements Obje
     private int index;
 
     public ConcurrentPrefilledObjectPool(int capacity, ObjectFactory<T> filler) {
-        objects = Arrays.allocateGeneric(capacity);
+        objects = Arrays.allocateGeneric(PoolObject.class, capacity);
         Arrays.fill(objects, filler);
         index = capacity;
     }

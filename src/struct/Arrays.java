@@ -2,6 +2,7 @@ package eu.menzani.struct;
 
 import eu.menzani.object.ObjectFactory;
 
+import java.lang.reflect.Array;
 import java.util.Objects;
 
 public class Arrays {
@@ -29,6 +30,11 @@ public class Arrays {
     @SuppressWarnings("unchecked")
     public static <T> T[] allocateGeneric(int length) {
         return (T[]) new Object[length];
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T[] allocateGeneric(Class<? super T> bound, int length) {
+        return (T[]) Array.newInstance(bound, length);
     }
 
     public static <T> void fill(T[] array, ObjectFactory<T> filler) {

@@ -10,7 +10,7 @@ public class String extends Element implements Comparable<String> {
 
     public static String allocate() {
         String instance = allocator.allocate();
-        instance.value.setLength(0);
+        instance.clear();
         return instance;
     }
 
@@ -41,6 +41,10 @@ public class String extends Element implements Comparable<String> {
 
     public StringBuilder set() {
         return value;
+    }
+
+    public void clear() {
+        value.setLength(0);
     }
 
     @Override

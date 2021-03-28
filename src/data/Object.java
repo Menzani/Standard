@@ -1,6 +1,7 @@
 package eu.menzani.data;
 
 import eu.menzani.object.Allocator;
+import eu.menzani.object.PoolObject;
 
 import java.util.*;
 
@@ -269,6 +270,11 @@ public class Object extends Element {
 
     @Override
     public void deallocate() {
+        for (PoolObject value : elements.values()) {
+            if (value != null) {
+                value.deallocate();
+            }
+        }
         allocator.deallocate(this);
     }
 }

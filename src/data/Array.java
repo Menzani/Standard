@@ -1,6 +1,7 @@
 package eu.menzani.data;
 
 import eu.menzani.object.Allocator;
+import eu.menzani.object.PoolObject;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -241,6 +242,11 @@ public class Array extends Element implements Iterable<Element> {
 
     @Override
     public void deallocate() {
+        for (PoolObject element : elements) {
+            if (element != null) {
+                element.deallocate();
+            }
+        }
         allocator.deallocate(this);
     }
 }

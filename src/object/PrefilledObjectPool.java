@@ -7,7 +7,7 @@ public class PrefilledObjectPool<T extends PoolObject> implements ObjectPool<T> 
     private int index;
 
     public PrefilledObjectPool(int capacity, ObjectFactory<T> filler) {
-        objects = Arrays.allocateGeneric(capacity);
+        objects = Arrays.allocateGeneric(PoolObject.class, capacity);
         Arrays.fill(objects, filler);
         index = capacity;
     }

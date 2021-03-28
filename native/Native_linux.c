@@ -1,10 +1,9 @@
 #define _GNU_SOURCE
 
-#include <jni.h>
+#include "Native.h"
 #include <time.h>
 #include <sched.h>
 #include <errno.h>
-#include "Native.h"
 
 JNIEXPORT void JNICALL Java_eu_menzani_system_LinuxSleep_sleep
   (JNIEnv *env, jclass clazz, jint nanoseconds)

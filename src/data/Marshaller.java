@@ -1,9 +1,17 @@
 package eu.menzani.data;
 
-import eu.menzani.lang.CharBuffer;
+public abstract class Marshaller {
+    private static final int defaultBufferSize = 8192;
 
-public interface Marshaller {
-    void marshal(Element element, StringBuilder builder);
+    public abstract void marshal(Element element, WriteBuffer buffer);
 
-    Element unmarshal(CharBuffer buffer);
+    public abstract Element unmarshal(ReadBuffer buffer);
+
+    public void marshal(Element element, Destination destination) {
+        marshal(element, new WriteBuffer(defaultBufferSize, destination));
+    }
+
+    public Element unmarshal(Source source) {
+        return unmarshal(new ReadBuffer(defaultBufferSize, source));
+    }
 }

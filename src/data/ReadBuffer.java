@@ -1,28 +1,24 @@
-package eu.menzani.lang;
+package eu.menzani.data;
 
-import eu.menzani.data.ParseException;
-
-public class CharBuffer implements CharSequence {
+public class ReadBuffer implements CharSequence {
     private final char[] buffer;
+    private final Source source;
+
     private int length;
     private int position;
 
-    public CharBuffer(int capacity) {
-        buffer = new char[capacity];
+    public ReadBuffer(int size, Source source) {
+        buffer = new char[size];
+        this.source = source;
     }
 
-    @Override
-    public int length() {
-        return length;
+    public int position() {
+        return position;
     }
 
     @Override
     public char charAt(int index) {
         return buffer[index];
-    }
-
-    public int position() {
-        return position;
     }
 
     public char next() {
@@ -50,14 +46,31 @@ public class CharBuffer implements CharSequence {
     }
 
     private char get(int index) {
-        if (index < length) {
-            return buffer[index];
+        if (index == length) {
+            length = source.fill(buffer);
+            if (length == -1) {
+                throw new ParseException();
+            }
+            position = 1;
+            return buffer[0];
         }
-        throw new ParseException();
+        return buffer[index];
     }
 
     public boolean hasNext() {
-        return position != length;
+        if (position == length) {
+            length = source.fill(buffer);
+            if (length == -1) {
+                return false;
+            }
+            position = 0;
+        }
+        return true;
+    }
+
+    @Override
+    public int length() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

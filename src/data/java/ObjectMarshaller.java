@@ -1,9 +1,9 @@
 package eu.menzani.data.java;
 
-import eu.menzani.data.Marshaller;
+import eu.menzani.data.Element;
 
 public interface ObjectMarshaller<T> {
-    void writeTo(Marshaller marshaller, T object);
+    Element toElement(T object);
 
-    T readFrom(Marshaller marshaller);
+    T fromElement(Element element);
 }

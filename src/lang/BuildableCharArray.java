@@ -22,10 +22,12 @@ public abstract class BuildableCharArray implements GarbageCollectionAware {
     }
 
     public void flush() {
-        int length = builder.length();
-        if (buffer.length != length) {
-            buffer = new char[length];
+        int capacity = builder.capacity();
+        if (buffer.length != capacity) {
+            buffer = new char[capacity];
         }
+
+        int length = builder.length();
         builder.getChars(0, length, buffer, 0);
         builder.setLength(0);
 

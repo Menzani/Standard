@@ -5,15 +5,17 @@ import eu.menzani.data.Integer;
 import eu.menzani.data.Object;
 import eu.menzani.data.String;
 import eu.menzani.data.*;
-import eu.menzani.lang.CharBuffer;
+import eu.menzani.data.ReadBuffer;
 import eu.menzani.data.ParseException;
 import eu.menzani.lang.NoGarbageParseDouble;
 
 import java.util.Map;
 
-public class CompactJsonMarshaller implements Marshaller {
+public class CompactJsonMarshaller extends Marshaller {
     @Override
-    public void marshal(Element element, StringBuilder builder) {
+    public void marshal(Element element, WriteBuffer buffer) {
+        StringBuilder builder = buffer.builder;
+
         if (element == null) {
             builder.append((java.lang.String) null);
         } else if (element instanceof String) {
@@ -29,7 +31,8 @@ public class CompactJsonMarshaller implements Marshaller {
                 builder.append('"');
                 builder.append(keyWithValue.getKey());
                 builder.append("\":");
-                marshal(keyWithValue.getValue(), builder);
+                buffer.checkFull();
+                marshal(keyWithValue.getValue(), buffer);
                 builder.append(',');
                 commaAdded = true;
             }
@@ -41,7 +44,8 @@ public class CompactJsonMarshaller implements Marshaller {
             builder.append('[');
             boolean commaAdded = false;
             for (Element arrayElement : ((Array) element).asList()) {
-                marshal(arrayElement, builder);
+                buffer.checkFull();
+                marshal(arrayElement, buffer);
                 builder.append(',');
                 commaAdded = true;
             }
@@ -62,7 +66,7 @@ public class CompactJsonMarshaller implements Marshaller {
     private final NoGarbageParseDouble noGarbageParseDouble = new NoGarbageParseDouble();
 
     @Override
-    public Element unmarshal(CharBuffer buffer) {
+    public Element unmarshal(ReadBuffer buffer) {
         switch (buffer.next()) {
             case 'n':
                 if (buffer.nextIs('u') &&

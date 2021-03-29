@@ -10,7 +10,7 @@ public class NoGarbageParseDouble {
         Native.init();
     }
 
-    private final long buffer = Unsafe.allocateMemory(21L);
+    private final long buffer = Unsafe.allocateMemory(24L);
     private int length;
 
     public NoGarbageParseDouble() {

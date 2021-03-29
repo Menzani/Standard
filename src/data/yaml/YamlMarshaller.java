@@ -1,17 +1,18 @@
 package eu.menzani.data.yaml;
 
-import eu.menzani.lang.CharBuffer;
+import eu.menzani.data.ReadBuffer;
 import eu.menzani.data.Element;
 import eu.menzani.data.Marshaller;
+import eu.menzani.data.WriteBuffer;
 
-public class YamlMarshaller implements Marshaller {
+public class YamlMarshaller extends Marshaller {
     @Override
-    public void marshal(Element element, StringBuilder builder) {
+    public void marshal(Element element, WriteBuffer buffer) {
 
     }
 
     @Override
-    public Element unmarshal(CharBuffer buffer) {
+    public Element unmarshal(ReadBuffer buffer) {
         return null;
     }
 }

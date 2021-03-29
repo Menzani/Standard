@@ -12,6 +12,10 @@ public class WriteBuffer extends BuildableCharArray {
         this.destination = destination;
     }
 
+    public int position() {
+        return builder.length();
+    }
+
     public void checkFull() {
         if (builder.length() > size) {
             flush();

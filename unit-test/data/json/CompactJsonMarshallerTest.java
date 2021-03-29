@@ -40,6 +40,7 @@ public class CompactJsonMarshallerTest {
         marshal(Decimal.allocate(5.5D), "5.5");
         marshal(Decimal.allocate(5.5F), "5.5");
         marshal(eu.menzani.data.String.allocate(""), "\"\"");
+        marshal(eu.menzani.data.String.allocate("\"-\\"), "\"\\\"-\\\\\"");
         marshal(Array.allocate(), "[]");
         marshal(Object.allocate(), "{}");
         marshal(element1, string1);
@@ -52,6 +53,7 @@ public class CompactJsonMarshallerTest {
         unmarshal("7", Integer.allocate(7L));
         unmarshal("5.5", Decimal.allocate(5.5D));
         unmarshal("\"\"", eu.menzani.data.String.allocate(""));
+        unmarshal("\"\\\"-\\\\\"", eu.menzani.data.String.allocate("\"-\\"));
         unmarshal("[]", Array.allocate());
         unmarshal("{}", Object.allocate());
         unmarshal(string1, element1);

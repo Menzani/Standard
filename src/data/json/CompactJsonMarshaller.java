@@ -8,10 +8,14 @@ import eu.menzani.data.*;
 import eu.menzani.data.ReadBuffer;
 import eu.menzani.data.ParseException;
 import eu.menzani.lang.NoGarbageParseDouble;
+import eu.menzani.lang.StringBuilders;
+import eu.menzani.lang.TargetReplacement;
 
 import java.util.Map;
 
 public class CompactJsonMarshaller extends Marshaller {
+    private static final TargetReplacement[] stringEscapes = {new TargetReplacement('\\', "\\\\"), new TargetReplacement('\"', "\\\"")};
+
     @Override
     public void marshal(Element element, WriteBuffer buffer) {
         StringBuilder builder = buffer.builder;
@@ -20,7 +24,9 @@ public class CompactJsonMarshaller extends Marshaller {
             builder.append((java.lang.String) null);
         } else if (element instanceof String) {
             builder.append('"');
+            int start = buffer.position();
             builder.append(((String) element).asCharSequence());
+            StringBuilders.replace(builder, start, buffer.position(), stringEscapes);
             builder.append('"');
         } else if (element instanceof Integer) {
             builder.append(((Integer) element).asLong());
@@ -29,7 +35,9 @@ public class CompactJsonMarshaller extends Marshaller {
             boolean commaAdded = false;
             for (Map.Entry<java.lang.String, Element> keyWithValue : ((Object) element).getKeysWithValues()) {
                 builder.append('"');
+                int start = buffer.position();
                 builder.append(keyWithValue.getKey());
+                StringBuilders.replace(builder, start, buffer.position(), stringEscapes);
                 builder.append("\":");
                 buffer.checkFull();
                 marshal(keyWithValue.getValue(), buffer);
@@ -91,10 +99,30 @@ public class CompactJsonMarshaller extends Marshaller {
                 }
                 throw new ParseException();
             case '"': {
-                int start = buffer.position();
-                while (buffer.nextIsNot('"')) ;
                 String string = String.allocate();
-                string.set().append(buffer, start, buffer.position() - 1);
+                StringBuilder builder = string.set();
+                outer:
+                while (true) {
+                    char character = buffer.next();
+                    switch (character) {
+                        case '\\':
+                            switch (buffer.next()) {
+                                case '"':
+                                    builder.append('"');
+                                    break;
+                                case '\\':
+                                    builder.append('\\');
+                                    break;
+                                default:
+                                    throw new ParseException();
+                            }
+                            break;
+                        case '"':
+                            break outer;
+                        default:
+                            builder.append(character);
+                    }
+                }
                 return string;
             }
             case '[': {
@@ -121,10 +149,30 @@ public class CompactJsonMarshaller extends Marshaller {
                     if (buffer.nextIsNot('"')) {
                         throw new ParseException();
                     }
-                    int start = buffer.position();
-                    while (buffer.nextIsNot('"')) ;
                     key.clear();
-                    key.set().append(buffer, start, buffer.position() - 1);
+                    StringBuilder builder = key.set();
+                    outer:
+                    while (true) {
+                        char character = buffer.next();
+                        switch (character) {
+                            case '\\':
+                                switch (buffer.next()) {
+                                    case '"':
+                                        builder.append('"');
+                                        break;
+                                    case '\\':
+                                        builder.append('\\');
+                                        break;
+                                    default:
+                                        throw new ParseException();
+                                }
+                                break;
+                            case '"':
+                                break outer;
+                            default:
+                                builder.append(character);
+                        }
+                    }
 
                     if (buffer.nextIsNot(':')) {
                         throw new ParseException();

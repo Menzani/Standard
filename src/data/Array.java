@@ -57,6 +57,10 @@ public class Array extends Element implements Iterable<Element> {
         elements.add(value);
     }
 
+    public void addNull() {
+        elements.add(null);
+    }
+
     public void set(int index, short value) {
         elements.set(index, Integer.allocate(value));
     }
@@ -93,6 +97,10 @@ public class Array extends Element implements Iterable<Element> {
         elements.set(index, value);
     }
 
+    public void setNull(int index) {
+        elements.set(index, null);
+    }
+
     public boolean contains(short value) {
         return elements.contains(Integer.allocate(value));
     }
@@ -127,6 +135,10 @@ public class Array extends Element implements Iterable<Element> {
 
     public boolean contains(Element value) {
         return elements.contains(value);
+    }
+
+    public boolean containsNull() {
+        return elements.contains(null);
     }
 
     public short getShort(int index) {

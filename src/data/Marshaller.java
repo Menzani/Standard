@@ -8,7 +8,9 @@ public abstract class Marshaller {
     public abstract Element unmarshal(ReadBuffer buffer);
 
     public void marshal(Element element, Destination destination) {
-        marshal(element, new WriteBuffer(defaultBufferSize, destination));
+        WriteBuffer buffer = new WriteBuffer(defaultBufferSize, destination);
+        marshal(element, buffer);
+        buffer.flush();
     }
 
     public Element unmarshal(Source source) {

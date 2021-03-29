@@ -16,11 +16,6 @@ public class ReadBuffer implements CharSequence {
         return position;
     }
 
-    @Override
-    public char charAt(int index) {
-        return buffer[index];
-    }
-
     public char next() {
         return get(position++);
     }
@@ -70,7 +65,12 @@ public class ReadBuffer implements CharSequence {
 
     @Override
     public int length() {
-        throw new UnsupportedOperationException();
+        return position;
+    }
+
+    @Override
+    public char charAt(int index) {
+        return buffer[index];
     }
 
     @Override

@@ -56,6 +56,10 @@ public class Object extends Element {
         elements.put(key, value);
     }
 
+    public void setNull(java.lang.String key) {
+        elements.put(key, null);
+    }
+
     public short getShort(java.lang.String key) {
         return getShort(key, (short) 0);
     }

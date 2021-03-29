@@ -1,5 +1,6 @@
 package eu.menzani.lang;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class Assert {
@@ -28,11 +29,11 @@ public class Assert {
     }
 
     public static void equal(Object left, Object right) {
-        assert left.equals(right) : left;
+        assert Objects.equals(left, right) : left;
     }
 
     public static void equalTo(Object left, Object right) {
-        assert left.equals(right) : left + " " + right;
+        assert Objects.equals(left, right) : left + " " + right;
     }
 
     public static void same(Object left, Object right) {
@@ -60,11 +61,11 @@ public class Assert {
     }
 
     public static void notEqual(Object left, Object right) {
-        assert !left.equals(right);
+        assert !Objects.equals(left, right);
     }
 
     public static void notEqualTo(Object left, Object right) {
-        assert !left.equals(right) : left;
+        assert !Objects.equals(left, right) : left;
     }
 
     public static void notSame(Object left, Object right) {

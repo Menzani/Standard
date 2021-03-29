@@ -1,5 +1,6 @@
 package eu.menzani.data;
 
+import eu.menzani.lang.StringBuilders;
 import eu.menzani.lang.View;
 import eu.menzani.object.Allocator;
 
@@ -45,6 +46,25 @@ public class String extends Element implements Comparable<String> {
 
     public void clear() {
         value.setLength(0);
+    }
+
+    @Override
+    public boolean equals(java.lang.Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+
+        String that = (String) object;
+        return StringBuilders.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return StringBuilders.hashCode(value);
+    }
+
+    @Override
+    public java.lang.String toString() {
+        return asJavaString();
     }
 
     @Override

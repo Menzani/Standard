@@ -1,5 +1,7 @@
 package eu.menzani.lang;
 
+import java.util.Objects;
+
 public class Ensure {
     public static void notEqual(int left, int right) {
         if (left == right) {
@@ -26,13 +28,13 @@ public class Ensure {
     }
 
     public static void notEqual(Object left, Object right) {
-        if (left.equals(right)) {
+        if (Objects.equals(left, right)) {
             throw new IllegalStateException();
         }
     }
 
     public static void notEqualTo(Object left, Object right) {
-        if (left.equals(right)) {
+        if (Objects.equals(left, right)) {
             throw new IllegalObjectStateException(left);
         }
     }

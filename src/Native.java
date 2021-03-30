@@ -9,7 +9,7 @@ public class Native {
     }
 
     static {
-        AppInfo.setProjectName("Standard");
+        AppInfo.setName("Standard");
         NativeLibrary nativeLibrary = new NativeLibrary(2278256207267942924L, Lang.EU_MENZANI_MODULE, "standard");
         nativeLibrary.load();
     }

@@ -2,7 +2,6 @@ package eu.menzani.misc;
 
 import eu.menzani.build.CompileCppTask;
 import eu.menzani.build.IdeaProject;
-import eu.menzani.build.IdeaProjectException;
 import eu.menzani.concurrent.Lazy;
 import eu.menzani.lang.Assert;
 import eu.menzani.lang.UncaughtException;
@@ -23,13 +22,11 @@ import java.nio.file.Path;
 public class NativeLibrary {
     public static final String FOLDER_IN_ARTIFACT = "native";
     private static final Lazy<Boolean> isNotLibrary = Lazy.of(() -> {
-        IdeaProject project;
-        try {
-            project = IdeaProject.current();
-        } catch (IdeaProjectException e) {
-            throw couldNotCompile(e, null);
+        IdeaProject project = IdeaProject.current();
+        if (project == null) {
+            return false;
         }
-        return project.isNotLibrary();
+        return project.isNotLibrary("Standard");
     });
 
     private final long versionId;
@@ -55,7 +52,7 @@ public class NativeLibrary {
                 CompileCppTask.run(true);
                 resource = ClassLoader.getSystemResource(resourceName);
             } else {
-                throw couldNotCompile(null, module);
+                throw new NativeLibraryException("Could not compile", module);
             }
         }
         String protocol = resource.getProtocol();
@@ -70,10 +67,6 @@ public class NativeLibrary {
         }
 
         System.load(path.toAbsolutePath().toString());
-    }
-
-    private static NativeLibraryException couldNotCompile(Throwable cause, Module module) {
-        return new NativeLibraryException("Could not compile", cause, module);
     }
 
     private static void extractFromJar(Path path, URL url) {

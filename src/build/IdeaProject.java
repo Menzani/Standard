@@ -1,9 +1,9 @@
 package eu.menzani.build;
 
 import eu.menzani.concurrent.Lazy;
+import eu.menzani.lang.Optional;
 import eu.menzani.lang.UncaughtException;
 import eu.menzani.misc.XmlParser;
-import eu.menzani.struct.AppInfo;
 import eu.menzani.system.SystemPaths;
 
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class IdeaProject {
-    private static final Lazy<IdeaProject> current = Lazy.of(() -> new IdeaProject(SystemPaths.WORKING_DIRECTORY));
+    private static final Lazy<IdeaProject> current = Lazy.of(() -> IdeaProject.fromFolder(SystemPaths.WORKING_DIRECTORY));
 
     public static IdeaProject current() {
         return current.get();
@@ -25,21 +25,22 @@ public class IdeaProject {
     private final String name;
     private final List<IdeaModule> modules;
 
-    public IdeaProject(Path directory) {
+    public static @Optional IdeaProject fromFolder(Path folder) {
+        Path ideaFolder = folder.resolve(IDEA_FOLDER_NAME);
+        if (Files.exists(ideaFolder)) {
+            return new IdeaProject(folder, ideaFolder);
+        }
+        return null;
+    }
+
+    private IdeaProject(Path directory, Path ideaFolder) {
         this.directory = directory;
-        ideaFolder = directory.resolve(IDEA_FOLDER_NAME);
-        checkIdeaFolder();
+        this.ideaFolder = ideaFolder;
         name = directory.getFileName().toString();
         try {
             modules = readModules();
         } catch (IOException e) {
             throw new UncaughtException(e);
-        }
-    }
-
-    private void checkIdeaFolder() {
-        if (Files.notExists(ideaFolder)) {
-            throw new IdeaProjectException("Could not find", directory);
         }
     }
 
@@ -65,7 +66,7 @@ public class IdeaProject {
         return modules;
     }
 
-    public boolean isNotLibrary() {
-        return name.equals(AppInfo.getProjectNameOrNull());
+    public boolean isNotLibrary(String fileProjectName) {
+        return name.equals(fileProjectName);
     }
 }

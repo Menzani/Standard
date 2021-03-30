@@ -24,7 +24,7 @@ class CppCompiler {
             .orHasExtension(FileExtension.C);
 
     private static final DigestFile sourcesDigest = new DigestFile(
-            SystemPaths.TEMP_FOLDER, "native-build_" + AppInfo.getProjectName());
+            SystemPaths.TEMP_FOLDER, "native-build_" + AppInfo.getName());
 
     private final Path sourcesFolder;
     private final Path outputFolder;

@@ -10,11 +10,18 @@ import eu.menzani.data.ParseException;
 import eu.menzani.lang.NoGarbageParseDouble;
 import eu.menzani.lang.StringBuilders;
 import eu.menzani.lang.TargetReplacement;
+import eu.menzani.object.GarbageCollectionAware;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public class CompactJsonMarshaller extends Marshaller {
+public class CompactJsonMarshaller extends Marshaller implements GarbageCollectionAware {
     private static final TargetReplacement[] stringEscapes = {new TargetReplacement('\\', "\\\\"), new TargetReplacement('\"', "\\\"")};
+
+    public CompactJsonMarshaller() {
+        gc();
+    }
 
     @Override
     public void marshal(Element element, WriteBuffer buffer) {
@@ -32,32 +39,30 @@ public class CompactJsonMarshaller extends Marshaller {
             builder.append(((Integer) element).asLong());
         } else if (element instanceof Object) {
             builder.append('{');
-            boolean commaAdded = false;
-            for (Map.Entry<java.lang.String, Element> keyWithValue : ((Object) element).getKeysWithValues()) {
-                builder.append('"');
-                int start = buffer.position();
-                builder.append(keyWithValue.getKey());
-                StringBuilders.replace(builder, start, buffer.position(), stringEscapes);
-                builder.append("\":");
-                buffer.checkFull();
-                marshal(keyWithValue.getValue(), buffer);
-                builder.append(',');
-                commaAdded = true;
-            }
-            if (commaAdded) {
+            Set<Map.Entry<java.lang.String, Element>> keysWithValues = ((Object) element).getKeysWithValues();
+            if (!keysWithValues.isEmpty()) {
+                for (Map.Entry<java.lang.String, Element> keyWithValue : keysWithValues) {
+                    builder.append('"');
+                    int start = buffer.position();
+                    builder.append(keyWithValue.getKey());
+                    StringBuilders.replace(builder, start, buffer.position(), stringEscapes);
+                    builder.append("\":");
+                    buffer.checkFull();
+                    marshal(keyWithValue.getValue(), buffer);
+                    builder.append(',');
+                }
                 builder.setLength(builder.length() - 1);
             }
             builder.append('}');
         } else if (element instanceof Array) {
             builder.append('[');
-            boolean commaAdded = false;
-            for (Element arrayElement : ((Array) element).asList()) {
-                buffer.checkFull();
-                marshal(arrayElement, buffer);
-                builder.append(',');
-                commaAdded = true;
-            }
-            if (commaAdded) {
+            List<Element> list = ((Array) element).asList();
+            if (!list.isEmpty()) {
+                for (Element arrayElement : list) {
+                    buffer.checkFull();
+                    marshal(arrayElement, buffer);
+                    builder.append(',');
+                }
                 builder.setLength(builder.length() - 1);
             }
             builder.append(']');
@@ -70,7 +75,7 @@ public class CompactJsonMarshaller extends Marshaller {
         }
     }
 
-    private final String key = String.allocate();
+    private StringBuilder keyBuilder;
     private final NoGarbageParseDouble noGarbageParseDouble = new NoGarbageParseDouble();
 
     @Override
@@ -149,8 +154,8 @@ public class CompactJsonMarshaller extends Marshaller {
                     if (buffer.nextIsNot('"')) {
                         throw new ParseException();
                     }
-                    key.clear();
-                    StringBuilder builder = key.set();
+                    StringBuilder builder = keyBuilder;
+                    builder.setLength(0);
                     outer:
                     while (true) {
                         char character = buffer.next();
@@ -177,7 +182,7 @@ public class CompactJsonMarshaller extends Marshaller {
                     if (buffer.nextIsNot(':')) {
                         throw new ParseException();
                     }
-                    object.set(key.asJavaString(), unmarshal(buffer));
+                    object.set(builder.toString(), unmarshal(buffer));
                     if (buffer.peekIs(',')) {
                         buffer.advance();
                     }
@@ -231,5 +236,10 @@ public class CompactJsonMarshaller extends Marshaller {
             default:
                 throw new ParseException();
         }
+    }
+
+    @Override
+    public void gc() {
+        keyBuilder = new StringBuilder();
     }
 }

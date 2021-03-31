@@ -1,5 +1,7 @@
 package eu.menzani.lang;
 
+import eu.menzani.struct.Strings;
+
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -34,6 +36,18 @@ public class Assert {
 
     public static void equalTo(Object left, Object right) {
         assert Objects.equals(left, right) : left + " " + right;
+    }
+
+    public static void equalMultiline(Object left, Object right) {
+        assert Objects.equals(left, right) : Strings.LN + toStringWrappedInEmptyLines(left);
+    }
+
+    public static void equalToMultiline(Object left, Object right) {
+        assert Objects.equals(left, right) : Strings.LN + toStringWrappedInEmptyLines(left) + toStringWrappedInEmptyLines(right);
+    }
+
+    private static String toStringWrappedInEmptyLines(Object object) {
+        return Strings.LN + object + Strings.LN;
     }
 
     public static void same(Object left, Object right) {

@@ -205,6 +205,10 @@ public class Array extends Element implements Iterable<Element> {
         elements.clear();
     }
 
+    public boolean isEmpty() {
+        return elements.isEmpty();
+    }
+
     @Override
     public Iterator<Element> iterator() {
         return elements.iterator();

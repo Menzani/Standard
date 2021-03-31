@@ -1,6 +1,8 @@
 package eu.menzani.struct;
 
 public class Strings {
+    public static final String LN = System.lineSeparator();
+
     public static String firstLetterToUppercase(String string) {
         if (string.isEmpty()) {
             return string;

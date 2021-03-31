@@ -216,6 +216,10 @@ public class Object extends Element {
         elements.clear();
     }
 
+    public boolean isEmpty() {
+        return elements.isEmpty();
+    }
+
     public Set<java.lang.String> getKeys() {
         return elements.keySet();
     }

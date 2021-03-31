@@ -16,4 +16,40 @@ public abstract class Marshaller {
     public Element unmarshal(Source source) {
         return unmarshal(new ReadBuffer(defaultBufferSize, source));
     }
+
+    protected static class Indent {
+        private final int increment;
+
+        private int asInt;
+        private final StringBuilder asStringBuilder = new StringBuilder();
+
+        public Indent(int increment) {
+            this.increment = increment;
+            asInt = -increment;
+        }
+
+        public boolean wasIncrementedAtLeastTwice() {
+            return asInt > 0;
+        }
+
+        public void increment() {
+            if (asInt >= 0) {
+                for (int i = 0; i < increment; i++) {
+                    asStringBuilder.append(' ');
+                }
+            }
+            asInt += increment;
+        }
+
+        public void decrement() {
+            asInt -= increment;
+            if (asInt >= 0) {
+                asStringBuilder.setLength(asInt);
+            }
+        }
+
+        public void appendTo(StringBuilder builder) {
+            builder.append(asStringBuilder);
+        }
+    }
 }

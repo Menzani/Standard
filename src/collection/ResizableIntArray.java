@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class ResizableIntArray {
     private int[] array;
-    private int index;
+    private int length;
 
     public ResizableIntArray() {
         this(10);
@@ -17,20 +17,20 @@ public class ResizableIntArray {
     }
 
     public void add(int element) {
-        int index = this.index++;
-        int length = array.length;
-        if (index == length) {
-            array = new int[length * 2];
+        int length = this.length++;
+        int arrayLength = array.length;
+        if (length == arrayLength) {
+            array = new int[arrayLength * 2];
         }
-        array[index] = element;
+        array[length] = element;
     }
 
     public int[] asFixedArray() {
-        return Arrays.copyOf(array, index);
+        return Arrays.copyOf(array, length);
     }
 
     public @Optional int[] asFixedArrayOrNull() {
-        if (index == 0) {
+        if (length == 0) {
             return null;
         }
         return asFixedArray();

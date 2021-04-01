@@ -63,6 +63,18 @@ public class Assume {
         }
     }
 
+    public static void lesserOrEqual(int value, int cap) {
+        if (value > cap) {
+            throw new IllegalIntArgumentException(value);
+        }
+    }
+
+    public static void lesserThanOrEqualTo(int value, int cap) {
+        if (value > cap) {
+            throw new IllegalIntArgumentException(value, cap);
+        }
+    }
+
     public static void notLesser(int value, int cap) {
         if (value < cap) {
             throw new IllegalIntArgumentException(value);

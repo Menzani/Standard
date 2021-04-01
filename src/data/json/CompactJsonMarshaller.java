@@ -5,14 +5,11 @@ import eu.menzani.data.Integer;
 import eu.menzani.data.Object;
 import eu.menzani.data.String;
 import eu.menzani.data.*;
-import eu.menzani.data.ReadBuffer;
-import eu.menzani.data.ParseException;
 import eu.menzani.lang.NoGarbageParseDouble;
 import eu.menzani.lang.StringBuilders;
 import eu.menzani.lang.TargetReplacement;
 import eu.menzani.object.GarbageCollectionAware;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,9 +53,9 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
             builder.append('}');
         } else if (element instanceof Array) {
             builder.append('[');
-            List<Element> list = ((Array) element).asList();
-            if (!list.isEmpty()) {
-                for (Element arrayElement : list) {
+            Array array = (Array) element;
+            if (array.isNotEmpty()) {
+                for (Element arrayElement : array) {
                     buffer.checkFull();
                     marshal(arrayElement, buffer);
                     builder.append(',');

@@ -9,7 +9,6 @@ import eu.menzani.lang.StringBuilders;
 import eu.menzani.lang.TargetReplacement;
 import eu.menzani.struct.Strings;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -77,8 +76,8 @@ public class YamlMarshaller extends Marshaller {
                 indent.decrement();
             }
         } else if (element instanceof Array) {
-            List<Element> list = ((Array) element).asList();
-            if (list.isEmpty()) {
+            Array array = (Array) element;
+            if (array.isEmpty()) {
                 if (isValueOfKey) {
                     builder.append(' ');
                 }
@@ -86,7 +85,7 @@ public class YamlMarshaller extends Marshaller {
             } else {
                 indent.increment();
                 boolean isFirst = true;
-                for (Element arrayElement : list) {
+                for (Element arrayElement : array) {
                     if (isFirst) {
                         if (indent.wasIncrementedAtLeastTwice()) {
                             builder.append(ln);

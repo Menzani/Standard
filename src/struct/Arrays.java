@@ -6,6 +6,30 @@ import java.lang.reflect.Array;
 import java.util.Objects;
 
 public class Arrays {
+    public static String toString(Object[] array, int from, int to) {
+        if (to == 0) {
+            return "[]";
+        }
+        StringBuilder builder = new StringBuilder();
+        builder.append('[');
+        for (; ; ) {
+            builder.append(array[from]);
+            if (++from == to) {
+                builder.append(']');
+                return builder.toString();
+            }
+            builder.append(", ");
+        }
+    }
+
+    public static int hashCode(Object[] array, int from, int to) {
+        int result = 1;
+        for (; from < to; from++) {
+            result = 31 * result + Objects.hashCode(array[from]);
+        }
+        return result;
+    }
+
     public static int orderIndependentHashCode(Object[] array) {
         int result = 0;
         for (Object element : array) {
@@ -35,6 +59,11 @@ public class Arrays {
     @SuppressWarnings("unchecked")
     public static <T> T[] allocateGeneric(Class<? super T> bound, int length) {
         return (T[]) Array.newInstance(bound, length);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T[] emptyCopyOf(T[] array, int length) {
+        return (T[]) Array.newInstance(array.getClass().getComponentType(), length);
     }
 
     public static <T> void fill(T[] array, ObjectFactory<T> filler) {

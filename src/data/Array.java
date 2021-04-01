@@ -1,7 +1,11 @@
 package eu.menzani.data;
 
+import eu.menzani.collection.ArrayView;
+import eu.menzani.lang.Assume;
+import eu.menzani.lang.Optional;
 import eu.menzani.object.Allocator;
 import eu.menzani.object.PoolObject;
+import eu.menzani.struct.Arrays;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -9,12 +13,12 @@ import java.util.function.Consumer;
 public class Array extends Element implements Iterable<Element> {
     private static final Allocator<Array> allocator = Allocator.create(Array::new);
 
-    private List<Element> elements;
+    private Element[] elements;
+    private int length;
+    private final Iterator iterator = new Iterator();
 
     public static Array allocate() {
-        Array instance = allocator.allocate();
-        instance.clear();
-        return instance;
+        return allocator.allocate();
     }
 
     private Array() {
@@ -22,214 +26,256 @@ public class Array extends Element implements Iterable<Element> {
     }
 
     public void add(short value) {
-        elements.add(Integer.allocate(value));
+        add(Integer.allocate(value));
     }
 
     public void add(int value) {
-        elements.add(Integer.allocate(value));
+        add(Integer.allocate(value));
     }
 
     public void add(long value) {
-        elements.add(Integer.allocate(value));
+        add(Integer.allocate(value));
     }
 
     public void add(boolean value) {
-        elements.add(Boolean.allocate(value));
+        add(Boolean.allocate(value));
     }
 
     public void add(float value) {
-        elements.add(Decimal.allocate(value));
+        add(Decimal.allocate(value));
     }
 
     public void add(double value) {
-        elements.add(Decimal.allocate(value));
+        add(Decimal.allocate(value));
     }
 
     public void add(java.lang.String value) {
-        elements.add(String.allocate(value));
+        add(String.allocate(value));
     }
 
     public void add(CharSequence value) {
-        elements.add(String.allocate(value));
+        add(String.allocate(value));
     }
 
     public void add(Element value) {
-        elements.add(value);
+        elements[length++] = value;
     }
 
     public void addNull() {
-        elements.add(null);
+        add((Element) null);
+    }
+
+    public void remove(int index) {
+        deallocate(index);
+        System.arraycopy(elements, index + 1, elements, index, (length--) - index);
     }
 
     public void set(int index, short value) {
-        elements.set(index, Integer.allocate(value));
+        set(index, Integer.allocate(value));
     }
 
     public void set(int index, int value) {
-        elements.set(index, Integer.allocate(value));
+        set(index, Integer.allocate(value));
     }
 
     public void set(int index, long value) {
-        elements.set(index, Integer.allocate(value));
+        set(index, Integer.allocate(value));
     }
 
     public void set(int index, boolean value) {
-        elements.set(index, Boolean.allocate(value));
+        set(index, Boolean.allocate(value));
     }
 
     public void set(int index, float value) {
-        elements.set(index, Decimal.allocate(value));
+        set(index, Decimal.allocate(value));
     }
 
     public void set(int index, double value) {
-        elements.set(index, Decimal.allocate(value));
+        set(index, Decimal.allocate(value));
     }
 
     public void set(int index, java.lang.String value) {
-        elements.set(index, String.allocate(value));
+        set(index, String.allocate(value));
     }
 
     public void set(int index, CharSequence value) {
-        elements.set(index, String.allocate(value));
+        set(index, String.allocate(value));
     }
 
     public void set(int index, Element value) {
-        elements.set(index, value);
+        elements[index] = value;
     }
 
     public void setNull(int index) {
-        elements.set(index, null);
+        set(index, (Element) null);
     }
 
     public boolean contains(short value) {
-        return elements.contains(Integer.allocate(value));
+        return contains(Integer.allocate(value));
     }
 
     public boolean contains(int value) {
-        return elements.contains(Integer.allocate(value));
+        return contains(Integer.allocate(value));
     }
 
     public boolean contains(long value) {
-        return elements.contains(Integer.allocate(value));
+        return contains(Integer.allocate(value));
     }
 
     public boolean contains(boolean value) {
-        return elements.contains(Boolean.allocate(value));
+        return contains(Boolean.allocate(value));
     }
 
     public boolean contains(float value) {
-        return elements.contains(Decimal.allocate(value));
+        return contains(Decimal.allocate(value));
     }
 
     public boolean contains(double value) {
-        return elements.contains(Decimal.allocate(value));
+        return contains(Decimal.allocate(value));
     }
 
     public boolean contains(java.lang.String value) {
-        return elements.contains(String.allocate(value));
+        return contains(String.allocate(value));
     }
 
     public boolean contains(CharSequence value) {
-        return elements.contains(String.allocate(value));
+        return contains(String.allocate(value));
     }
 
     public boolean contains(Element value) {
-        return elements.contains(value);
+        Assume.notNull(value);
+        for (int i = 0; i < length; i++) {
+            if (value.equals(elements[i])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean containsNull() {
-        return elements.contains(null);
+        for (int i = 0; i < length; i++) {
+            if (elements[i] == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean containsNullable(@Optional Element value) {
+        if (value == null) {
+            return containsNull();
+        }
+        for (int i = 0; i < length; i++) {
+            if (value.equals(elements[i])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public short getShort(int index) {
-        return ((Integer) elements.get(index)).asShort();
+        return getInteger(index).asShort();
     }
 
     public int getInt(int index) {
-        return ((Integer) elements.get(index)).asInt();
+        return getInteger(index).asInt();
     }
 
     public long getLong(int index) {
-        return ((Integer) elements.get(index)).asLong();
+        return getInteger(index).asLong();
     }
 
     public boolean getJavaBoolean(int index) {
-        return ((Boolean) elements.get(index)).asPrimitive();
+        return getBoolean(index).asPrimitive();
     }
 
     public float getFloat(int index) {
-        return ((Decimal) elements.get(index)).asFloat();
+        return getDecimal(index).asFloat();
     }
 
     public double getDouble(int index) {
-        return ((Decimal) elements.get(index)).asDouble();
+        return getDecimal(index).asDouble();
     }
 
     public java.lang.String getJavaString(int index) {
-        return ((String) elements.get(index)).asJavaString();
+        return getString(index).asJavaString();
     }
 
     public CharSequence getCharSequence(int index) {
-        return ((String) elements.get(index)).asCharSequence();
+        return getString(index).asCharSequence();
     }
 
     public Integer getInteger(int index) {
-        return (Integer) elements.get(index);
+        return (Integer) getElement(index);
     }
 
     public Boolean getBoolean(int index) {
-        return (Boolean) elements.get(index);
+        return (Boolean) getElement(index);
     }
 
     public Decimal getDecimal(int index) {
-        return (Decimal) elements.get(index);
+        return (Decimal) getElement(index);
     }
 
     public String getString(int index) {
-        return (String) elements.get(index);
+        return (String) getElement(index);
     }
 
     public Array getArray(int index) {
-        return (Array) elements.get(index);
+        return (Array) getElement(index);
     }
 
     public Object getObject(int index) {
-        return (Object) elements.get(index);
+        return (Object) getElement(index);
     }
 
     public Element getElement(int index) {
-        return elements.get(index);
+        return elements[index];
     }
 
     public void clear() {
-        elements.clear();
+        for (int i = 0; i < length; i++) {
+            deallocate(i);
+        }
+        length = 0;
     }
 
     public boolean isEmpty() {
-        return elements.isEmpty();
+        return length == 0;
+    }
+
+    public boolean isNotEmpty() {
+        return length != 0;
     }
 
     @Override
-    public Iterator<Element> iterator() {
-        return elements.iterator();
+    public java.util.Iterator<Element> iterator() {
+        return listIterator();
+    }
+
+    public ListIterator<Element> listIterator() {
+        return listIterator(0);
+    }
+
+    public ListIterator<Element> listIterator(int index) {
+        iterator.initialize(elements, length, index, length);
+        return iterator;
     }
 
     @Override
     public void forEach(Consumer<? super Element> action) {
-        elements.forEach(action);
+        for (int i = 0; i < length; i++) {
+            action.accept(elements[i]);
+        }
     }
 
     @Override
     public Spliterator<Element> spliterator() {
-        return elements.spliterator();
-    }
-
-    public List<Element> asList() {
-        return elements;
+        return Spliterators.spliterator(elements, 0, length, 0);
     }
 
     public List<Element> asListView() {
-        return Collections.unmodifiableList(asList());
+        return new ArrayView<>(elements, 0, length);
     }
 
     @Override
@@ -238,31 +284,109 @@ public class Array extends Element implements Iterable<Element> {
         if (object == null || getClass() != object.getClass()) return false;
 
         Array that = (Array) object;
-        return elements.equals(that.elements);
+        int length = this.length;
+        if (length != that.length) return false;
+        return java.util.Arrays.equals(elements, 0, length, that.elements, 0, length);
     }
 
     @Override
     public int hashCode() {
-        return elements.hashCode();
+        return Arrays.hashCode(elements, 0, length);
     }
 
     @Override
     public java.lang.String toString() {
-        return elements.toString();
+        return Arrays.toString(elements, 0, length);
     }
 
     @Override
     public void gc() {
-        elements = new ArrayList<>();
+        elements = new Element[Math.max(length, 10)];
+    }
+
+    private void deallocate(int index) {
+        PoolObject element = elements[index];
+        if (element != null) {
+            element.deallocate();
+            elements[index] = null;
+        }
     }
 
     @Override
     public void deallocate() {
-        for (PoolObject element : elements) {
-            if (element != null) {
-                element.deallocate();
-            }
-        }
+        clear();
         allocator.deallocate(this);
+    }
+
+    private static class Iterator implements ListIterator<Element> {
+        private Element[] elements;
+        private int length;
+        private int start;
+        private int end;
+        private int index;
+
+        private Iterator() {
+        }
+
+        void initialize(Element[] elements, int length, int start, int end) {
+            this.elements = elements;
+            this.length = length;
+            this.start = start;
+            this.end = end;
+            this.index = start;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return index != end;
+        }
+
+        @Override
+        public Element next() {
+            return elements[index++];
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return index != start;
+        }
+
+        @Override
+        public Element previous() {
+            return elements[--index];
+        }
+
+        @Override
+        public int nextIndex() {
+            return index;
+        }
+
+        @Override
+        public int previousIndex() {
+            return index - 1;
+        }
+
+        @Override
+        public void remove() {
+            System.arraycopy(elements, index, elements, index - 1, length - index);
+        }
+
+        @Override
+        public void set(Element element) {
+            elements[index] = element;
+        }
+
+        @Override
+        public void add(Element element) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super Element> action) {
+            for (int i = index; i < end; i++) {
+                action.accept(elements[i]);
+            }
+            index = end;
+        }
     }
 }

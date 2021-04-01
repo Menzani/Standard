@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 public class ResizableArray<T> implements Iterable<T> {
     private final Class<T> elementType;
     private T[] array;
-    private int index;
+    private int length;
 
     public ResizableArray(Class<T> elementType) {
         this(10, elementType);
@@ -23,12 +23,12 @@ public class ResizableArray<T> implements Iterable<T> {
     }
 
     public void add(T element) {
-        int index = this.index++;
-        int length = array.length;
-        if (index == length) {
-            array = createArray(length * 2);
+        int length = this.length++;
+        int arrayLength = array.length;
+        if (length == arrayLength) {
+            array = createArray(arrayLength * 2);
         }
-        array[index] = element;
+        array[length] = element;
     }
 
     @SuppressWarnings("unchecked")
@@ -37,11 +37,11 @@ public class ResizableArray<T> implements Iterable<T> {
     }
 
     public T[] asFixedArray() {
-        return Arrays.copyOf(array, index);
+        return Arrays.copyOf(array, length);
     }
 
     public @Optional T[] asFixedArrayOrNull() {
-        if (index == 0) {
+        if (length == 0) {
             return null;
         }
         return asFixedArray();

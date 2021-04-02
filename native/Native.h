@@ -24,11 +24,17 @@ JNIEXPORT jint JNICALL Java_eu_menzani_system_Threads_bindCurrentThread
 JNIEXPORT jint JNICALL Java_eu_menzani_system_Threads_setCurrentThreadPriority
   (JNIEnv *, jclass);
 
-JNIEXPORT jdouble JNICALL Java_eu_menzani_lang_DoubleConversion_parse
+JNIEXPORT jint JNICALL Java_eu_menzani_lang_DecimalConversion_appendDouble
+  (JNIEnv *, jclass, jdouble, jlong);
+
+JNIEXPORT jint JNICALL Java_eu_menzani_lang_DecimalConversion_appendFloat
+  (JNIEnv *, jclass, jfloat, jlong);
+
+JNIEXPORT jdouble JNICALL Java_eu_menzani_lang_DecimalConversion_parseDouble
   (JNIEnv *, jclass, jlong, jint);
 
-JNIEXPORT jint JNICALL Java_eu_menzani_lang_DoubleConversion_append
-  (JNIEnv *, jclass, jdouble, jlong);
+JNIEXPORT jfloat JNICALL Java_eu_menzani_lang_DecimalConversion_parseFloat
+  (JNIEnv *, jclass, jlong, jint);
 
 #ifdef __cplusplus
 }

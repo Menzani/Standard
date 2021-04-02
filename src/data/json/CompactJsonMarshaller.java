@@ -5,7 +5,7 @@ import eu.menzani.data.Integer;
 import eu.menzani.data.Object;
 import eu.menzani.data.String;
 import eu.menzani.data.*;
-import eu.menzani.lang.DoubleConversion;
+import eu.menzani.lang.DecimalConversion;
 import eu.menzani.lang.StringBuilders;
 import eu.menzani.lang.TargetReplacement;
 import eu.menzani.object.GarbageCollectionAware;
@@ -17,7 +17,7 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
     private static final TargetReplacement[] stringEscapes = {new TargetReplacement('\\', "\\\\"), new TargetReplacement('\"', "\\\"")};
 
     private StringBuilder keyBuilder;
-    private final DoubleConversion doubleConversion = new DoubleConversion();
+    private final DecimalConversion decimalConversion = new DecimalConversion();
 
     public CompactJsonMarshaller() {
         gc();
@@ -67,7 +67,7 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
             }
             builder.append(']');
         } else if (element instanceof Decimal) {
-            doubleConversion.append(((Decimal) element).asDouble(), builder);
+            decimalConversion.appendDouble(((Decimal) element).asDouble(), builder);
         } else if (element instanceof Boolean) {
             builder.append(((Boolean) element).asPrimitive());
         } else {
@@ -225,7 +225,7 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
                 }
 
                 if (isDecimal) {
-                    return Decimal.allocate(doubleConversion.parse(buffer, start, buffer.position()));
+                    return Decimal.allocate(decimalConversion.parseDouble(buffer, start, buffer.position()));
                 }
                 return Integer.allocate(Long.parseLong(buffer, start, buffer.position(), 10));
             default:

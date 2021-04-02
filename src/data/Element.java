@@ -7,16 +7,12 @@ public abstract class Element implements PoolObject {
     }
 
     public Element getElement(Path path) {
-        java.lang.String[] strings = path.getStrings();
-        int[] ints = path.getInts();
-
         Element result = this;
-        for (int i = 0; i < strings.length; i++) {
-            if (Path.isVoid(strings[i])) {
-                result = ((Array) result).getElement(ints[i]);
+        for (int i = 0; i < path.length(); i++) {
+            if (path.isString(i)) {
+                result = ((Object) result).getElement(path.getString(i));
             } else {
-                assert Path.isVoid(ints[i]);
-                result = ((Object) result).getElement(strings[i]);
+                result = ((Array) result).getElement(path.getInt(i));
             }
         }
         return result;

@@ -9,4 +9,8 @@ public class Strings {
         }
         return Character.toUpperCase(string.charAt(0)) + string.substring(1);
     }
+
+    public static boolean isInteger(String string) {
+        return Patterns.ONLY_DIGITS.matcher(string).matches();
+    }
 }

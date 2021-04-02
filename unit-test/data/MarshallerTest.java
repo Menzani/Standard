@@ -3,9 +3,9 @@ package eu.menzani.data;
 import eu.menzani.lang.Assert;
 
 public abstract class MarshallerTest {
-    protected static final Object element1;
+    protected final Object element1;
 
-    static {
+    {
         element1 = Object.allocate();
         element1.set("key1", "value1");
         Array value2 = Array.allocate();

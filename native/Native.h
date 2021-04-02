@@ -24,8 +24,11 @@ JNIEXPORT jint JNICALL Java_eu_menzani_system_Threads_bindCurrentThread
 JNIEXPORT jint JNICALL Java_eu_menzani_system_Threads_setCurrentThreadPriority
   (JNIEnv *, jclass);
 
-JNIEXPORT jdouble JNICALL Java_eu_menzani_lang_NoGarbageParseDouble_parse
+JNIEXPORT jdouble JNICALL Java_eu_menzani_lang_DoubleConversion_parse
   (JNIEnv *, jclass, jlong, jint);
+
+JNIEXPORT jint JNICALL Java_eu_menzani_lang_DoubleConversion_append
+  (JNIEnv *, jclass, jdouble, jlong);
 
 #ifdef __cplusplus
 }

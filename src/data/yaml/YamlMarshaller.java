@@ -5,6 +5,7 @@ import eu.menzani.data.Integer;
 import eu.menzani.data.Object;
 import eu.menzani.data.String;
 import eu.menzani.data.*;
+import eu.menzani.lang.DoubleConversion;
 import eu.menzani.lang.StringBuilders;
 import eu.menzani.lang.TargetReplacement;
 import eu.menzani.object.GarbageCollectionAware;
@@ -18,6 +19,8 @@ public class YamlMarshaller extends Marshaller implements GarbageCollectionAware
 
     private final java.lang.String ln;
     private Indent indent;
+
+    private final DoubleConversion doubleConversion = new DoubleConversion();
 
     public YamlMarshaller() {
         this(Strings.LN);
@@ -113,7 +116,7 @@ public class YamlMarshaller extends Marshaller implements GarbageCollectionAware
             if (isValueOfKey) {
                 builder.append(' ');
             }
-            builder.append(((Decimal) element).asDouble());
+            doubleConversion.append(((Decimal) element).asDouble(), builder);
         } else if (element instanceof Boolean) {
             if (isValueOfKey) {
                 builder.append(' ');

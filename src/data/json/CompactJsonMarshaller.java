@@ -5,7 +5,7 @@ import eu.menzani.data.Integer;
 import eu.menzani.data.Object;
 import eu.menzani.data.String;
 import eu.menzani.data.*;
-import eu.menzani.lang.NoGarbageParseDouble;
+import eu.menzani.lang.DoubleConversion;
 import eu.menzani.lang.StringBuilders;
 import eu.menzani.lang.TargetReplacement;
 import eu.menzani.object.GarbageCollectionAware;
@@ -15,6 +15,9 @@ import java.util.Set;
 
 public class CompactJsonMarshaller extends Marshaller implements GarbageCollectionAware {
     private static final TargetReplacement[] stringEscapes = {new TargetReplacement('\\', "\\\\"), new TargetReplacement('\"', "\\\"")};
+
+    private StringBuilder keyBuilder;
+    private final DoubleConversion doubleConversion = new DoubleConversion();
 
     public CompactJsonMarshaller() {
         gc();
@@ -64,16 +67,13 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
             }
             builder.append(']');
         } else if (element instanceof Decimal) {
-            builder.append(((Decimal) element).asDouble());
+            doubleConversion.append(((Decimal) element).asDouble(), builder);
         } else if (element instanceof Boolean) {
             builder.append(((Boolean) element).asPrimitive());
         } else {
             throw new AssertionError();
         }
     }
-
-    private StringBuilder keyBuilder;
-    private final NoGarbageParseDouble noGarbageParseDouble = new NoGarbageParseDouble();
 
     @Override
     public Element unmarshal(ReadBuffer buffer) {
@@ -225,9 +225,7 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
                 }
 
                 if (isDecimal) {
-                    noGarbageParseDouble.reset();
-                    noGarbageParseDouble.put(buffer, start, buffer.position());
-                    return Decimal.allocate(noGarbageParseDouble.parse());
+                    return Decimal.allocate(doubleConversion.parse(buffer, start, buffer.position()));
                 }
                 return Integer.allocate(Long.parseLong(buffer, start, buffer.position(), 10));
             default:

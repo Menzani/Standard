@@ -1,5 +1,7 @@
 package eu.menzani.data;
 
+import eu.menzani.object.GarbageCollectionAware;
+
 public abstract class Marshaller {
     private static final int defaultBufferSize = 8192;
 
@@ -17,15 +19,21 @@ public abstract class Marshaller {
         return unmarshal(new ReadBuffer(defaultBufferSize, source));
     }
 
-    protected static class Indent {
+    protected static class Indent implements GarbageCollectionAware {
         private final int increment;
 
         private int asInt;
-        private final StringBuilder asStringBuilder = new StringBuilder();
+        private StringBuilder asStringBuilder;
 
         public Indent(int increment) {
             this.increment = increment;
+            gc();
+            reset();
+        }
+
+        public void reset() {
             asInt = -increment;
+            asStringBuilder.setLength(0);
         }
 
         public boolean wasIncrementedAtLeastTwice() {
@@ -50,6 +58,11 @@ public abstract class Marshaller {
 
         public void appendTo(StringBuilder builder) {
             builder.append(asStringBuilder);
+        }
+
+        @Override
+        public void gc() {
+            asStringBuilder = new StringBuilder();
         }
     }
 }

@@ -7,15 +7,17 @@ import eu.menzani.data.String;
 import eu.menzani.data.*;
 import eu.menzani.lang.StringBuilders;
 import eu.menzani.lang.TargetReplacement;
+import eu.menzani.object.GarbageCollectionAware;
 import eu.menzani.struct.Strings;
 
 import java.util.Map;
 import java.util.Set;
 
-public class YamlMarshaller extends Marshaller {
+public class YamlMarshaller extends Marshaller implements GarbageCollectionAware {
     private static final TargetReplacement[] stringEscapes = {new TargetReplacement('\\', "\\\\"), new TargetReplacement(':', "\\:")};
 
     private final java.lang.String ln;
+    private Indent indent;
 
     public YamlMarshaller() {
         this(Strings.LN);
@@ -23,11 +25,17 @@ public class YamlMarshaller extends Marshaller {
 
     public YamlMarshaller(java.lang.String lineSeparator) {
         ln = lineSeparator;
+        setIndent(2);
+    }
+
+    public void setIndent(int indent) {
+        this.indent = new Indent(indent);
     }
 
     @Override
     public void marshal(Element element, WriteBuffer buffer) {
-        marshal(element, buffer, buffer.builder, new Indent(2), false, true);
+        indent.reset();
+        marshal(element, buffer, buffer.builder, indent, false, true);
     }
 
     private void marshal(Element element, WriteBuffer buffer, StringBuilder builder, Indent indent, boolean isValueOfKey, boolean isNotElementOfArray) {
@@ -119,5 +127,10 @@ public class YamlMarshaller extends Marshaller {
     @Override
     public Element unmarshal(ReadBuffer buffer) {
         return null;
+    }
+
+    @Override
+    public void gc() {
+        indent.gc();
     }
 }

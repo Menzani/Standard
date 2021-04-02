@@ -7,8 +7,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class Lang {
-    public static final java.lang.Module JAVA_BASE_MODULE = IllegalArgumentException.class.getModule();
-    public static final java.lang.Module EU_MENZANI_MODULE = Lang.class.getModule();
+    public static final Module JAVA_BASE_MODULE = IllegalArgumentException.class.getModule();
+    public static final Module EU_MENZANI_MODULE = Lang.class.getModule();
 
     static final Object[] NO_ARGS = new Object[0];
     private static final Class<?>[] noParameterTypes = new Class<?>[0];

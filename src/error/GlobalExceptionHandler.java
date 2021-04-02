@@ -4,8 +4,6 @@ import eu.menzani.lang.Optional;
 import eu.menzani.struct.Patterns;
 import eu.menzani.swing.Swing;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -70,9 +68,8 @@ public class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
             throwable = process(throwable);
             if (throwable == null) return;
 
-            StringWriter writer = new StringWriter();
-            throwable.printStackTrace(new PrintWriter(writer));
-            String stackTrace = "Exception in thread \"" + thread.getName() + "\" " + writer.toString();
+            String stackTrace = "Exception in thread \"" + thread.getName() + "\" " +
+                    GlobalStackTraceFilter.getInstance().printFilteredStackTraceToString(throwable);
 
             if (!swingActions.isEmpty()) {
                 String stackTraceForLabel = "<html>" + stackTrace.replace("\n", "<br>").replace("\t", "&emsp;") + "</html>";

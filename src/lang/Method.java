@@ -1,11 +1,16 @@
 package eu.menzani.lang;
 
 import eu.menzani.InternalUnsafe;
+import eu.menzani.error.GlobalStackTraceFilter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
 public class Method<T> implements Invokable<T> {
+    static {
+        GlobalStackTraceFilter.getInstance().addMethodToRemove(Method.class, "call");
+    }
+
     private final java.lang.reflect.Method method;
     private Object targetInstance;
 
@@ -37,11 +42,13 @@ public class Method<T> implements Invokable<T> {
     }
 
     @Override
+    @RemovedFromStackTrace
     public T call() {
         return call(Lang.NO_ARGS);
     }
 
     @Override
+    @RemovedFromStackTrace
     @SuppressWarnings("unchecked")
     public T call(Object... arguments) {
         try {

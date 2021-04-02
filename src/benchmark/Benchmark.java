@@ -3,7 +3,7 @@ package eu.menzani.benchmark;
 import eu.menzani.concurrent.ThreadGroup;
 import eu.menzani.io.JavaProcessLauncher;
 import eu.menzani.lang.Check;
-import eu.menzani.lang.Module;
+import eu.menzani.lang.Classes;
 import eu.menzani.object.ObjectFactory;
 import eu.menzani.struct.JVMOption;
 import eu.menzani.struct.MemorySize;
@@ -125,7 +125,7 @@ public abstract class Benchmark {
                         "-p",
                         SystemProperty.MODULE_PATH_STRING,
                         "-m",
-                        Module.of(clazz).getNameEmptyOrWithSlash() + clazz.getName()
+                        Classes.getFullName(clazz)
                 );
             }
 

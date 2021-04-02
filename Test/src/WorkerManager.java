@@ -2,7 +2,9 @@ package eu.menzani.test;
 
 import eu.menzani.concurrent.ThreadGroup;
 import eu.menzani.error.GlobalExceptionHandler;
+import eu.menzani.error.GlobalStackTraceFilter;
 import eu.menzani.lang.Optional;
+import eu.menzani.lang.StackTraceFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,13 @@ class WorkerManager {
     private final List<TestClass> cancelled = new ArrayList<>();
     private final Lock cancelLock = new ReentrantLock();
 
+    private boolean atLeastOneFailureOccurred;
     private boolean printCurrentTestMethod;
+
+    private final StackTraceFilter stackTraceFilter = new StackTraceFilter()
+            .addMethodsToRemove(GlobalStackTraceFilter.getInstance())
+            .addMethodToRemove(TestMethod.class, "runTest")
+            .addMethodToRemove(Worker.class, "run");
 
     WorkerManager(FailedTests failedTests) {
         this.failedTests = failedTests;
@@ -63,13 +71,17 @@ class WorkerManager {
         throwable = GlobalExceptionHandler.process(throwable);
         if (throwable == null) return;
 
-        if (printCurrentTestMethod && testElement instanceof TestMethod) {
-            throwable.printStackTrace();
-        } else {
-            synchronized (System.err) {
-                System.err.println(testElement);
-                throwable.printStackTrace();
+        synchronized (System.err) {
+            if (atLeastOneFailureOccurred) {
+                System.err.println();
             }
+            atLeastOneFailureOccurred = true;
+
+            if (!printCurrentTestMethod || !(testElement instanceof TestMethod)) {
+                System.err.println(testElement);
+            }
+
+            stackTraceFilter.printFilteredStackTrace(throwable);
         }
 
         failedTests.add(testElement);

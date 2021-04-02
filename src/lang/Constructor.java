@@ -1,10 +1,15 @@
 package eu.menzani.lang;
 
 import eu.menzani.InternalUnsafe;
+import eu.menzani.error.GlobalStackTraceFilter;
 
 import java.lang.reflect.InvocationTargetException;
 
 public class Constructor<T> implements Invokable<T> {
+    static {
+        GlobalStackTraceFilter.getInstance().addMethodToRemove(Constructor.class, "call");
+    }
+
     private final java.lang.reflect.Constructor<T> constructor;
 
     Constructor(java.lang.reflect.Constructor<T> constructor) {
@@ -27,11 +32,13 @@ public class Constructor<T> implements Invokable<T> {
     }
 
     @Override
+    @RemovedFromStackTrace
     public T call() {
         return call(Lang.NO_ARGS);
     }
 
     @Override
+    @RemovedFromStackTrace
     public T call(Object... arguments) {
         try {
             return constructor.newInstance(arguments);

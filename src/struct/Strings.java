@@ -13,4 +13,8 @@ public class Strings {
     public static boolean isInteger(String string) {
         return Patterns.ONLY_DIGITS.matcher(string).matches();
     }
+
+    public static boolean isInteger(String string, int from, int to) {
+        return Patterns.ONLY_DIGITS.matcher(string).region(from, to).matches();
+    }
 }

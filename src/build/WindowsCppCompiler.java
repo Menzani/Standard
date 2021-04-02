@@ -3,6 +3,7 @@ package eu.menzani.build;
 import eu.menzani.io.PrintToConsoleException;
 import eu.menzani.io.ProcessLauncher;
 import eu.menzani.struct.FileExtension;
+import eu.menzani.struct.Strings;
 import eu.menzani.system.Platform;
 import eu.menzani.system.SystemProperty;
 
@@ -59,7 +60,7 @@ class WindowsCppCompiler {
         Path includeFolder = SystemProperty.JAVA_HOME.resolve("include");
         String outputFile = outputFileWithoutExtension.toAbsolutePath() + CppCompiler.outputFileSuffixFor(architecture);
         StringBuilder builder = new StringBuilder(
-                "cl.exe /I \"" + includeFolder + "\" /I \"" + includeFolder.resolve("win32") + "\" /Fe\"" + outputFile + "\" /LD");
+                "cl.exe /LD /O2 /GS- /I \"" + includeFolder + "\" /I \"" + includeFolder.resolve("win32") + "\" /Fe\"" + outputFile + '"');
         for (Path source : sources) {
             builder.append(' ');
             builder.append(source.toAbsolutePath().toString());
@@ -73,7 +74,9 @@ class WindowsCppCompiler {
             int indexOfCppExtension = line.indexOf(cppFileErrorLineContains);
             int indexOfCExtension = line.indexOf(cFileErrorLineContains);
             int indexOfHExtension = line.indexOf(hFileErrorLineContains);
-            if (indexOfCppExtension == -1 && indexOfCExtension == -1 && indexOfHExtension == -1) continue;
+            if (indexOfCppExtension == -1 && indexOfCExtension == -1 && indexOfHExtension == -1) {
+                continue;
+            }
             int indexOfExtension;
             int extensionLength;
             if (indexOfCppExtension == -1) {
@@ -89,9 +92,7 @@ class WindowsCppCompiler {
                 extensionLength = 5;
             }
             int indexOfClosingBracket = line.indexOf("):", indexOfExtension);
-            try {
-                Integer.parseInt(line, indexOfExtension + extensionLength, indexOfClosingBracket, 10);
-            } catch (NumberFormatException e) {
+            if (!Strings.isInteger(line, indexOfExtension + extensionLength, indexOfClosingBracket)) {
                 continue;
             }
             System.err.println(line);

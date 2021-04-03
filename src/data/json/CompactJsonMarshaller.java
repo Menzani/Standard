@@ -16,8 +16,8 @@ import java.util.Set;
 public class CompactJsonMarshaller extends Marshaller implements GarbageCollectionAware {
     private static final TargetReplacement[] stringEscapes = {new TargetReplacement('\\', "\\\\"), new TargetReplacement('\"', "\\\"")};
 
-    private StringBuilder keyBuilder;
     private final DecimalConversion decimalConversion = new DecimalConversion();
+    private StringBuilder keyBuilder;
 
     public CompactJsonMarshaller() {
         gc();
@@ -196,6 +196,8 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
             case '7':
             case '8':
             case '9':
+            case 'I':
+            case 'N':
                 int start = buffer.position() - 1;
                 boolean isDecimal = false;
                 outer:
@@ -207,20 +209,8 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
                             break outer;
                         case '.':
                             isDecimal = true;
-                        case '0':
-                        case '1':
-                        case '2':
-                        case '3':
-                        case '4':
-                        case '5':
-                        case '6':
-                        case '7':
-                        case '8':
-                        case '9':
-                            buffer.advance();
-                            break;
                         default:
-                            throw new ParseException();
+                            buffer.advance();
                     }
                 }
 

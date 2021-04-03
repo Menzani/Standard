@@ -1,7 +1,6 @@
 package eu.menzani.test;
 
 import eu.menzani.lang.Invokable;
-import eu.menzani.lang.RemovedFromStackTrace;
 
 import java.lang.reflect.Method;
 
@@ -18,7 +17,6 @@ class TestMethod extends TestElement {
         return testClass;
     }
 
-    @RemovedFromStackTrace("eu.menzani.test.WorkerManager.stackTraceFilter")
     void runTest(Object instance) {
         eu.menzani.lang.Method<?> invokable = Invokable.of(method);
         invokable.setTargetInstance(instance);

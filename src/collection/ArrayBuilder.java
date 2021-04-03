@@ -1,7 +1,7 @@
 package eu.menzani.collection;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
+import eu.menzani.struct.Arrays;
+
 import java.util.Collection;
 
 public class ArrayBuilder<F, T> extends CollectionBuilder<F> {
@@ -10,17 +10,12 @@ public class ArrayBuilder<F, T> extends CollectionBuilder<F> {
 
     public ArrayBuilder(Collection<F> from, Class<T> toElementType) {
         super(from);
-        to = createTo(toElementType, from.size());
+        to = Arrays.allocateGeneric(toElementType, from.size());
     }
 
     public ArrayBuilder(F[] from, Class<T> toElementType) {
         super(from);
-        to = createTo(toElementType, from.length);
-    }
-
-    @SuppressWarnings("unchecked")
-    private T[] createTo(Class<T> toElementType, int length) {
-        return (T[]) Array.newInstance(toElementType, length);
+        to = Arrays.allocateGeneric(toElementType, from.length);
     }
 
     public void add(T element) {
@@ -28,6 +23,6 @@ public class ArrayBuilder<F, T> extends CollectionBuilder<F> {
     }
 
     public T[] build() {
-        return Arrays.copyOf(to, toIndex);
+        return java.util.Arrays.copyOf(to, toIndex);
     }
 }

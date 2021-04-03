@@ -58,7 +58,11 @@ public class Array extends Element implements Iterable<Element> {
     }
 
     public void add(Element value) {
-        elements[length++] = value;
+        int length = this.length++;
+        if (length == elements.length) {
+            elements = java.util.Arrays.copyOf(elements, length * 2);
+        }
+        elements[length] = value;
     }
 
     public void addNull() {

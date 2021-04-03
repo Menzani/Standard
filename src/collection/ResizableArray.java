@@ -1,15 +1,13 @@
 package eu.menzani.collection;
 
 import eu.menzani.lang.Optional;
+import eu.menzani.struct.Arrays;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
 public class ResizableArray<T> implements Iterable<T> {
-    private final Class<T> elementType;
     private T[] array;
     private int length;
 
@@ -18,26 +16,19 @@ public class ResizableArray<T> implements Iterable<T> {
     }
 
     public ResizableArray(int initialLength, Class<T> elementType) {
-        this.elementType = elementType;
-        array = createArray(initialLength);
+        array = Arrays.allocateGeneric(elementType, initialLength);
     }
 
     public void add(T element) {
         int length = this.length++;
-        int arrayLength = array.length;
-        if (length == arrayLength) {
-            array = createArray(arrayLength * 2);
+        if (length == array.length) {
+            array = java.util.Arrays.copyOf(array, length * 2);
         }
         array[length] = element;
     }
 
-    @SuppressWarnings("unchecked")
-    private T[] createArray(int length) {
-        return (T[]) Array.newInstance(elementType, length);
-    }
-
     public T[] asFixedArray() {
-        return Arrays.copyOf(array, length);
+        return java.util.Arrays.copyOf(array, length);
     }
 
     public @Optional T[] asFixedArrayOrNull() {

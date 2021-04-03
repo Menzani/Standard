@@ -1,7 +1,5 @@
 package eu.menzani.test;
 
-import eu.menzani.lang.RemovedFromStackTrace;
-
 class Worker extends Thread {
     private final WorkerManager manager;
 
@@ -10,7 +8,6 @@ class Worker extends Thread {
     }
 
     @Override
-    @RemovedFromStackTrace("eu.menzani.test.WorkerManager.stackTraceFilter")
     public void run() {
         TestMethod testMethod;
         while ((testMethod = manager.next()) != null) {

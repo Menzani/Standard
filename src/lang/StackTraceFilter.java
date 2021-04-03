@@ -8,6 +8,8 @@ public class StackTraceFilter {
     private final List<String> methodsToRemove = new CopyOnWriteArrayList<>();
     private final Object output;
 
+    private boolean isFirstLine;
+
     public StackTraceFilter() {
         this(System.err);
     }
@@ -36,6 +38,7 @@ public class StackTraceFilter {
     }
 
     public void printFilteredStackTrace(Throwable throwable) {
+        isFirstLine = true;
         if (output instanceof PrintStream) {
             throwable.printStackTrace((PrintStream) output);
         } else {
@@ -49,6 +52,10 @@ public class StackTraceFilter {
         }
         String line = (String) x;
         if (line.startsWith("\tat ")) {
+            if (isFirstLine) {
+                isFirstLine = false;
+                return true;
+            }
             return shouldNotBeRemoved(line);
         }
         return true;

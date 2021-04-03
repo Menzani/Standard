@@ -32,13 +32,11 @@ public class Constructor<T> implements Invokable<T> {
     }
 
     @Override
-    @RemovedFromStackTrace
     public T call() {
         return call(Lang.NO_ARGS);
     }
 
     @Override
-    @RemovedFromStackTrace
     public T call(Object... arguments) {
         try {
             return constructor.newInstance(arguments);

@@ -42,13 +42,11 @@ public class Method<T> implements Invokable<T> {
     }
 
     @Override
-    @RemovedFromStackTrace
     public T call() {
         return call(Lang.NO_ARGS);
     }
 
     @Override
-    @RemovedFromStackTrace
     @SuppressWarnings("unchecked")
     public T call(Object... arguments) {
         try {

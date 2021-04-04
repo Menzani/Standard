@@ -1,28 +1,42 @@
 package eu.menzani.data;
 
 import eu.menzani.collection.ArrayView;
-import eu.menzani.lang.Assume;
 import eu.menzani.lang.Optional;
 import eu.menzani.object.Allocator;
 import eu.menzani.object.PoolObject;
 import eu.menzani.struct.Arrays;
 
-import java.util.*;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Consumer;
 
 public class Array extends Element implements Iterable<Element> {
     private static final Allocator<Array> allocator = Allocator.create(Array::new);
 
-    private Element[] elements;
+    private Element[] elements = new Element[10];
     private int length;
-    private final Iterator iterator = new Iterator();
+
+    private Iterator iterator;
 
     public static Array allocate() {
         return allocator.allocate();
     }
 
+    public static Array allocate(int initialCapacity) {
+        Array instance = allocator.allocate();
+        instance.ensureCapacity(initialCapacity);
+        return instance;
+    }
+
     private Array() {
-        gc();
+    }
+
+    public void ensureCapacity(int capacity) {
+        if (elements.length < capacity) {
+            resizeElements(capacity);
+        }
     }
 
     public void add(short value) {
@@ -60,9 +74,13 @@ public class Array extends Element implements Iterable<Element> {
     public void add(Element value) {
         int length = this.length++;
         if (length == elements.length) {
-            elements = java.util.Arrays.copyOf(elements, length * 2);
+            resizeElements(length * 2);
         }
         elements[length] = value;
+    }
+
+    private void resizeElements(int newCapacity) {
+        elements = java.util.Arrays.copyOf(elements, newCapacity, Element[].class);
     }
 
     public void addNull() {
@@ -70,7 +88,10 @@ public class Array extends Element implements Iterable<Element> {
     }
 
     public void remove(int index) {
-        deallocate(index);
+        PoolObject element = elements[index];
+        if (element != null) {
+            element.deallocate();
+        }
         System.arraycopy(elements, index + 1, elements, index, (length--) - index);
     }
 
@@ -147,7 +168,6 @@ public class Array extends Element implements Iterable<Element> {
     }
 
     public boolean contains(Element value) {
-        Assume.notNull(value);
         for (int i = 0; i < length; i++) {
             if (value.equals(elements[i])) {
                 return true;
@@ -169,12 +189,7 @@ public class Array extends Element implements Iterable<Element> {
         if (value == null) {
             return containsNull();
         }
-        for (int i = 0; i < length; i++) {
-            if (value.equals(elements[i])) {
-                return true;
-            }
-        }
-        return false;
+        return contains(value);
     }
 
     public short getShort(int index) {
@@ -239,7 +254,11 @@ public class Array extends Element implements Iterable<Element> {
 
     public void clear() {
         for (int i = 0; i < length; i++) {
-            deallocate(i);
+            PoolObject element = elements[i];
+            if (element != null) {
+                element.deallocate();
+                elements[i] = null;
+            }
         }
         length = 0;
     }
@@ -258,11 +277,14 @@ public class Array extends Element implements Iterable<Element> {
     }
 
     public ListIterator<Element> listIterator() {
-        return listIterator(0);
+        return listIterator(0, length);
     }
 
-    public ListIterator<Element> listIterator(int index) {
-        iterator.initialize(elements, length, index, length);
+    public ListIterator<Element> listIterator(int from, int to) {
+        if (iterator == null) {
+            iterator = new Iterator();
+        }
+        iterator.initialize(from, to);
         return iterator;
     }
 
@@ -305,15 +327,7 @@ public class Array extends Element implements Iterable<Element> {
 
     @Override
     public void gc() {
-        elements = new Element[Math.max(length, 10)];
-    }
-
-    private void deallocate(int index) {
-        PoolObject element = elements[index];
-        if (element != null) {
-            element.deallocate();
-            elements[index] = null;
-        }
+        resizeElements(length + 10);
     }
 
     @Override
@@ -322,22 +336,18 @@ public class Array extends Element implements Iterable<Element> {
         allocator.deallocate(this);
     }
 
-    private static class Iterator implements ListIterator<Element> {
-        private Element[] elements;
-        private int length;
+    private class Iterator implements ListIterator<Element> {
         private int start;
         private int end;
         private int index;
 
-        private Iterator() {
+        Iterator() {
         }
 
-        void initialize(Element[] elements, int length, int start, int end) {
-            this.elements = elements;
-            this.length = length;
+        void initialize(int start, int end) {
             this.start = start;
             this.end = end;
-            this.index = start;
+            index = start;
         }
 
         @Override
@@ -372,7 +382,7 @@ public class Array extends Element implements Iterable<Element> {
 
         @Override
         public void remove() {
-            System.arraycopy(elements, index, elements, index - 1, length - index);
+            Array.this.remove(index - 1);
         }
 
         @Override

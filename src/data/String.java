@@ -7,7 +7,7 @@ import eu.menzani.object.Allocator;
 public class String extends Element implements Comparable<String> {
     private static final Allocator<String> allocator = Allocator.create(String::new);
 
-    private StringBuilder value;
+    private StringBuilder value = new StringBuilder();
 
     public static String allocate() {
         String instance = allocator.allocate();
@@ -28,7 +28,6 @@ public class String extends Element implements Comparable<String> {
     }
 
     private String() {
-        gc();
     }
 
     public java.lang.String asJavaString() {
@@ -74,7 +73,7 @@ public class String extends Element implements Comparable<String> {
 
     @Override
     public void gc() {
-        value = new StringBuilder();
+        value = new StringBuilder(value);
     }
 
     @Override

@@ -136,11 +136,15 @@ public class AtomicBooleanArray {
     }
 
     public static String toStringOpaque(boolean[] array) {
+        int lengthMinusOne = array.length - 1;
+        if (lengthMinusOne == -1) {
+            return "[]";
+        }
         StringBuilder builder = new StringBuilder();
         builder.append('[');
-        for (int i = 0, iMax = array.length - 1; ; i++) {
+        for (int i = 0; ; i++) {
             builder.append(UNSAFE.getBooleanOpaque(array, ARRAY_BOOLEAN_BASE_OFFSET + ARRAY_BOOLEAN_INDEX_SCALE * i));
-            if (i == iMax) {
+            if (i == lengthMinusOne) {
                 builder.append(']');
                 return builder.toString();
             }
@@ -149,11 +153,15 @@ public class AtomicBooleanArray {
     }
 
     public static String toStringAcquire(boolean[] array) {
+        int lengthMinusOne = array.length - 1;
+        if (lengthMinusOne == -1) {
+            return "[]";
+        }
         StringBuilder builder = new StringBuilder();
         builder.append('[');
-        for (int i = 0, iMax = array.length - 1; ; i++) {
+        for (int i = 0; ; i++) {
             builder.append(UNSAFE.getBooleanAcquire(array, ARRAY_BOOLEAN_BASE_OFFSET + ARRAY_BOOLEAN_INDEX_SCALE * i));
-            if (i == iMax) {
+            if (i == lengthMinusOne) {
                 builder.append(']');
                 return builder.toString();
             }
@@ -162,11 +170,15 @@ public class AtomicBooleanArray {
     }
 
     public static String toStringVolatile(boolean[] array) {
+        int lengthMinusOne = array.length - 1;
+        if (lengthMinusOne == -1) {
+            return "[]";
+        }
         StringBuilder builder = new StringBuilder();
         builder.append('[');
-        for (int i = 0, iMax = array.length - 1; ; i++) {
+        for (int i = 0; ; i++) {
             builder.append(UNSAFE.getBooleanVolatile(array, ARRAY_BOOLEAN_BASE_OFFSET + ARRAY_BOOLEAN_INDEX_SCALE * i));
-            if (i == iMax) {
+            if (i == lengthMinusOne) {
                 builder.append(']');
                 return builder.toString();
             }

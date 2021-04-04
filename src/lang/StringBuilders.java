@@ -1,7 +1,7 @@
 package eu.menzani.lang;
 
 public class StringBuilders {
-    public static boolean equals(StringBuilder left, StringBuilder right) {
+    public static boolean equals(CharSequence left, CharSequence right) {
         int length = left.length();
         if (length != right.length()) {
             return false;
@@ -14,23 +14,26 @@ public class StringBuilders {
         return true;
     }
 
-    public static boolean equals(String string, StringBuilder builder, int builderFrom, int builderTo) {
-        if (string.length() != builderTo - builderFrom) {
+    public static boolean equals(String string, CharSequence charSequence, int charSequenceFrom, int charSequenceTo) {
+        if (string.length() != charSequenceTo - charSequenceFrom) {
             return false;
         }
-        for (int i = 0; builderFrom < builderTo; builderFrom++) {
-            if (string.charAt(i++) != builder.charAt(builderFrom)) {
+        for (int i = 0; charSequenceFrom < charSequenceTo; charSequenceFrom++) {
+            if (string.charAt(i++) != charSequence.charAt(charSequenceFrom)) {
                 return false;
             }
         }
         return true;
     }
 
-    // Developed from java.lang.StringUTF16.hashCode()
-    public static int hashCode(StringBuilder builder) {
+    public static int hashCode(CharSequence charSequence) {
+        int length = charSequence.length();
+        if (length == 0) {
+            return 0;
+        }
         int result = 0;
-        for (int i = 0, length = builder.length() >> 1; i < length; i++) {
-            result = 31 * result + builder.charAt(i);
+        for (int i = 0; i < length; i++) {
+            result = 31 * result + charSequence.charAt(i);
         }
         return result;
     }

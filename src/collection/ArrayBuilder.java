@@ -6,7 +6,7 @@ import java.util.Collection;
 
 public class ArrayBuilder<F, T> extends CollectionBuilder<F> {
     private final T[] to;
-    private int toIndex;
+    private int length;
 
     public ArrayBuilder(Collection<F> from, Class<T> toElementType) {
         super(from);
@@ -19,10 +19,10 @@ public class ArrayBuilder<F, T> extends CollectionBuilder<F> {
     }
 
     public void add(T element) {
-        to[toIndex++] = element;
+        to[length++] = element;
     }
 
     public T[] build() {
-        return java.util.Arrays.copyOf(to, toIndex);
+        return java.util.Arrays.copyOf(to, length);
     }
 }

@@ -255,11 +255,15 @@ public class AtomicDoubleArray {
     }
 
     public static String toStringOpaque(double[] array) {
+        int lengthMinusOne = array.length - 1;
+        if (lengthMinusOne == -1) {
+            return "[]";
+        }
         StringBuilder builder = new StringBuilder();
         builder.append('[');
-        for (int i = 0, iMax = array.length - 1; ; i++) {
+        for (int i = 0; ; i++) {
             builder.append(UNSAFE.getDoubleOpaque(array, ARRAY_DOUBLE_BASE_OFFSET + ARRAY_DOUBLE_INDEX_SCALE * i));
-            if (i == iMax) {
+            if (i == lengthMinusOne) {
                 builder.append(']');
                 return builder.toString();
             }
@@ -268,11 +272,15 @@ public class AtomicDoubleArray {
     }
 
     public static String toStringAcquire(double[] array) {
+        int lengthMinusOne = array.length - 1;
+        if (lengthMinusOne == -1) {
+            return "[]";
+        }
         StringBuilder builder = new StringBuilder();
         builder.append('[');
-        for (int i = 0, iMax = array.length - 1; ; i++) {
+        for (int i = 0; ; i++) {
             builder.append(UNSAFE.getDoubleAcquire(array, ARRAY_DOUBLE_BASE_OFFSET + ARRAY_DOUBLE_INDEX_SCALE * i));
-            if (i == iMax) {
+            if (i == lengthMinusOne) {
                 builder.append(']');
                 return builder.toString();
             }
@@ -281,11 +289,15 @@ public class AtomicDoubleArray {
     }
 
     public static String toStringVolatile(double[] array) {
+        int lengthMinusOne = array.length - 1;
+        if (lengthMinusOne == -1) {
+            return "[]";
+        }
         StringBuilder builder = new StringBuilder();
         builder.append('[');
-        for (int i = 0, iMax = array.length - 1; ; i++) {
+        for (int i = 0; ; i++) {
             builder.append(UNSAFE.getDoubleVolatile(array, ARRAY_DOUBLE_BASE_OFFSET + ARRAY_DOUBLE_INDEX_SCALE * i));
-            if (i == iMax) {
+            if (i == lengthMinusOne) {
                 builder.append(']');
                 return builder.toString();
             }

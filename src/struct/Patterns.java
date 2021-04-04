@@ -9,6 +9,6 @@ public class Patterns {
     private static final Pattern replaceLineSeparators = Pattern.compile("\r\n?");
 
     public static String normalizeLineSeparators(String string) {
-        return replaceLineSeparators.matcher(string).replaceAll(System.lineSeparator());
+        return replaceLineSeparators.matcher(string).replaceAll(Strings.LN);
     }
 }

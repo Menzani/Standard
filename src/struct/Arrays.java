@@ -7,12 +7,12 @@ import java.util.Objects;
 
 public class Arrays {
     public static String toString(Object[] array, int from, int to) {
-        if (to == 0) {
+        if (to == from) {
             return "[]";
         }
         StringBuilder builder = new StringBuilder();
         builder.append('[');
-        for (; ; ) {
+        while (true) {
             builder.append(array[from]);
             if (++from == to) {
                 builder.append(']');
@@ -25,7 +25,11 @@ public class Arrays {
     public static int hashCode(Object[] array, int from, int to) {
         int result = 1;
         for (; from < to; from++) {
-            result = 31 * result + Objects.hashCode(array[from]);
+            result *= 31;
+            Object element = array[from];
+            if (element != null) {
+                result += element.hashCode();
+            }
         }
         return result;
     }
@@ -33,7 +37,7 @@ public class Arrays {
     public static int orderIndependentHashCode(Object[] array) {
         int result = 0;
         for (Object element : array) {
-            result += Objects.hashCode(element);
+            result += element.hashCode();
         }
         return result;
     }

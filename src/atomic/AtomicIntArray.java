@@ -291,11 +291,15 @@ public class AtomicIntArray {
     }
 
     public static String toStringOpaque(int[] array) {
+        int lengthMinusOne = array.length - 1;
+        if (lengthMinusOne == -1) {
+            return "[]";
+        }
         StringBuilder builder = new StringBuilder();
         builder.append('[');
-        for (int i = 0, iMax = array.length - 1; ; i++) {
+        for (int i = 0; ; i++) {
             builder.append(UNSAFE.getIntOpaque(array, ARRAY_INT_BASE_OFFSET + ARRAY_INT_INDEX_SCALE * i));
-            if (i == iMax) {
+            if (i == lengthMinusOne) {
                 builder.append(']');
                 return builder.toString();
             }
@@ -304,11 +308,15 @@ public class AtomicIntArray {
     }
 
     public static String toStringAcquire(int[] array) {
+        int lengthMinusOne = array.length - 1;
+        if (lengthMinusOne == -1) {
+            return "[]";
+        }
         StringBuilder builder = new StringBuilder();
         builder.append('[');
-        for (int i = 0, iMax = array.length - 1; ; i++) {
+        for (int i = 0; ; i++) {
             builder.append(UNSAFE.getIntAcquire(array, ARRAY_INT_BASE_OFFSET + ARRAY_INT_INDEX_SCALE * i));
-            if (i == iMax) {
+            if (i == lengthMinusOne) {
                 builder.append(']');
                 return builder.toString();
             }
@@ -317,11 +325,15 @@ public class AtomicIntArray {
     }
 
     public static String toStringVolatile(int[] array) {
+        int lengthMinusOne = array.length - 1;
+        if (lengthMinusOne == -1) {
+            return "[]";
+        }
         StringBuilder builder = new StringBuilder();
         builder.append('[');
-        for (int i = 0, iMax = array.length - 1; ; i++) {
+        for (int i = 0; ; i++) {
             builder.append(UNSAFE.getIntVolatile(array, ARRAY_INT_BASE_OFFSET + ARRAY_INT_INDEX_SCALE * i));
-            if (i == iMax) {
+            if (i == lengthMinusOne) {
                 builder.append(']');
                 return builder.toString();
             }

@@ -291,11 +291,15 @@ public class AtomicLongArray {
     }
 
     public static String toStringOpaque(long[] array) {
+        int lengthMinusOne = array.length - 1;
+        if (lengthMinusOne == -1) {
+            return "[]";
+        }
         StringBuilder builder = new StringBuilder();
         builder.append('[');
-        for (int i = 0, iMax = array.length - 1; ; i++) {
+        for (int i = 0; ; i++) {
             builder.append(UNSAFE.getLongOpaque(array, ARRAY_LONG_BASE_OFFSET + ARRAY_LONG_INDEX_SCALE * i));
-            if (i == iMax) {
+            if (i == lengthMinusOne) {
                 builder.append(']');
                 return builder.toString();
             }
@@ -304,11 +308,15 @@ public class AtomicLongArray {
     }
 
     public static String toStringAcquire(long[] array) {
+        int lengthMinusOne = array.length - 1;
+        if (lengthMinusOne == -1) {
+            return "[]";
+        }
         StringBuilder builder = new StringBuilder();
         builder.append('[');
-        for (int i = 0, iMax = array.length - 1; ; i++) {
+        for (int i = 0; ; i++) {
             builder.append(UNSAFE.getLongAcquire(array, ARRAY_LONG_BASE_OFFSET + ARRAY_LONG_INDEX_SCALE * i));
-            if (i == iMax) {
+            if (i == lengthMinusOne) {
                 builder.append(']');
                 return builder.toString();
             }
@@ -317,11 +325,15 @@ public class AtomicLongArray {
     }
 
     public static String toStringVolatile(long[] array) {
+        int lengthMinusOne = array.length - 1;
+        if (lengthMinusOne == -1) {
+            return "[]";
+        }
         StringBuilder builder = new StringBuilder();
         builder.append('[');
-        for (int i = 0, iMax = array.length - 1; ; i++) {
+        for (int i = 0; ; i++) {
             builder.append(UNSAFE.getLongVolatile(array, ARRAY_LONG_BASE_OFFSET + ARRAY_LONG_INDEX_SCALE * i));
-            if (i == iMax) {
+            if (i == lengthMinusOne) {
                 builder.append(']');
                 return builder.toString();
             }

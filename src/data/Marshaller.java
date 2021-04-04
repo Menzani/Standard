@@ -23,11 +23,10 @@ public abstract class Marshaller {
         private final int increment;
 
         private int asInt;
-        private StringBuilder asStringBuilder;
+        private StringBuilder asStringBuilder = new StringBuilder();
 
         public Indent(int increment) {
             this.increment = increment;
-            gc();
             reset();
         }
 
@@ -62,7 +61,7 @@ public abstract class Marshaller {
 
         @Override
         public void gc() {
-            asStringBuilder = new StringBuilder();
+            asStringBuilder = new StringBuilder(asStringBuilder);
         }
     }
 }

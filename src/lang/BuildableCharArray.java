@@ -1,23 +1,23 @@
 package eu.menzani.lang;
 
 import eu.menzani.object.GarbageCollectionAware;
+import eu.menzani.struct.Strings;
 
 public abstract class BuildableCharArray implements GarbageCollectionAware {
     protected static final int DEFAULT_INITIAL_CAPACITY = 512;
 
-    private final int initialCapacity;
     private char[] buffer;
 
     @View
     public StringBuilder builder;
 
     protected BuildableCharArray(int initialCapacity) {
-        this.initialCapacity = initialCapacity;
-        gc();
+        buffer = new char[initialCapacity];
+        builder = new StringBuilder(initialCapacity);
     }
 
     public void println() {
-        builder.append(System.lineSeparator());
+        builder.append(Strings.LN);
         flush();
     }
 
@@ -38,7 +38,7 @@ public abstract class BuildableCharArray implements GarbageCollectionAware {
 
     @Override
     public void gc() {
-        buffer = new char[initialCapacity];
-        builder = new StringBuilder(initialCapacity);
+        builder = new StringBuilder(builder);
+        buffer = new char[builder.capacity()];
     }
 }

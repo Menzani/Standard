@@ -1,6 +1,7 @@
 package eu.menzani.error;
 
 import eu.menzani.struct.AppInfo;
+import eu.menzani.struct.Strings;
 
 import java.awt.*;
 import java.nio.file.Files;
@@ -17,7 +18,7 @@ class ErrorReport implements Action {
     }
 
     private static String createDefaultHeader() {
-        String ln = System.lineSeparator();
+        final String ln = Strings.LN;
         return "An error occurred in " + AppInfo.getName() + ln + ln +
                 "The application was terminated to prevent data corruption." + ln +
                 "Some data may have been lost." + ln + ln +

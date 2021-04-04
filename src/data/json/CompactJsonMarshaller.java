@@ -10,9 +10,6 @@ import eu.menzani.lang.StringBuilders;
 import eu.menzani.lang.TargetReplacement;
 import eu.menzani.object.GarbageCollectionAware;
 
-import java.util.Map;
-import java.util.Set;
-
 public class CompactJsonMarshaller extends Marshaller implements GarbageCollectionAware {
     private static final TargetReplacement[] stringEscapes = {new TargetReplacement('\\', "\\\\"), new TargetReplacement('\"', "\\\"")};
 
@@ -39,16 +36,16 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
             builder.append(((Integer) element).asLong());
         } else if (element instanceof Object) {
             builder.append('{');
-            Set<Map.Entry<java.lang.String, Element>> keysWithValues = ((Object) element).getKeysWithValues();
-            if (!keysWithValues.isEmpty()) {
-                for (Map.Entry<java.lang.String, Element> keyWithValue : keysWithValues) {
+            Object object = (Object) element;
+            if (object.isNotEmpty()) {
+                for (KeyValue keyValue : object.getKeyValues()) {
                     builder.append('"');
                     int start = buffer.position();
-                    builder.append(keyWithValue.getKey());
+                    builder.append(keyValue.getKey());
                     StringBuilders.replace(builder, start, buffer.position(), stringEscapes);
                     builder.append("\":");
                     buffer.checkFull();
-                    marshal(keyWithValue.getValue(), buffer);
+                    marshal(keyValue.getValue(), buffer);
                     builder.append(',');
                 }
                 builder.setLength(builder.length() - 1);

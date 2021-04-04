@@ -50,7 +50,7 @@ public class ListFile implements Closeable {
     }
 
     public void next() {
-        builder.append(System.lineSeparator());
+        builder.append(Strings.LN);
     }
 
     @Override

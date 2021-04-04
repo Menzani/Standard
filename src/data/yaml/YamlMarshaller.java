@@ -11,9 +11,6 @@ import eu.menzani.lang.TargetReplacement;
 import eu.menzani.object.GarbageCollectionAware;
 import eu.menzani.struct.Strings;
 
-import java.util.Map;
-import java.util.Set;
-
 public class YamlMarshaller extends Marshaller implements GarbageCollectionAware {
     private static final TargetReplacement[] stringEscapes = {new TargetReplacement('\\', "\\\\"), new TargetReplacement(':', "\\:")};
 
@@ -58,8 +55,8 @@ public class YamlMarshaller extends Marshaller implements GarbageCollectionAware
             }
             builder.append(((Integer) element).asLong());
         } else if (element instanceof Object) {
-            Set<Map.Entry<java.lang.String, Element>> keysWithValues = ((Object) element).getKeysWithValues();
-            if (keysWithValues.isEmpty()) {
+            Object object = (Object) element;
+            if (object.isEmpty()) {
                 if (isValueOfKey) {
                     builder.append(' ');
                 }
@@ -67,7 +64,7 @@ public class YamlMarshaller extends Marshaller implements GarbageCollectionAware
             } else {
                 indent.increment();
                 boolean isFirst = true;
-                for (Map.Entry<java.lang.String, Element> keyWithValue : keysWithValues) {
+                for (KeyValue keyValue : object.getKeyValues()) {
                     if (isFirst) {
                         if (isNotElementOfArray) {
                             indent.appendTo(builder);
@@ -78,11 +75,11 @@ public class YamlMarshaller extends Marshaller implements GarbageCollectionAware
                         indent.appendTo(builder);
                     }
                     int start = buffer.position();
-                    builder.append(keyWithValue.getKey());
+                    builder.append(keyValue.getKey());
                     StringBuilders.replace(builder, start, buffer.position(), stringEscapes);
                     builder.append(':');
                     buffer.checkFull();
-                    marshal(keyWithValue.getValue(), buffer, builder, indent, true, true);
+                    marshal(keyValue.getValue(), buffer, builder, indent, true, true);
                 }
                 indent.decrement();
             }

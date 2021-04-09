@@ -77,7 +77,9 @@ public class ArrayView<T> extends AbstractList<T> implements RandomAccess, Seria
 
     @Override
     public Object[] toArray() {
-        int fromIndex = this.fromIndex;
+        if (fromIndex == 0 && toIndex == array.length) {
+            return array;
+        }
         int size = toIndex - fromIndex;
         Object[] result = new Object[size];
         System.arraycopy(array, fromIndex, result, 0, size);
@@ -86,7 +88,6 @@ public class ArrayView<T> extends AbstractList<T> implements RandomAccess, Seria
 
     @Override
     public <U> U[] toArray(U[] typedArray) {
-        int fromIndex = this.fromIndex;
         int size = toIndex - fromIndex;
         if (typedArray.length > size) {
             System.arraycopy(array, fromIndex, typedArray, 0, size);
@@ -99,7 +100,6 @@ public class ArrayView<T> extends AbstractList<T> implements RandomAccess, Seria
 
     @Override
     public <U> U[] toArray(IntFunction<U[]> generator) {
-        int fromIndex = this.fromIndex;
         int size = toIndex - fromIndex;
         U[] result = generator.apply(size);
         System.arraycopy(array, fromIndex, result, 0, size);

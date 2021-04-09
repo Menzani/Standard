@@ -17,7 +17,7 @@ public class Object extends Element {
 
     private KeyIterator keyIterator;
     private ValueIterator valueIterator;
-    private Iterator iterator;
+    private KeyValueIterator keyValueIterator;
     private Buffer<KeyValue> buffer_usedByEquals;
 
     public static Object allocate() {
@@ -122,8 +122,14 @@ public class Object extends Element {
         }
         buckets = newBuckets;
         mask = newMask;
-        if (iterator != null) {
-            iterator.setBuckets(newBuckets);
+        if (keyIterator != null) {
+            keyIterator.setBuckets(newBuckets);
+        }
+        if (valueIterator != null) {
+            valueIterator.setBuckets(newBuckets);
+        }
+        if (keyValueIterator != null) {
+            keyValueIterator.setBuckets(newBuckets);
         }
     }
 
@@ -404,30 +410,26 @@ public class Object extends Element {
 
     public Iterable<java.lang.String> getKeys() {
         if (keyIterator == null) {
-            keyIterator = new KeyIterator(this);
+            keyIterator = new KeyIterator(buckets);
         }
-        iterator.initialize();
+        keyIterator.initialize();
         return keyIterator;
     }
 
     public Iterable<Element> getValues() {
         if (valueIterator == null) {
-            valueIterator = new ValueIterator(this);
+            valueIterator = new ValueIterator(buckets);
         }
-        iterator.initialize();
+        valueIterator.initialize();
         return valueIterator;
     }
 
     public Iterable<KeyValue> getKeyValues() {
-        initializeIterator();
-        iterator.initialize();
-        return iterator;
-    }
-
-    private void initializeIterator() {
-        if (iterator == null) {
-            iterator = new Iterator(buckets);
+        if (keyValueIterator == null) {
+            keyValueIterator = new KeyValueIterator(buckets);
         }
+        keyValueIterator.initialize();
+        return keyValueIterator;
     }
 
     @Override
@@ -493,51 +495,13 @@ public class Object extends Element {
         allocator.deallocate(this);
     }
 
-    private static class KeyIterator implements IterableIterator<java.lang.String> {
-        private final Iterator iterator;
-
-        KeyIterator(Object outer) {
-            outer.initializeIterator();
-            iterator = outer.iterator;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return iterator.hasNext();
-        }
-
-        @Override
-        public java.lang.String next() {
-            return iterator.next().key;
-        }
-    }
-
-    private static class ValueIterator implements IterableIterator<Element> {
-        private final Iterator iterator;
-
-        ValueIterator(Object outer) {
-            outer.initializeIterator();
-            iterator = outer.iterator;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return iterator.hasNext();
-        }
-
-        @Override
-        public Element next() {
-            return iterator.next().value;
-        }
-    }
-
-    private static class Iterator implements IterableIterator<KeyValue> {
+    private static abstract class AbstractIterator {
         private KeyValue[] buckets;
 
         private int index;
-        private KeyValue bucket;
+        KeyValue bucket;
 
-        Iterator(KeyValue[] buckets) {
+        AbstractIterator(KeyValue[] buckets) {
             this.buckets = buckets;
         }
 
@@ -550,7 +514,6 @@ public class Object extends Element {
             bucket = null;
         }
 
-        @Override
         public boolean hasNext() {
             if (bucket == null || bucket.next == null) {
                 do {
@@ -564,6 +527,34 @@ public class Object extends Element {
                 bucket = bucket.next;
             }
             return true;
+        }
+    }
+
+    private static class KeyIterator extends AbstractIterator implements IterableIterator<java.lang.String> {
+        KeyIterator(KeyValue[] buckets) {
+            super(buckets);
+        }
+
+        @Override
+        public java.lang.String next() {
+            return bucket.key;
+        }
+    }
+
+    private static class ValueIterator extends AbstractIterator implements IterableIterator<Element> {
+        ValueIterator(KeyValue[] buckets) {
+            super(buckets);
+        }
+
+        @Override
+        public Element next() {
+            return bucket.value;
+        }
+    }
+
+    private static class KeyValueIterator extends AbstractIterator implements IterableIterator<KeyValue> {
+        KeyValueIterator(KeyValue[] buckets) {
+            super(buckets);
         }
 
         @Override

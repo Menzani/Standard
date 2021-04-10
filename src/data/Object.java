@@ -138,7 +138,9 @@ public class Object extends Element {
     }
 
     public boolean remove(java.lang.String key) {
-        KeyValue bucket = buckets[key.hashCode() & mask];
+        int hash = key.hashCode() & mask;
+        KeyValue bucket = buckets[hash];
+        boolean first = true;
         while (true) {
             if (bucket == null) {
                 return false;
@@ -147,14 +149,18 @@ public class Object extends Element {
                 break;
             }
             bucket = bucket.next;
+            first = false;
+        }
+        if (first) {
+            buckets[hash] = null;
+        } else if (bucket.previous != null) {
+            bucket.previous.next = bucket.next;
         }
         if (bucket.next != null) {
             bucket.next.previous = bucket.previous;
         }
-        if (bucket.previous != null) {
-            bucket.previous.next = bucket.next;
-        }
         bucket.deallocate();
+        size--;
         return true;
     }
 
@@ -484,7 +490,7 @@ public class Object extends Element {
             buffer_usedByEquals.gc();
         }
 
-        int newCapacity = size + 16;
+        int newCapacity = size() + 16;
         growSize = newCapacity * (buckets.length / growSize);
         resizeBuckets(newCapacity);
     }

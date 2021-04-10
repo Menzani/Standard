@@ -31,11 +31,15 @@ public class ResizableArray<T> implements Iterable<T> {
         return java.util.Arrays.copyOf(array, length);
     }
 
-    public @Optional T[] asFixedArrayOrNull() {
+    public T[] asFixedArrayOr(T[] emptyValue) {
         if (length == 0) {
-            return null;
+            return emptyValue;
         }
         return asFixedArray();
+    }
+
+    public @Optional T[] asFixedArrayOrNull() {
+        return asFixedArrayOr(null);
     }
 
     public ArrayView<T> view() {

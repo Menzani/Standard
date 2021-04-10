@@ -5,15 +5,18 @@ import eu.menzani.io.PrintCharArraySliceToPrintStream;
 import java.io.PrintStream;
 
 public class PrintStreamDestination implements Destination {
-    private final PrintCharArraySliceToPrintStream stream;
+    private static final PrintStreamDestination standardOutput = new PrintStreamDestination(System.out);
+    private static final PrintStreamDestination standardError = new PrintStreamDestination(System.err);
 
     public static PrintStreamDestination standardOutput() {
-        return new PrintStreamDestination(System.out);
+        return standardOutput;
     }
 
     public static PrintStreamDestination standardError() {
-        return new PrintStreamDestination(System.err);
+        return standardError;
     }
+
+    private final PrintCharArraySliceToPrintStream stream;
 
     public PrintStreamDestination(PrintStream stream) {
         this.stream = new PrintCharArraySliceToPrintStream(stream);

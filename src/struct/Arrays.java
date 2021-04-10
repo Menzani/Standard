@@ -61,8 +61,8 @@ public class Arrays {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T[] allocateGeneric(Class<? super T> bound, int length) {
-        return (T[]) Array.newInstance(bound, length);
+    public static <T> T[] allocateGeneric(Class<? super T> elementType, int length) {
+        return (T[]) Array.newInstance(elementType, length);
     }
 
     @SuppressWarnings("unchecked")

@@ -79,7 +79,7 @@ class Runner {
     private void loadFailedTests() throws IOException {
         failedTests = new FailedTests(index.hashCode());
 
-        if (failedTests.shouldExecuteOnlyFailed()) {
+        if (failedTests.shouldExecuteOnlyFailed() && index.shouldExecuteAll()) {
             for (TestClass testClass : index.getTestClasses()) {
                 if (failedTests.contains(testClass)) {
                     continue;

@@ -73,6 +73,10 @@ public abstract class Benchmark {
         return false;
     }
 
+    protected MemorySize getHeapSize() {
+        return MemorySize.ofGigabytes(8);
+    }
+
     public void launchBenchmark() {
         launchBenchmark(ConsoleBenchmarkListener.INSTANCE);
     }
@@ -84,7 +88,7 @@ public abstract class Benchmark {
         } else {
             JavaProcessLauncher launcher = new JavaProcessLauncher();
             launcher.addProperty(launched.setAsBoolean(true));
-            launcher.setFixedHeap(MemorySize.ofGigabytes(8));
+            launcher.setFixedHeap(getHeapSize());
             launcher.addJVMOptions(
                     JVMOption.USE_LARGE_PAGES,
                     JVMOption.ALWAYS_PRE_TOUCH,
@@ -154,38 +158,11 @@ public abstract class Benchmark {
         if (concurrency == 1) {
             getThreadManipulation().applyToCurrentThread();
 
-            if (shouldAutoProfile()) {
-                int autoProfileDivideBy = getAutoProfileDivideBy();
-                Profiler profiler = new Profiler(this, autoProfileDivideBy);
-                long start = System.nanoTime();
-                do {
-                    profiler.start();
-                    test(numIterations);
-                    profiler.stop();
-                } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > warmupMemoryCap);
-                synchronized (this) {
-                    results.clear();
-                }
-                profiler = new Profiler(this, autoProfileDivideBy);
-                start = System.nanoTime();
-                do {
-                    profiler.start();
-                    test(numIterations);
-                    profiler.stop();
-                } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > testMemoryCap);
-            } else {
-                long start = System.nanoTime();
-                do {
-                    test(numIterations);
-                } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > warmupMemoryCap);
-                synchronized (this) {
-                    results.clear();
-                }
-                start = System.nanoTime();
-                do {
-                    test(numIterations);
-                } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > testMemoryCap);
+            run(numIterations, runtime, warmupMemoryCap);
+            synchronized (this) {
+                results.clear();
             }
+            run(numIterations, runtime, testMemoryCap);
         } else {
             ThreadGroup threads = new ThreadGroup(concurrency);
             BenchmarkThreadFactory factory = new BenchmarkThreadFactory(getConcurrentThreadManipulation());
@@ -205,7 +182,28 @@ public abstract class Benchmark {
         }
     }
 
+    private void run(int numIterations, Runtime runtime, long memoryCap) {
+        if (shouldAutoProfile()) {
+            Profiler profiler = new Profiler(this, getAutoProfileDivideBy());
+            long start = System.nanoTime();
+            do {
+                profiler.start();
+                test(numIterations);
+                profiler.stop();
+                onTestEnd();
+            } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > memoryCap);
+        } else {
+            long start = System.nanoTime();
+            do {
+                test(numIterations);
+            } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > memoryCap);
+        }
+    }
+
     protected abstract void test(int i);
+
+    protected void onTestEnd() {
+    }
 
     private class BenchmarkThreadFactory implements ObjectFactory<Thread> {
         private final ThreadManipulationSpread threadManipulation;

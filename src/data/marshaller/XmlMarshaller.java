@@ -1,8 +1,7 @@
-package eu.menzani.data.xml;
+package eu.menzani.data.marshaller;
 
-import eu.menzani.data.ReadBuffer;
 import eu.menzani.data.Element;
-import eu.menzani.data.Marshaller;
+import eu.menzani.data.ReadBuffer;
 import eu.menzani.data.WriteBuffer;
 
 public class XmlMarshaller extends Marshaller {

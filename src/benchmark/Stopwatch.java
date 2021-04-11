@@ -36,6 +36,10 @@ public class Stopwatch {
         minimumToReport = Long.MAX_VALUE;
     }
 
+    public void enableReport() {
+        minimumToReport = 0L;
+    }
+
     public void stop() {
         final long end = System.nanoTime();
         long elapsed = calculateElapsed(end);

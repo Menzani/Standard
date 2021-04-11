@@ -39,15 +39,19 @@ public class Assert {
     }
 
     public static void equalMultiline(Object left, Object right) {
-        assert Objects.equals(left, right) : Strings.LN + toStringWrappedInEmptyLines(left);
+        assert Objects.equals(left, right) : equalMultiline_message(left);
+    }
+
+    private static String equalMultiline_message(Object left) {
+        return Strings.LN + Strings.LN + left + Strings.LN;
     }
 
     public static void equalToMultiline(Object left, Object right) {
-        assert Objects.equals(left, right) : Strings.LN + toStringWrappedInEmptyLines(left) + toStringWrappedInEmptyLines(right);
+        assert Objects.equals(left, right) : equalToMultiline_message(left, right);
     }
 
-    private static String toStringWrappedInEmptyLines(Object object) {
-        return Strings.LN + object + Strings.LN;
+    private static String equalToMultiline_message(Object left, Object right) {
+        return Strings.LN + Strings.LN + left + Strings.LN + Strings.LN + right + Strings.LN;
     }
 
     public static void same(Object left, Object right) {
@@ -202,24 +206,24 @@ public class Assert {
         assert value >= lowerBound && value <= upperBound : value;
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T extends Throwable> T fails(FailingLogic logic, Class<T> exceptionClass) {
+    public static <T extends Throwable> T fails(FallibleLogic logic, Class<T> exceptionClass) {
         try {
             logic.run();
         } catch (Throwable e) {
-            Assert.equal(e.getClass(), exceptionClass);
-            return (T) e;
+            Assert.same(e.getClass(), exceptionClass);
+            @SuppressWarnings("unchecked") var temp = (T) e;
+            return temp;
         }
         throw new AssertionError();
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T extends Throwable> T fails(FailingLogic logic, Class<T> exceptionClass, Supplier<?> messageSupplier) {
+    public static <T extends Throwable> T fails(FallibleLogic logic, Class<T> exceptionClass, Supplier<?> messageSupplier) {
         try {
             logic.run();
         } catch (Throwable e) {
             assert e.getClass() == exceptionClass : messageSupplier.get();
-            return (T) e;
+            @SuppressWarnings("unchecked") var temp = (T) e;
+            return temp;
         }
         throw new AssertionError();
     }

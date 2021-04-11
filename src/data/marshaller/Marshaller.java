@@ -1,9 +1,13 @@
-package eu.menzani.data;
+package eu.menzani.data.marshaller;
 
+import eu.menzani.data.*;
 import eu.menzani.object.GarbageCollectionAware;
 
 public abstract class Marshaller {
     private static final int defaultBufferSize = 8192;
+
+    protected Marshaller() {
+    }
 
     public abstract void marshal(Element element, WriteBuffer buffer);
 
@@ -23,10 +27,11 @@ public abstract class Marshaller {
         private final int increment;
 
         private int asInt;
-        private StringBuilder asStringBuilder = new StringBuilder();
+        private StringBuilder asStringBuilder;
 
         public Indent(int increment) {
             this.increment = increment;
+            gc();
             reset();
         }
 
@@ -61,7 +66,7 @@ public abstract class Marshaller {
 
         @Override
         public void gc() {
-            asStringBuilder = new StringBuilder(asStringBuilder);
+            asStringBuilder = new StringBuilder();
         }
     }
 }

@@ -1,13 +1,18 @@
 package eu.menzani.lang;
 
-import java.io.*;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import eu.menzani.error.GlobalStackTraceFilter;
+
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class StackTraceFilter {
-    private final List<String> methodsToRemove = new CopyOnWriteArrayList<>();
-    private final Object output;
+    private final Set<String> methodsToRemove = new CopyOnWriteArraySet<>();
+    private final Set<StackTraceFilter> inheritFrom = new CopyOnWriteArraySet<>();
 
+    private final Object output;
     private boolean isFirstLine;
 
     public StackTraceFilter() {
@@ -22,8 +27,18 @@ public class StackTraceFilter {
         this.output = new FilteredPrintWriter(output);
     }
 
-    public StackTraceFilter addMethodsToRemove(StackTraceFilter copyFrom) {
-        methodsToRemove.addAll(copyFrom.methodsToRemove);
+    public StackTraceFilter inheritFromGlobal() {
+        inheritFrom(GlobalStackTraceFilter.getInstance());
+        return this;
+    }
+
+    public StackTraceFilter inheritFrom(StackTraceFilter filter) {
+        inheritFrom.add(filter);
+        return this;
+    }
+
+    public StackTraceFilter stopInheritingFrom(StackTraceFilter filter) {
+        inheritFrom.remove(filter);
         return this;
     }
 
@@ -62,12 +77,24 @@ public class StackTraceFilter {
     }
 
     private boolean shouldNotBeRemoved(String line) {
-        for (String methodToRemove : methodsToRemove) {
-            if (line.startsWith(methodToRemove, 4)) {
+        if (shouldBeRemoved(this, line)) {
+            return false;
+        }
+        for (StackTraceFilter filter : inheritFrom) {
+            if (shouldBeRemoved(filter, line)) {
                 return false;
             }
         }
         return true;
+    }
+
+    private static boolean shouldBeRemoved(StackTraceFilter filter, String line) {
+        for (String methodToRemove : filter.methodsToRemove) {
+            if (line.startsWith(methodToRemove, 4)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private class FilteredPrintWriter extends PrintWriter {

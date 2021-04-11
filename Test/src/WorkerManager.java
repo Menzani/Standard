@@ -2,7 +2,6 @@ package eu.menzani.test;
 
 import eu.menzani.concurrent.ThreadGroup;
 import eu.menzani.error.GlobalExceptionHandler;
-import eu.menzani.error.GlobalStackTraceFilter;
 import eu.menzani.lang.Optional;
 import eu.menzani.lang.StackTraceFilter;
 
@@ -26,7 +25,7 @@ class WorkerManager {
     private boolean printCurrentTestMethod;
 
     private final StackTraceFilter stackTraceFilter = new StackTraceFilter()
-            .addMethodsToRemove(GlobalStackTraceFilter.getInstance())
+            .inheritFromGlobal()
             .addMethodToRemove(TestMethod.class, "runTest")
             .addMethodToRemove(Worker.class, "run");
 

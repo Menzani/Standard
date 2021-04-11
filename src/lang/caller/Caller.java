@@ -15,7 +15,7 @@ public class Caller {
 
     public static StaticObjectVoid ofConstructorVoid(Class<?> clazz) {
         GeneratedClass<StaticObjectVoid> generatedClass = new GeneratedClass<>(clazz);
-        String className = generatedClass.getClassName();
+        String clazzInternalName = generatedClass.getSiblingInternalName();
 
         ClassWriter writer = generatedClass.createClassWriter(staticObjectVoidInterfaces);
 
@@ -24,9 +24,9 @@ public class Caller {
         Label label = new Label();
         methodVisitor.visitLabel(label);
         methodVisitor.visitLineNumber(6, label);
-        methodVisitor.visitTypeInsn(NEW, className);
+        methodVisitor.visitTypeInsn(NEW, clazzInternalName);
         methodVisitor.visitInsn(DUP);
-        methodVisitor.visitMethodInsn(INVOKESPECIAL, className, "<init>", "()V", false);
+        methodVisitor.visitMethodInsn(INVOKESPECIAL, clazzInternalName, "<init>", "()V", false);
         methodVisitor.visitInsn(ARETURN);
         methodVisitor.visitMaxs(2, 1);
         methodVisitor.visitEnd();
@@ -36,7 +36,7 @@ public class Caller {
 
     public static InstanceVoidVoid ofInstanceVoidVoid(Method method) {
         GeneratedClass<InstanceVoidVoid> generatedClass = new GeneratedClass<>(method.getDeclaringClass());
-        String className = generatedClass.getClassName();
+        String classInternalName = generatedClass.getSiblingInternalName();
         String methodName = method.getName();
 
         ClassWriter writer = generatedClass.createClassWriter(instanceVoidVoidInterfaces);
@@ -47,8 +47,8 @@ public class Caller {
         methodVisitor.visitLabel(label);
         methodVisitor.visitLineNumber(6, label);
         methodVisitor.visitVarInsn(ALOAD, 1);
-        methodVisitor.visitTypeInsn(CHECKCAST, className);
-        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, className, methodName, "()V", false);
+        methodVisitor.visitTypeInsn(CHECKCAST, classInternalName);
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, classInternalName, methodName, "()V", false);
         label = new Label();
         methodVisitor.visitLabel(label);
         methodVisitor.visitLineNumber(7, label);

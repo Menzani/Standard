@@ -1,6 +1,6 @@
 package eu.menzani.lang;
 
 @FunctionalInterface
-public interface FailingLogic {
+public interface FallibleLogic {
     void run() throws Throwable;
 }

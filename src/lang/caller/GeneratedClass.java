@@ -1,5 +1,6 @@
 package eu.menzani.lang.caller;
 
+import eu.menzani.error.GlobalStackTraceFilter;
 import eu.menzani.lang.Lang;
 import eu.menzani.struct.ConcurrentKeyedCounter;
 import eu.menzani.struct.KeyedCounter;
@@ -15,22 +16,26 @@ class GeneratedClass<T> {
     private static final KeyedCounter<Class<?>> id = new ConcurrentKeyedCounter<>();
 
     private final Class<?> sibling;
-    private final String className;
-    private final String callerClassName;
+    private final String siblingInternalName;
+    private final String internalName;
+    private final String fullName;
+
     private final ClassWriter writer = new ClassWriter(0);
 
     GeneratedClass(Class<?> sibling) {
         this.sibling = sibling;
-        className = Type.getInternalName(sibling);
-        callerClassName = className + "$Caller" + id.increment(sibling);
+        siblingInternalName = Type.getInternalName(sibling);
+        String simpleName = "$Caller" + id.increment(sibling);
+        internalName = siblingInternalName + simpleName;
+        fullName = sibling.getName() + simpleName;
     }
 
-    String getClassName() {
-        return className;
+    String getSiblingInternalName() {
+        return siblingInternalName;
     }
 
     ClassWriter createClassWriter(String[] interfaces) {
-        writer.visit(V11, ACC_PUBLIC | ACC_SUPER, callerClassName, null, "java/lang/Object", interfaces);
+        writer.visit(V11, ACC_PUBLIC | ACC_SUPER, internalName, null, "java/lang/Object", interfaces);
 
         MethodVisitor methodVisitor = writer.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
         methodVisitor.visitCode();
@@ -46,9 +51,11 @@ class GeneratedClass<T> {
         return writer;
     }
 
-    @SuppressWarnings("unchecked")
     T createInstance() {
-        Class<?> generated = Unsafe.defineClass(callerClassName, writer.toByteArray(), sibling);
-        return (T) Lang.newInstance(generated);
+        Class<?> generated = Unsafe.defineClass(internalName, writer.toByteArray(), sibling);
+
+        GlobalStackTraceFilter.getInstance().addMethodToRemove(fullName, "call");
+
+        return Lang.newInstanceCast(generated);
     }
 }

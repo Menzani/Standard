@@ -46,6 +46,11 @@ public class Lang {
         return new StaticFieldOffset(InternalUnsafe.UNSAFE.staticFieldBase(field), InternalUnsafe.UNSAFE.staticFieldOffset(field));
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> T newInstanceCast(Class<?> clazz) {
+        return (T) newInstance(clazz);
+    }
+
     public static <T> T newInstance(Class<T> clazz) {
         try {
             return clazz.getConstructor(noParameterTypes).newInstance(NO_ARGS);

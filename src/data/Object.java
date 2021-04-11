@@ -165,23 +165,14 @@ public class Object extends Element {
     }
 
     public boolean containsKey(java.lang.String key) {
-        KeyValue bucket = null;
-        int index = 0;
-        while (true) {
-            if (bucket == null || bucket.next == null) {
-                do {
-                    if (index == buckets.length) {
-                        return false;
-                    }
-                    bucket = buckets[index++];
-                } while (bucket == null);
-            } else {
-                bucket = bucket.next;
-            }
-            if (key.equals(bucket.key)) {
+        KeyValue bucket = buckets[key.hashCode() & mask];
+        while (bucket != null) {
+            if (bucket.key.equals(key)) {
                 return true;
             }
+            bucket = bucket.next;
         }
+        return false;
     }
 
     public boolean containsValue(Element value) {

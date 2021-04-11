@@ -1,9 +1,11 @@
-package eu.menzani.data;
+package eu.menzani.data.marshaller;
 
+import eu.menzani.data.Object;
+import eu.menzani.data.*;
 import eu.menzani.lang.Assert;
 
-public abstract class MarshallerTest {
-    protected final Object element1;
+abstract class MarshallerTest {
+    final Object element1;
 
     {
         element1 = Object.allocate();
@@ -24,17 +26,17 @@ public abstract class MarshallerTest {
 
     private final Marshaller marshaller;
 
-    protected MarshallerTest(Marshaller marshaller) {
+    MarshallerTest(Marshaller marshaller) {
         this.marshaller = marshaller;
     }
 
-    protected void marshal(Element from, java.lang.String to) {
+    void marshal(Element from, java.lang.String to) {
         CharSequenceDestination destination = new CharSequenceDestination();
         marshaller.marshal(from, destination);
         Assert.equalToMultiline(destination.getString(), to);
     }
 
-    protected void unmarshal(java.lang.String from, Element to) {
+    void unmarshal(java.lang.String from, Element to) {
         Source source = new CharSequenceSource(from);
         Element element = marshaller.unmarshal(source);
         Assert.equalToMultiline(element, to);

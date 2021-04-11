@@ -1,4 +1,4 @@
-package eu.menzani.data.java;
+package eu.menzani.data.marshaller;
 
 import eu.menzani.data.Element;
 

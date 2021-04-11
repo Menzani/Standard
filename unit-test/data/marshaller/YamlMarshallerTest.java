@@ -1,4 +1,4 @@
-package eu.menzani.data.yaml;
+package eu.menzani.data.marshaller;
 
 import eu.menzani.data.Boolean;
 import eu.menzani.data.Integer;

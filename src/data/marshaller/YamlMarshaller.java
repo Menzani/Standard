@@ -1,4 +1,4 @@
-package eu.menzani.data.yaml;
+package eu.menzani.data.marshaller;
 
 import eu.menzani.data.Boolean;
 import eu.menzani.data.Integer;
@@ -18,6 +18,7 @@ public class YamlMarshaller extends Marshaller implements GarbageCollectionAware
     private Indent indent;
 
     private final DecimalConversion decimalConversion = new DecimalConversion();
+    private StringBuilder keyBuilder;
 
     public YamlMarshaller() {
         this(Strings.LN);
@@ -26,6 +27,7 @@ public class YamlMarshaller extends Marshaller implements GarbageCollectionAware
     public YamlMarshaller(java.lang.String lineSeparator) {
         ln = lineSeparator;
         setIndent(2);
+        gc();
     }
 
     public void setIndent(int indent) {
@@ -132,5 +134,7 @@ public class YamlMarshaller extends Marshaller implements GarbageCollectionAware
     @Override
     public void gc() {
         indent.gc();
+
+        keyBuilder = new StringBuilder();
     }
 }

@@ -88,7 +88,7 @@ public class Array extends Element implements Iterable<Element> {
     }
 
     public void remove(int index) {
-        PoolObject element = elements[index];
+        Element element = elements[index];
         if (element != null) {
             element.deallocate();
         }
@@ -254,7 +254,7 @@ public class Array extends Element implements Iterable<Element> {
 
     public void clear() {
         for (int i = 0; i < length; i++) {
-            PoolObject element = elements[i];
+            Element element = elements[i];
             if (element != null) {
                 element.deallocate();
                 elements[i] = null;

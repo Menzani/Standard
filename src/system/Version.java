@@ -55,7 +55,7 @@ public enum Version {
                 current = JAVA_19;
                 break;
             default:
-                throw new AssertionError("Version is unknown.");
+                throw new PlatformNotSupportedException();
         }
     }
 }

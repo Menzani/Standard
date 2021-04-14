@@ -3,12 +3,11 @@ package eu.menzani.data.marshaller;
 import eu.menzani.data.Boolean;
 import eu.menzani.data.Integer;
 import eu.menzani.data.Object;
+import eu.menzani.data.String;
 import eu.menzani.data.*;
 
-import java.lang.String;
-
 public class CompactJsonMarshallerTest extends MarshallerTest {
-    private static final String string1 = "{\"key1\":\"value1\",\"key2\":[true,false,null,55,55.78,[],{\"key3\":{}}],\"key3\":\"\r\n\"}";
+    private static final java.lang.String string1 = "{\"key1\":\"value1\",\"key2\":[true,false,null,55,55.78,[],{\"key3\":{}}],\"key3\":\"\r\n\"}";
 
     public CompactJsonMarshallerTest() {
         super(new CompactJsonMarshaller());
@@ -23,8 +22,8 @@ public class CompactJsonMarshallerTest extends MarshallerTest {
         marshal(Integer.allocate(7L), "7");
         marshal(Decimal.allocate(5.5D), "5.5");
         marshal(Decimal.allocate(5.5F), "5.5");
-        marshal(eu.menzani.data.String.allocate(""), "\"\"");
-        marshal(eu.menzani.data.String.allocate("\"-\\"), "\"\\\"-\\\\\"");
+        marshal(String.allocate(""), "\"\"");
+        marshal(String.allocate("\"-\\"), "\"\\\"-\\\\\"");
         marshal(Array.allocate(), "[]");
         marshal(Object.allocate(), "{}");
         marshal(element1, string1);
@@ -36,8 +35,8 @@ public class CompactJsonMarshallerTest extends MarshallerTest {
         unmarshal("null", null);
         unmarshal("7", Integer.allocate(7L));
         unmarshal("5.5", Decimal.allocate(5.5D));
-        unmarshal("\"\"", eu.menzani.data.String.allocate(""));
-        unmarshal("\"\\\"-\\\\\"", eu.menzani.data.String.allocate("\"-\\"));
+        unmarshal("\"\"", String.allocate(""));
+        unmarshal("\"\\\"-\\\\\"", String.allocate("\"-\\"));
         unmarshal("[]", Array.allocate());
         unmarshal("{}", Object.allocate());
         unmarshal(string1, element1);

@@ -1,7 +1,5 @@
 package eu.menzani.lang;
 
-import java.util.Objects;
-
 public class Check {
     public static void equal(char left, char right) {
         if (left != right) {
@@ -40,13 +38,13 @@ public class Check {
     }
 
     public static void equal(Object left, Object right) {
-        if (!Objects.equals(left, right)) {
+        if (left != right && (left == null || !left.equals(right))) {
             throw new AssertionError(left);
         }
     }
 
     public static void equalTo(Object left, Object right) {
-        if (!Objects.equals(left, right)) {
+        if (left != right && (left == null || !left.equals(right))) {
             throw new ObjectAssertionError(left, right);
         }
     }
@@ -76,13 +74,13 @@ public class Check {
     }
 
     public static void notEqual(Object left, Object right) {
-        if (Objects.equals(left, right)) {
+        if (left == right || (left != null && left.equals(right))) {
             throw new AssertionError();
         }
     }
 
     public static void notEqualTo(Object left, Object right) {
-        if (Objects.equals(left, right)) {
+        if (left == right || (left != null && left.equals(right))) {
             throw new AssertionError(left);
         }
     }

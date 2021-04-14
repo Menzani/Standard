@@ -1,7 +1,5 @@
 package eu.menzani.lang;
 
-import java.util.Objects;
-
 public class Assume {
     public static void notEqual(int left, int right) {
         if (left == right) {
@@ -28,13 +26,13 @@ public class Assume {
     }
 
     public static void notEqual(Object left, Object right) {
-        if (Objects.equals(left, right)) {
+        if (left == right || (left != null && left.equals(right))) {
             throw new IllegalArgumentException();
         }
     }
 
     public static void notEqualTo(Object left, Object right) {
-        if (Objects.equals(left, right)) {
+        if (left == right || (left != null && left.equals(right))) {
             throw new IllegalObjectArgumentException(left);
         }
     }

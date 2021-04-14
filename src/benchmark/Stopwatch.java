@@ -9,6 +9,7 @@ import eu.menzani.time.TimeFormat;
 public class Stopwatch {
     private String prefix;
     private long minimumToReport;
+
     private long start;
 
     public Stopwatch() {

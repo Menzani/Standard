@@ -22,8 +22,11 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
 
     @Override
     public void marshal(Element element, WriteBuffer buffer) {
-        StringBuilder builder = buffer.builder;
+        marshal(element, buffer, buffer.builder);
+        buffer.flush();
+    }
 
+    private void marshal(Element element, WriteBuffer buffer, StringBuilder builder) {
         if (element == null) {
             builder.append((java.lang.String) null);
         } else if (element instanceof String) {

@@ -2,7 +2,6 @@ package eu.menzani.lang;
 
 import eu.menzani.struct.Strings;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
 public class Assert {
@@ -31,15 +30,15 @@ public class Assert {
     }
 
     public static void equal(Object left, Object right) {
-        assert Objects.equals(left, right) : left;
+        assert left == right || (left != null && left.equals(right)) : left;
     }
 
     public static void equalTo(Object left, Object right) {
-        assert Objects.equals(left, right) : left + " " + right;
+        assert left == right || (left != null && left.equals(right)) : left + " " + right;
     }
 
     public static void equalMultiline(Object left, Object right) {
-        assert Objects.equals(left, right) : equalMultiline_message(left);
+        assert left == right || (left != null && left.equals(right)) : equalMultiline_message(left);
     }
 
     private static String equalMultiline_message(Object left) {
@@ -47,7 +46,7 @@ public class Assert {
     }
 
     public static void equalToMultiline(Object left, Object right) {
-        assert Objects.equals(left, right) : equalToMultiline_message(left, right);
+        assert left == right || (left != null && left.equals(right)) : equalToMultiline_message(left, right);
     }
 
     private static String equalToMultiline_message(Object left, Object right) {
@@ -79,11 +78,11 @@ public class Assert {
     }
 
     public static void notEqual(Object left, Object right) {
-        assert !Objects.equals(left, right);
+        assert left != right && (left == null || !left.equals(right));
     }
 
     public static void notEqualTo(Object left, Object right) {
-        assert !Objects.equals(left, right) : left;
+        assert left != right && (left == null || !left.equals(right)) : left;
     }
 
     public static void notSame(Object left, Object right) {

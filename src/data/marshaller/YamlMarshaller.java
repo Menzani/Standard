@@ -36,8 +36,10 @@ public class YamlMarshaller extends Marshaller implements GarbageCollectionAware
 
     @Override
     public void marshal(Element element, WriteBuffer buffer) {
+        requireObject(element);
         indent.reset();
         marshal(element, buffer, buffer.builder, indent, false, true);
+        buffer.flush();
     }
 
     private void marshal(Element element, WriteBuffer buffer, StringBuilder builder, Indent indent, boolean isValueOfKey, boolean isNotElementOfArray) {

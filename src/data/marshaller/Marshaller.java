@@ -1,6 +1,7 @@
 package eu.menzani.data.marshaller;
 
 import eu.menzani.data.*;
+import eu.menzani.data.Object;
 import eu.menzani.object.GarbageCollectionAware;
 
 public abstract class Marshaller {
@@ -14,13 +15,17 @@ public abstract class Marshaller {
     public abstract Element unmarshal(ReadBuffer buffer);
 
     public void marshal(Element element, Destination destination) {
-        WriteBuffer buffer = new WriteBuffer(defaultBufferSize, destination);
-        marshal(element, buffer);
-        buffer.flush();
+        marshal(element, new WriteBuffer(defaultBufferSize, destination));
     }
 
     public Element unmarshal(Source source) {
         return unmarshal(new ReadBuffer(defaultBufferSize, source));
+    }
+
+    protected static void requireObject(Element element) {
+        if (!(element instanceof Object)) {
+            throw new IllegalArgumentException("element must be an Object.");
+        }
     }
 
     protected static class Indent implements GarbageCollectionAware {

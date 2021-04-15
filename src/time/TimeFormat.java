@@ -16,13 +16,16 @@ public class TimeFormat {
     }
 
     public static String formatThroughput(double nanoseconds) {
+        if (nanoseconds < 1D) {
+            return doubleFormat.format(1D / nanoseconds) + "B op/sec";
+        }
         if (nanoseconds < 1_000D) {
-            return doubleFormat.format(1_000D / nanoseconds) + "M msg/sec";
+            return doubleFormat.format(1_000D / nanoseconds) + "M op/sec";
         }
         if (nanoseconds < 1_000_000D) {
-            return doubleFormat.format(1_000_000D / nanoseconds) + "K msg/sec";
+            return doubleFormat.format(1_000_000D / nanoseconds) + "K op/sec";
         }
-        return doubleFormat.format(1_000_000_000D / nanoseconds) + " msg/sec";
+        return doubleFormat.format(1_000_000_000D / nanoseconds) + " op/sec";
     }
 
     public static String formatExecutionTime(long nanoseconds) {

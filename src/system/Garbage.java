@@ -5,6 +5,7 @@ import com.sun.management.GcInfo;
 import eu.menzani.InternalUnsafe;
 import eu.menzani.io.PrintStreamBuffer;
 import eu.menzani.lang.UncaughtException;
+import eu.menzani.object.GlobalCleaner;
 import eu.menzani.struct.ConcurrentObjectToggle;
 import eu.menzani.struct.ObjectToggle;
 
@@ -30,7 +31,7 @@ public class Garbage {
     }
 
     public static void freeMemory(Object object, long... addresses) {
-        Cleaner.value.register(object, new FreeMemory(addresses));
+        GlobalCleaner.register(object, new FreeMemory(addresses));
     }
 
     public static void logGCs() {
@@ -72,10 +73,6 @@ public class Garbage {
         public void accept(MemoryUsage memoryUsage) {
             total += memoryUsage.getUsed();
         }
-    }
-
-    private static class Cleaner {
-        static final java.lang.ref.Cleaner value = java.lang.ref.Cleaner.create();
     }
 
     private static class FreeMemory implements Runnable {

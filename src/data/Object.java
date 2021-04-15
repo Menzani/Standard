@@ -2,7 +2,7 @@ package eu.menzani.data;
 
 import eu.menzani.collection.Buffer;
 import eu.menzani.collection.IterableIterator;
-import eu.menzani.lang.Numbers;
+import eu.menzani.lang.Assume;
 import eu.menzani.lang.Optional;
 import eu.menzani.object.Allocator;
 import eu.menzani.struct.Iterables;
@@ -35,9 +35,8 @@ public class Object extends Element {
     }
 
     public void ensureCapacity(int capacity) {
-        if (!Numbers.isPowerOfTwo(capacity)) {
-            throw new IllegalArgumentException("capacity must be a power of 2.");
-        }
+        Assume.powerOfTwo(capacity);
+
         int currentCapacity = buckets.length;
         if (currentCapacity < capacity) {
             growSize = capacity * (currentCapacity / growSize);

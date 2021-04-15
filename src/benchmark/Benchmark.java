@@ -30,12 +30,12 @@ public abstract class Benchmark {
         return result;
     }
 
-    protected int getNumIterations() {
-        return 1_000_000;
-    }
-
     protected int getConcurrency() {
         return 1;
+    }
+
+    protected int getNumIterations() {
+        return 1_000_000;
     }
 
     protected ThreadManipulation getThreadManipulation() {
@@ -148,12 +148,15 @@ public abstract class Benchmark {
         int concurrency = getConcurrency();
         Check.notLesser(concurrency, 1);
 
+        init();
         int numIterations = getNumIterations();
+        logic(numIterations);
+
         Runtime runtime = Runtime.getRuntime();
         long warmupMemoryCap = runtime.totalMemory() / 2L;
 
         long startMemory = runtime.freeMemory();
-        test(numIterations);
+        logic(numIterations);
         long endMemory = runtime.freeMemory();
         long testMemoryCap = (startMemory - endMemory) * 2L;
 
@@ -167,7 +170,7 @@ public abstract class Benchmark {
             run(numIterations, runtime, testMemoryCap);
         } else {
             ThreadGroup threads = new ThreadGroup(concurrency);
-            BenchmarkThreadFactory factory = new BenchmarkThreadFactory(getConcurrentThreadManipulation());
+            BenchmarkThreadFactory factory = new BenchmarkThreadFactory();
             factory.setMemoryCap(warmupMemoryCap);
             threads.run(factory);
             synchronized (this) {
@@ -190,29 +193,31 @@ public abstract class Benchmark {
             long start = System.nanoTime();
             do {
                 profiler.start();
-                test(numIterations);
+                logic(numIterations);
                 profiler.stop();
-                onTestEnd();
+                onLogicEnd();
             } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > memoryCap);
         } else {
             long start = System.nanoTime();
             do {
-                test(numIterations);
+                logic(numIterations);
             } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > memoryCap);
         }
     }
 
-    protected abstract void test(int i);
+    protected void init() {
+    }
 
-    protected void onTestEnd() {
+    protected abstract void logic(int i);
+
+    protected void onLogicEnd() {
     }
 
     private class BenchmarkThreadFactory implements ObjectFactory<Thread> {
-        private final ThreadManipulationSpread threadManipulation;
+        private final ThreadManipulationSpread threadManipulation = getConcurrentThreadManipulation();
         private long memoryCap;
 
-        BenchmarkThreadFactory(ThreadManipulationSpread threadManipulation) {
-            this.threadManipulation = threadManipulation;
+        BenchmarkThreadFactory() {
         }
 
         void setMemoryCap(long memoryCap) {
@@ -222,7 +227,42 @@ public abstract class Benchmark {
 
         @Override
         public Thread newInstance() {
-            return new BenchmarkThread(threadManipulation, Benchmark.this, memoryCap);
+            return new BenchmarkThread(threadManipulation, memoryCap);
+        }
+    }
+
+    private class BenchmarkThread extends Thread {
+        private final ThreadManipulationSpread threadManipulation;
+        private final long memoryCap;
+
+        BenchmarkThread(ThreadManipulationSpread threadManipulation, long memoryCap) {
+            this.threadManipulation = threadManipulation;
+            this.memoryCap = memoryCap;
+        }
+
+        @Override
+        public void run() {
+            threadManipulation.applyToNextThread();
+
+            Benchmark benchmark = Benchmark.this;
+            int numIterations = benchmark.getNumIterations();
+            Runtime runtime = Runtime.getRuntime();
+            long memoryCap = this.memoryCap;
+
+            if (benchmark.shouldAutoProfile()) {
+                Profiler profiler = new Profiler(benchmark, benchmark.getAutoProfileDivideBy(), benchmark.getAutoProfileResultFormat());
+                long start = System.nanoTime();
+                do {
+                    profiler.start();
+                    benchmark.logic(numIterations);
+                    profiler.stop();
+                } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > memoryCap);
+            } else {
+                long start = System.nanoTime();
+                do {
+                    benchmark.logic(numIterations);
+                } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > memoryCap);
+            }
         }
     }
 }

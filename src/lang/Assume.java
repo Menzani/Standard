@@ -235,6 +235,18 @@ public class Assume {
         }
     }
 
+    public static void powerOfTwo(int value) {
+        if (!Numbers.isPowerOfTwo(value)) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static void powerOfTwo(long value) {
+        if (!Numbers.isPowerOfTwo(value)) {
+            throw new IllegalArgumentException();
+        }
+    }
+
     static final String exceptionClassName = IllegalArgumentException.class.getName() + ": ";
 
     private static class IllegalIntArgumentException extends IllegalArgumentException {

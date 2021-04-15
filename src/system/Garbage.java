@@ -6,6 +6,7 @@ import eu.menzani.InternalUnsafe;
 import eu.menzani.io.PrintStreamBuffer;
 import eu.menzani.lang.UncaughtException;
 import eu.menzani.struct.ConcurrentObjectToggle;
+import eu.menzani.struct.ObjectToggle;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
@@ -22,7 +23,7 @@ import java.util.function.Consumer;
 
 public class Garbage {
     private static final ValuesSumAction valuesSumAction = new ValuesSumAction();
-    private static final ConcurrentObjectToggle<JVMListener> jvmListener = new ConcurrentObjectToggle<>();
+    private static final ObjectToggle<JVMListener> jvmListener = new ConcurrentObjectToggle<>();
 
     public static void freeMemory(long address) {
         InternalUnsafe.UNSAFE.freeMemory(address);

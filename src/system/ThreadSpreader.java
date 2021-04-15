@@ -1,23 +1,26 @@
 package eu.menzani.system;
 
+import eu.menzani.atomic.AtomicInt;
 import eu.menzani.lang.Assume;
 import eu.menzani.lang.Ensure;
-
-import java.util.concurrent.atomic.AtomicInteger;
+import eu.menzani.lang.Lang;
 
 public class ThreadSpreader {
+    private static final long NEXT_CPU = Lang.objectFieldOffset(ThreadSpreader.class, "nextCPU");
+
     private final int firstCPU;
     private final int lastCPU;
     private final int increment;
     private final boolean cycle;
-    private final AtomicInteger nextCPU;
+
+    private int nextCPU;
 
     ThreadSpreader(Builder builder) {
         firstCPU = builder.firstCPU;
         lastCPU = builder.lastCPU;
         increment = builder.increment;
         cycle = builder.cycle;
-        nextCPU = new AtomicInteger(firstCPU);
+        reset();
     }
 
     public void bindCurrentThreadToNextCPU() {
@@ -25,7 +28,7 @@ public class ThreadSpreader {
     }
 
     public int nextCPU() {
-        return nextCPU.getAndUpdate(cpu -> {
+        return AtomicInt.getAndUpdate(this, NEXT_CPU, cpu -> {
             if (cpu > lastCPU) {
                 throw new ThreadManipulationException("No more CPUs are available to bind to.");
             }
@@ -38,7 +41,7 @@ public class ThreadSpreader {
     }
 
     public void reset() {
-        nextCPU.set(firstCPU);
+        AtomicInt.setOpaque(this, NEXT_CPU, firstCPU);
     }
 
     public static class Builder {

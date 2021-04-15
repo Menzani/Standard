@@ -7,11 +7,19 @@ public class Profiler {
     private long start;
 
     public Profiler(Object object, int divideBy) {
-        this(object.getClass(), divideBy);
+        this(object, divideBy, ResultFormat.TIME);
+    }
+
+    public Profiler(Object object, int divideBy, ResultFormat resultFormat) {
+        this(object.getClass(), divideBy, resultFormat);
     }
 
     public Profiler(Class<?> clazz, int divideBy) {
-        this(clazz.getSimpleName(), divideBy);
+        this(clazz, divideBy, ResultFormat.TIME);
+    }
+
+    public Profiler(Class<?> clazz, int divideBy, ResultFormat resultFormat) {
+        this(clazz.getSimpleName(), divideBy, resultFormat);
     }
 
     public Profiler(String name, int divideBy) {

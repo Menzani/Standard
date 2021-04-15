@@ -3,7 +3,7 @@ package eu.menzani.struct;
 import eu.menzani.atomic.Atomic;
 import eu.menzani.lang.Lang;
 
-public class ConcurrentObjectToggle<T> {
+public class ConcurrentObjectToggle<T> extends ObjectToggle<T> {
     private static final long VALUE, LAST_SET_VALUE;
 
     static {
@@ -17,14 +17,17 @@ public class ConcurrentObjectToggle<T> {
     private Object value;
     private T lastSetValue;
 
+    @Override
     public boolean set() {
         return Atomic.compareAndSetVolatile(this, VALUE, null, placeholder);
     }
 
+    @Override
     public void set(T value) {
         Atomic.setRelease(this, VALUE, value);
     }
 
+    @Override
     public boolean unset() {
         Object value = Atomic.getAndSetVolatile(this, VALUE, null);
         if (value == null) {
@@ -39,6 +42,7 @@ public class ConcurrentObjectToggle<T> {
         return true;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public T get() {
         Object value;
@@ -49,18 +53,5 @@ public class ConcurrentObjectToggle<T> {
             return Atomic.getAcquire(this, LAST_SET_VALUE);
         }
         return (T) value;
-    }
-
-    public void ensureNotSet(String exceptionMessage) {
-        if (!set()) {
-            throw new IllegalStateException(exceptionMessage);
-        }
-    }
-
-    public T ensureSet(String exceptionMessage) {
-        if (unset()) {
-            return get();
-        }
-        throw new IllegalStateException(exceptionMessage);
     }
 }

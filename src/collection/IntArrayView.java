@@ -79,7 +79,11 @@ public class IntArrayView extends AbstractList<Integer> implements RandomAccess,
     public Object[] toArray() {
         int size = toIndex - fromIndex;
         Object[] result = new Object[size];
-        System.arraycopy(array, fromIndex, result, 0, size);
+        int j = 0;
+        for (int i = fromIndex; i < toIndex; i++) {
+            result[j++] = array[i];
+        }
+        assert j == size;
         return result;
     }
 

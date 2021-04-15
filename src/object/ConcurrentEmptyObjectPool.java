@@ -1,5 +1,6 @@
 package eu.menzani.object;
 
+import eu.menzani.atomic.AtomicArray;
 import eu.menzani.struct.Arrays;
 
 public class ConcurrentEmptyObjectPool<T extends PoolObject> implements ObjectPool<T> {
@@ -17,18 +18,18 @@ public class ConcurrentEmptyObjectPool<T extends PoolObject> implements ObjectPo
         if (index == 0) {
             return factory.newInstance();
         }
-        return objects[--index];
+        return AtomicArray.getPlain(objects, --index);
     }
 
     @Override
     public synchronized void acquire(T object) {
-        objects[index++] = object;
+        AtomicArray.setPlain(objects, index++, object);
     }
 
     @Override
     public synchronized void gc() {
         for (int i = 0; i < index; i++) {
-            objects[i].gc();
+            AtomicArray.getPlain(objects, i).gc();
         }
     }
 }

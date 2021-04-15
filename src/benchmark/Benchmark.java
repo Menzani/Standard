@@ -1,5 +1,6 @@
 package eu.menzani.benchmark;
 
+import eu.menzani.collection.FixedList;
 import eu.menzani.concurrent.ThreadGroup;
 import eu.menzani.io.JavaProcessLauncher;
 import eu.menzani.lang.Check;
@@ -9,13 +10,10 @@ import eu.menzani.struct.JVMOption;
 import eu.menzani.struct.MemorySize;
 import eu.menzani.system.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public abstract class Benchmark {
     static Benchmark current;
 
-    private final List<Result> results = new ArrayList<>();
+    private final FixedList<Result> results = new FixedList<>(10);
 
     protected Benchmark() {
         current = this;
@@ -55,6 +53,10 @@ public abstract class Benchmark {
 
     protected int getAutoProfileDivideBy() {
         return getNumIterations();
+    }
+
+    protected ResultFormat getAutoProfileResultFormat() {
+        return ResultFormat.TIME;
     }
 
     protected boolean shouldAutoProfile() {
@@ -184,7 +186,7 @@ public abstract class Benchmark {
 
     private void run(int numIterations, Runtime runtime, long memoryCap) {
         if (shouldAutoProfile()) {
-            Profiler profiler = new Profiler(this, getAutoProfileDivideBy());
+            Profiler profiler = new Profiler(this, getAutoProfileDivideBy(), getAutoProfileResultFormat());
             long start = System.nanoTime();
             do {
                 profiler.start();

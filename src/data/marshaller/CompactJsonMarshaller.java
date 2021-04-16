@@ -200,13 +200,13 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
             case 'N':
                 int start = buffer.position() - 1;
                 boolean isDecimal = false;
-                outer:
+                loop:
                 while (buffer.hasNext()) {
                     switch (buffer.peek()) {
                         case ',':
                         case ']':
                         case '}':
-                            break outer;
+                            break loop;
                         case '.':
                             isDecimal = true;
                         default:

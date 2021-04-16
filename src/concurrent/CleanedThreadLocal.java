@@ -1,45 +1,43 @@
 package eu.menzani.concurrent;
 
 import eu.menzani.lang.Assert;
+import eu.menzani.object.ObjectFactory;
 import jdk.internal.misc.TerminatingThreadLocal;
 
-public abstract class CleanedThreadLocal<T> extends java.lang.ThreadLocal<T> {
+import java.util.function.Consumer;
+
+public class CleanedThreadLocal<T> extends java.lang.ThreadLocal<T> {
     private static final Object flag = new Object();
 
     private final Handle handle = new Handle();
+    private final ObjectFactory<T> factory;
+    private final Consumer<? super T> onClean;
 
-    protected CleanedThreadLocal() {
+    public CleanedThreadLocal(ObjectFactory<T> factory) {
+        this(factory, null);
+    }
+
+    public CleanedThreadLocal(ObjectFactory<T> factory, Consumer<? super T> onClean) {
+        this.factory = factory;
+        this.onClean = onClean;
     }
 
     @Override
     public void set(T value) {
         super.set(value);
         handle.onSet();
-        onSet(value);
     }
 
     @Override
     public void remove() {
         super.remove();
         handle.remove();
-        onRemove();
     }
 
     @Override
     protected T initialValue() {
         handle.onSet();
-        return newInitialValue();
-    }
-
-    protected void onSet(T value) {
-    }
-
-    protected void onRemove() {
-    }
-
-    protected abstract T newInitialValue();
-
-    protected void onCleaned(T value) {
+        return factory.newInstance();
     }
 
     private class Handle extends TerminatingThreadLocal<Object> {
@@ -53,7 +51,9 @@ public abstract class CleanedThreadLocal<T> extends java.lang.ThreadLocal<T> {
             }
             Assert.same(value, flag);
 
-            onCleaned(CleanedThreadLocal.this.get());
+            if (onClean != null) {
+                onClean.accept(CleanedThreadLocal.this.get());
+            }
             CleanedThreadLocal.super.remove();
         }
 

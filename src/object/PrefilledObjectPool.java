@@ -24,6 +24,16 @@ public class PrefilledObjectPool<T extends PoolObject> implements ObjectPool<T> 
     }
 
     @Override
+    public boolean isFull() {
+        return index == objects.length;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return index == 0;
+    }
+
+    @Override
     public void gc() {
         for (int i = 0; i < index; i++) {
             AtomicArray.getPlain(objects, i).gc();

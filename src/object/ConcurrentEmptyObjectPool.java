@@ -27,6 +27,16 @@ public class ConcurrentEmptyObjectPool<T extends PoolObject> implements ObjectPo
     }
 
     @Override
+    public synchronized boolean isFull() {
+        return index == objects.length;
+    }
+
+    @Override
+    public synchronized boolean isEmpty() {
+        return index == 0;
+    }
+
+    @Override
     public synchronized void gc() {
         for (int i = 0; i < index; i++) {
             AtomicArray.getPlain(objects, i).gc();

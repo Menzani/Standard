@@ -7,6 +7,8 @@ import static eu.menzani.system.Unsafe.ARRAY_BYTE_BASE_OFFSET;
 import static eu.menzani.system.Unsafe.ARRAY_BYTE_INDEX_SCALE;
 
 public class HeapBuffer {
+    public static final byte[] EMPTY = new byte[0];
+
     public static byte[] allocate(int length) {
         Assume.notGreater(length, Integer.MAX_VALUE - 8);
         return new byte[length + 8];

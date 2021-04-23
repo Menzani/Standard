@@ -1,51 +1,73 @@
 package eu.menzani.data;
 
+import eu.menzani.io.InputStreamReader;
 import eu.menzani.lang.UncaughtException;
 
 import java.io.*;
+import java.net.Socket;
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class IOSource implements Source, Closeable {
-    private final Reader reader;
+    private static final IOSource standardInput = new IOSource(System.in);
 
-    public IOSource(Path file) {
-        this(file, StandardCharsets.UTF_8);
+    public static IOSource standardInput() {
+        return standardInput;
     }
 
-    public IOSource(Path file, Charset charset) {
+    private final Reader reader;
+
+    /**
+     * Does not generate garbage while operating.
+     */
+    public IOSource(File file) {
         try {
-            reader = createReader(Files.newInputStream(file), charset);
+            reader = createReader(new FileInputStream(file));
         } catch (IOException e) {
             throw new UncaughtException(e);
         }
     }
 
-    public IOSource(URL url) {
-        this(url, StandardCharsets.UTF_8);
+    /**
+     * Generates garbage while operating.
+     */
+    public IOSource(Path file) {
+        try {
+            reader = createReader(Files.newInputStream(file));
+        } catch (IOException e) {
+            throw new UncaughtException(e);
+        }
     }
 
-    public IOSource(URL url, Charset charset) {
+    /**
+     * Does not generate garbage while operating.
+     */
+    public IOSource(Socket socket) {
         try {
-            reader = createReader(url.openStream(), charset);
+            reader = createReader(socket.getInputStream());
+        } catch (IOException e) {
+            throw new UncaughtException(e);
+        }
+    }
+
+    /**
+     * Does not generate garbage while operating.
+     */
+    public IOSource(URL url) {
+        try {
+            reader = createReader(url.openStream());
         } catch (IOException e) {
             throw new UncaughtException(e);
         }
     }
 
     public IOSource(InputStream stream) {
-        this(stream, StandardCharsets.UTF_8);
+        reader = createReader(stream);
     }
 
-    public IOSource(InputStream stream, Charset charset) {
-        reader = createReader(stream, charset);
-    }
-
-    private static Reader createReader(InputStream stream, Charset charset) {
-        return new InputStreamReader(stream, charset);
+    private static Reader createReader(InputStream stream) {
+        return new InputStreamReader(stream);
     }
 
     public IOSource(Reader reader) {

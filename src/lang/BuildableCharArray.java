@@ -12,7 +12,13 @@ public abstract class BuildableCharArray implements GarbageCollectionAware {
     public StringBuilder builder;
 
     protected BuildableCharArray(int initialCapacity) {
-        buffer = new char[initialCapacity];
+        this(initialCapacity, true);
+    }
+
+    protected BuildableCharArray(int initialCapacity, boolean initBuffer) {
+        if (initBuffer) {
+            buffer = new char[initialCapacity];
+        }
         builder = new StringBuilder(initialCapacity);
     }
 

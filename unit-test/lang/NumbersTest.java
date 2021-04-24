@@ -28,14 +28,14 @@ public class NumbersTest {
         Assert.equal(Numbers.getNextPowerOfTwo(-129), 0);
     }
 
-    public void isPowerOfTwo() {
+    public void isPowerOfTwoOrNot() {
         assert Numbers.isPowerOfTwo(128);
-        assert !Numbers.isPowerOfTwo(127);
+        assert Numbers.isNotPowerOfTwo(127);
         assert Numbers.isPowerOfTwo(0);
         assert Numbers.isPowerOfTwo(2);
 
-        assert !Numbers.isPowerOfTwo(-128);
-        assert !Numbers.isPowerOfTwo(-127);
-        assert !Numbers.isPowerOfTwo(-2);
+        assert Numbers.isNotPowerOfTwo(-128);
+        assert Numbers.isNotPowerOfTwo(-127);
+        assert Numbers.isNotPowerOfTwo(-2);
     }
 }

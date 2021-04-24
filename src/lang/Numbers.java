@@ -28,4 +28,20 @@ public class Numbers {
     public static boolean isPowerOfTwo(long value) {
         return (value & -value) == value;
     }
+
+    public static boolean isNotPowerOfTwo(int value) {
+        return (value & -value) != value;
+    }
+
+    public static boolean isNotPowerOfTwo(long value) {
+        return (value & -value) != value;
+    }
+
+    public static boolean isEven(int value) {
+        return (value & 1) == 0;
+    }
+
+    public static boolean isOdd(int value) {
+        return (value & 1) != 0;
+    }
 }

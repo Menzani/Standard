@@ -236,13 +236,25 @@ public class Assume {
     }
 
     public static void powerOfTwo(int value) {
-        if (!Numbers.isPowerOfTwo(value)) {
+        if (Numbers.isNotPowerOfTwo(value)) {
             throw new IllegalArgumentException();
         }
     }
 
     public static void powerOfTwo(long value) {
-        if (!Numbers.isPowerOfTwo(value)) {
+        if (Numbers.isNotPowerOfTwo(value)) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static void even(int value) {
+        if (Numbers.isOdd(value)) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static void odd(int value) {
+        if (Numbers.isEven(value)) {
             throw new IllegalArgumentException();
         }
     }

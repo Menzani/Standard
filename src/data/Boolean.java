@@ -4,21 +4,27 @@ import eu.menzani.lang.Immutable;
 
 @Immutable
 public final class Boolean extends Element {
-    public static final Boolean TRUE = new Boolean(true);
-    public static final Boolean FALSE = new Boolean(false);
+    public static final Boolean TRUE = new Boolean(true, "true");
+    public static final Boolean FALSE = new Boolean(false, "false");
 
     private final boolean value;
+    private final java.lang.String asString;
 
     public static Boolean allocate(boolean value) {
         return value ? TRUE : FALSE;
     }
 
-    private Boolean(boolean value) {
+    private Boolean(boolean value, java.lang.String asString) {
         this.value = value;
+        this.asString = asString;
     }
 
     public boolean asPrimitive() {
         return value;
+    }
+
+    public java.lang.String asString() {
+        return asString;
     }
 
     @Override
@@ -37,7 +43,7 @@ public final class Boolean extends Element {
 
     @Override
     public java.lang.String toString() {
-        return java.lang.Boolean.toString(value);
+        return asString;
     }
 
     @Override

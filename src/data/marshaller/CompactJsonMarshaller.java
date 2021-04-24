@@ -6,7 +6,6 @@ import eu.menzani.data.Object;
 import eu.menzani.data.String;
 import eu.menzani.data.*;
 import eu.menzani.lang.DecimalConversion;
-import eu.menzani.lang.StringBuilders;
 import eu.menzani.lang.TargetReplacement;
 import eu.menzani.object.GarbageCollectionAware;
 
@@ -21,55 +20,55 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
     }
 
     @Override
-    public void marshal(Element element, WriteBuffer buffer) {
-        marshal(element, buffer, buffer.getBuilder());
-        buffer.flush();
+    public void marshal(Element element, Destination destination) {
+        marshal0(element, destination);
+        destination.flush();
     }
 
-    private void marshal(Element element, WriteBuffer buffer, StringBuilder builder) {
+    private void marshal0(Element element, Destination destination) {
         if (element == null) {
-            builder.append((java.lang.String) null);
+            destination.append("null");
         } else if (element instanceof String) {
-            builder.append('"');
-            int start = buffer.position();
-            builder.append(((String) element).asCharSequence());
-            StringBuilders.replace(builder, start, buffer.position(), stringEscapes);
-            builder.append('"');
+            destination.append('"');
+            destination.setCurrentTargetReplacements(stringEscapes);
+            destination.append(((String) element).set());
+            destination.removeCurrentTargetReplacements();
+            destination.append('"');
         } else if (element instanceof Integer) {
-            builder.append(((Integer) element).asLong());
+            destination.append(((Integer) element).asLong());
         } else if (element instanceof Object) {
-            builder.append('{');
+            destination.append('{');
             Object object = (Object) element;
             if (object.isNotEmpty()) {
                 for (KeyValue keyValue : object.getKeyValues()) {
-                    builder.append('"');
-                    int start = buffer.position();
-                    builder.append(keyValue.getKey());
-                    StringBuilders.replace(builder, start, buffer.position(), stringEscapes);
-                    builder.append("\":");
-                    buffer.checkFull();
-                    marshal(keyValue.getValue(), buffer);
-                    builder.append(',');
+                    destination.append('"');
+                    destination.setCurrentTargetReplacements(stringEscapes);
+                    destination.append(keyValue.getKey());
+                    destination.removeCurrentTargetReplacements();
+                    destination.append("\":");
+                    destination.checkFlush();
+                    marshal0(keyValue.getValue(), destination);
+                    destination.append(',');
                 }
-                builder.setLength(builder.length() - 1);
+                destination.deleteLastChar();
             }
-            builder.append('}');
+            destination.append('}');
         } else if (element instanceof Array) {
-            builder.append('[');
+            destination.append('[');
             Array array = (Array) element;
             if (array.isNotEmpty()) {
                 for (Element arrayElement : array) {
-                    buffer.checkFull();
-                    marshal(arrayElement, buffer);
-                    builder.append(',');
+                    destination.checkFlush();
+                    marshal0(arrayElement, destination);
+                    destination.append(',');
                 }
-                builder.setLength(builder.length() - 1);
+                destination.deleteLastChar();
             }
-            builder.append(']');
+            destination.append(']');
         } else if (element instanceof Decimal) {
-            decimalConversion.appendDouble(((Decimal) element).asDouble(), builder);
+            decimalConversion.appendDouble(((Decimal) element).asDouble(), destination);
         } else if (element instanceof Boolean) {
-            builder.append(((Boolean) element).asPrimitive());
+            destination.append(((Boolean) element).asString());
         } else {
             throw new AssertionError();
         }

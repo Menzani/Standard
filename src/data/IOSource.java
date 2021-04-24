@@ -1,5 +1,6 @@
 package eu.menzani.data;
 
+import eu.menzani.lang.Assume;
 import eu.menzani.lang.UncaughtException;
 import eu.menzani.struct.HeapBuffer;
 
@@ -110,6 +111,7 @@ public class IOSource extends Source implements Closeable {
     }
 
     private static byte[] createBuffer(int size) {
+        Assume.even(size);
         return new byte[size];
     }
 

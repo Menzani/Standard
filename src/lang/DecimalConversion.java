@@ -1,6 +1,7 @@
 package eu.menzani.lang;
 
 import eu.menzani.Native;
+import eu.menzani.data.Destination;
 import eu.menzani.struct.DirectBuffer;
 import eu.menzani.system.Garbage;
 import eu.menzani.system.Unsafe;
@@ -10,13 +11,26 @@ public class DecimalConversion {
         Native.init();
     }
 
-    private static final int maxCharsInDouble = 24;
-
-    private final long nativeBuffer = Unsafe.allocateMemory(maxCharsInDouble);
-    private final char[] heapBuffer = new char[maxCharsInDouble];
+    private final long buffer = Unsafe.allocateMemory(24L);
 
     public DecimalConversion() {
-        Garbage.freeMemory(this, nativeBuffer);
+        Garbage.freeMemory(this, buffer);
+    }
+
+    public void appendDouble(double value, Destination destination) {
+        if (Double.isNaN(value)) {
+            destination.append("NaN");
+        } else if (value == Double.POSITIVE_INFINITY) {
+            destination.append("Infinity");
+        } else if (value == Double.NEGATIVE_INFINITY) {
+            destination.append("-Infinity");
+        } else {
+            int length = appendDouble(value, buffer);
+
+            for (int i = 0; i < length; i++) {
+                destination.append((char) DirectBuffer.getByte(buffer, i));
+            }
+        }
     }
 
     public void appendDouble(double value, StringBuilder builder) {
@@ -27,7 +41,7 @@ public class DecimalConversion {
         } else if (value == Double.NEGATIVE_INFINITY) {
             builder.append("-Infinity");
         } else {
-            readFromHeapBuffer(appendDouble(value, nativeBuffer), builder);
+            readFromBuffer(appendDouble(value, buffer), builder);
         }
     }
 
@@ -39,29 +53,28 @@ public class DecimalConversion {
         } else if (value == Float.NEGATIVE_INFINITY) {
             builder.append("-Infinity");
         } else {
-            readFromHeapBuffer(appendFloat(value, nativeBuffer), builder);
+            readFromBuffer(appendFloat(value, buffer), builder);
         }
     }
 
-    private void readFromHeapBuffer(int length, StringBuilder builder) {
+    private void readFromBuffer(int length, StringBuilder builder) {
         for (int i = 0; i < length; i++) {
-            heapBuffer[i] = (char) DirectBuffer.getByte(nativeBuffer, i);
+            builder.append((char) DirectBuffer.getByte(buffer, i));
         }
-        builder.append(heapBuffer, 0, length);
     }
 
     public double parseDouble(CharSequence charSequence, int from, int to) {
-        return parseDouble(nativeBuffer, writeToNativeBuffer(charSequence, from, to));
+        return parseDouble(buffer, writeToBuffer(charSequence, from, to));
     }
 
     public float parseFloat(CharSequence charSequence, int from, int to) {
-        return parseFloat(nativeBuffer, writeToNativeBuffer(charSequence, from, to));
+        return parseFloat(buffer, writeToBuffer(charSequence, from, to));
     }
 
-    private int writeToNativeBuffer(CharSequence charSequence, int from, int to) {
+    private int writeToBuffer(CharSequence charSequence, int from, int to) {
         int length = to - from;
         for (int i = 0; i < length; i++) {
-            DirectBuffer.putByte(nativeBuffer, i, (byte) charSequence.charAt(from + i));
+            DirectBuffer.putByte(buffer, i, (byte) charSequence.charAt(from + i));
         }
         return length;
     }

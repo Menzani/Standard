@@ -6,7 +6,6 @@ import eu.menzani.data.Object;
 import eu.menzani.data.String;
 import eu.menzani.data.*;
 import eu.menzani.lang.DecimalConversion;
-import eu.menzani.lang.StringBuilders;
 import eu.menzani.lang.TargetReplacement;
 import eu.menzani.object.GarbageCollectionAware;
 import eu.menzani.struct.Strings;
@@ -35,55 +34,55 @@ public class YamlMarshaller extends Marshaller implements GarbageCollectionAware
     }
 
     @Override
-    public void marshal(Element element, WriteBuffer buffer) {
+    public void marshal(Element element, Destination destination) {
         requireObject(element);
         indent.reset();
-        marshal(element, buffer, buffer.getBuilder(), indent, false, true);
-        buffer.flush();
+        marshal(element, destination, indent, false, true);
+        destination.flush();
     }
 
-    private void marshal(Element element, WriteBuffer buffer, StringBuilder builder, Indent indent, boolean isValueOfKey, boolean isNotElementOfArray) {
+    private void marshal(Element element, Destination destination, Indent indent, boolean isValueOfKey, boolean isNotElementOfArray) {
         if (element == null) {
             if (isValueOfKey) {
-                builder.append(' ');
+                destination.append(' ');
             }
-            builder.append((java.lang.String) null);
+            destination.append("null");
         } else if (element instanceof String) {
             if (isValueOfKey) {
-                builder.append(' ');
+                destination.append(' ');
             }
-            builder.append(((String) element).asCharSequence());
+            destination.append(((String) element).set());
         } else if (element instanceof Integer) {
             if (isValueOfKey) {
-                builder.append(' ');
+                destination.append(' ');
             }
-            builder.append(((Integer) element).asLong());
+            destination.append(((Integer) element).asLong());
         } else if (element instanceof Object) {
             Object object = (Object) element;
             if (object.isEmpty()) {
                 if (isValueOfKey) {
-                    builder.append(' ');
+                    destination.append(' ');
                 }
-                builder.append("{}");
+                destination.append("{}");
             } else {
                 indent.increment();
                 boolean isFirst = true;
                 for (KeyValue keyValue : object.getKeyValues()) {
                     if (isFirst) {
                         if (isNotElementOfArray) {
-                            indent.appendTo(builder);
+                            indent.appendTo(destination);
                         }
                         isFirst = false;
                     } else {
-                        builder.append(ln);
-                        indent.appendTo(builder);
+                        destination.append(ln);
+                        indent.appendTo(destination);
                     }
-                    int start = buffer.position();
-                    builder.append(keyValue.getKey());
-                    StringBuilders.replace(builder, start, buffer.position(), stringEscapes);
-                    builder.append(':');
-                    buffer.checkFull();
-                    marshal(keyValue.getValue(), buffer, builder, indent, true, true);
+                    destination.setCurrentTargetReplacements(stringEscapes);
+                    destination.append(keyValue.getKey());
+                    destination.removeCurrentTargetReplacements();
+                    destination.append(':');
+                    destination.checkFlush();
+                    marshal(keyValue.getValue(), destination, indent, true, true);
                 }
                 indent.decrement();
             }
@@ -91,38 +90,38 @@ public class YamlMarshaller extends Marshaller implements GarbageCollectionAware
             Array array = (Array) element;
             if (array.isEmpty()) {
                 if (isValueOfKey) {
-                    builder.append(' ');
+                    destination.append(' ');
                 }
-                builder.append("[]");
+                destination.append("[]");
             } else {
                 indent.increment();
                 boolean isFirst = true;
                 for (Element arrayElement : array) {
                     if (isFirst) {
                         if (indent.wasIncrementedAtLeastTwice()) {
-                            builder.append(ln);
+                            destination.append(ln);
                         }
                         isFirst = false;
                     } else {
-                        builder.append(ln);
+                        destination.append(ln);
                     }
-                    indent.appendTo(builder);
-                    builder.append("- ");
-                    buffer.checkFull();
-                    marshal(arrayElement, buffer, builder, indent, false, false);
+                    indent.appendTo(destination);
+                    destination.append("- ");
+                    destination.checkFlush();
+                    marshal(arrayElement, destination, indent, false, false);
                 }
                 indent.decrement();
             }
         } else if (element instanceof Decimal) {
             if (isValueOfKey) {
-                builder.append(' ');
+                destination.append(' ');
             }
-            decimalConversion.appendDouble(((Decimal) element).asDouble(), builder);
+            decimalConversion.appendDouble(((Decimal) element).asDouble(), destination);
         } else if (element instanceof Boolean) {
             if (isValueOfKey) {
-                builder.append(' ');
+                destination.append(' ');
             }
-            builder.append(((Boolean) element).asPrimitive());
+            destination.append(((Boolean) element).asString());
         } else {
             throw new AssertionError();
         }

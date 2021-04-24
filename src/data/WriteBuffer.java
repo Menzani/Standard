@@ -1,15 +1,28 @@
 package eu.menzani.data;
 
-import eu.menzani.lang.BuildableCharArray;
+import eu.menzani.object.GarbageCollectionAware;
 
-public class WriteBuffer extends BuildableCharArray {
+public class WriteBuffer implements GarbageCollectionAware {
     private final int size;
     private final Destination destination;
 
+    private StringBuilder builder;
+    private char[] buffer;
+
+    public WriteBuffer(Destination destination) {
+        this(8192, destination);
+    }
+
     public WriteBuffer(int size, Destination destination) {
-        super(size * 2);
         this.size = size;
         this.destination = destination;
+
+        builder = new StringBuilder(size *= 2);
+        buffer = new char[size];
+    }
+
+    public StringBuilder getBuilder() {
+        return builder;
     }
 
     public int position() {
@@ -22,8 +35,22 @@ public class WriteBuffer extends BuildableCharArray {
         }
     }
 
+    public void flush() {
+        int capacity = builder.capacity();
+        if (buffer.length != capacity) {
+            buffer = new char[capacity];
+        }
+
+        int length = builder.length();
+        builder.getChars(0, length, buffer, 0);
+        builder.setLength(0);
+
+        destination.send(buffer, length);
+    }
+
     @Override
-    protected void flush(char[] buffer, int end) {
-        destination.send(buffer, end);
+    public void gc() {
+        builder = new StringBuilder(builder);
+        buffer = new char[builder.capacity()];
     }
 }

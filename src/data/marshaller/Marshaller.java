@@ -5,21 +5,12 @@ import eu.menzani.data.Object;
 import eu.menzani.object.GarbageCollectionAware;
 
 public abstract class Marshaller {
-    private static final int defaultBufferSize = 8192;
-
-    protected Marshaller() {
-    }
-
     public abstract void marshal(Element element, WriteBuffer buffer);
 
-    public abstract Element unmarshal(ReadBuffer buffer);
+    public abstract Element unmarshal(Source source);
 
     public void marshal(Element element, Destination destination) {
-        marshal(element, new WriteBuffer(defaultBufferSize, destination));
-    }
-
-    public Element unmarshal(Source source) {
-        return unmarshal(new ReadBuffer(defaultBufferSize, source));
+        marshal(element, new WriteBuffer(destination));
     }
 
     protected static void requireObject(Element element) {

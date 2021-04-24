@@ -30,9 +30,8 @@ public class InputStreamReader extends Reader {
             return -1;
         }
         int j = 0;
-        len += off;
-        while (off < len) {
-            cbuf[off++] = HeapBuffer.getChar(buffer, j += 2);
+        for (len += off; off < len; j += 2) {
+            cbuf[off++] = HeapBuffer.getChar(buffer, j);
         }
         assert j == amountRead;
         return amountRead;
@@ -51,9 +50,8 @@ public class InputStreamReader extends Reader {
         }
         int j = 0;
         int position = target.position();
-        len += position;
-        while (position++ < len) {
-            target.put(HeapBuffer.getChar(buffer, j += 2));
+        for (len += position; position++ < len; j += 2) {
+            target.put(HeapBuffer.getChar(buffer, j));
         }
         assert j == amountRead;
         return amountRead;
@@ -81,8 +79,8 @@ public class InputStreamReader extends Reader {
             return -1;
         }
         int j = 0;
-        for (int i = 0; i < length; i++) {
-            cbuf[i] = HeapBuffer.getChar(buffer, j += 2);
+        for (int i = 0; i < length; j += 2) {
+            cbuf[i++] = HeapBuffer.getChar(buffer, j);
         }
         assert j == amountRead;
         return amountRead;

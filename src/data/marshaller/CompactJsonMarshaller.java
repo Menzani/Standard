@@ -22,7 +22,7 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
 
     @Override
     public void marshal(Element element, WriteBuffer buffer) {
-        marshal(element, buffer, buffer.builder);
+        marshal(element, buffer, buffer.getBuilder());
         buffer.flush();
     }
 
@@ -76,27 +76,27 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
     }
 
     @Override
-    public Element unmarshal(ReadBuffer buffer) {
-        switch (buffer.next()) {
+    public Element unmarshal(Source source) {
+        switch (source.next()) {
             case 'n':
-                if (buffer.nextIs('u') &&
-                        buffer.nextIs('l') &&
-                        buffer.nextIs('l')) {
+                if (source.nextIs('u') &&
+                        source.nextIs('l') &&
+                        source.nextIs('l')) {
                     return null;
                 }
                 throw new ParseException();
             case 't':
-                if (buffer.nextIs('r') &&
-                        buffer.nextIs('u') &&
-                        buffer.nextIs('e')) {
+                if (source.nextIs('r') &&
+                        source.nextIs('u') &&
+                        source.nextIs('e')) {
                     return Boolean.TRUE;
                 }
                 throw new ParseException();
             case 'f':
-                if (buffer.nextIs('a') &&
-                        buffer.nextIs('l') &&
-                        buffer.nextIs('s') &&
-                        buffer.nextIs('e')) {
+                if (source.nextIs('a') &&
+                        source.nextIs('l') &&
+                        source.nextIs('s') &&
+                        source.nextIs('e')) {
                     return Boolean.FALSE;
                 }
                 throw new ParseException();
@@ -105,10 +105,10 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
                 StringBuilder builder = string.set();
                 outer:
                 while (true) {
-                    char character = buffer.next();
+                    char character = source.next();
                     switch (character) {
                         case '\\':
-                            switch (buffer.next()) {
+                            switch (source.next()) {
                                 case '"':
                                     builder.append('"');
                                     break;
@@ -130,35 +130,35 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
             case '[': {
                 Array array = Array.allocate();
                 while (true) {
-                    if (buffer.peekIs(']')) {
-                        buffer.advance();
+                    if (source.peekIs(']')) {
+                        source.advance();
                         return array;
                     }
-                    array.add(unmarshal(buffer));
-                    if (buffer.peekIs(',')) {
-                        buffer.advance();
+                    array.add(unmarshal(source));
+                    if (source.peekIs(',')) {
+                        source.advance();
                     }
                 }
             }
             case '{':
                 Object object = Object.allocate();
                 while (true) {
-                    if (buffer.peekIs('}')) {
-                        buffer.advance();
+                    if (source.peekIs('}')) {
+                        source.advance();
                         return object;
                     }
 
-                    if (buffer.nextIsNot('"')) {
+                    if (source.nextIsNot('"')) {
                         throw new ParseException();
                     }
                     StringBuilder builder = keyBuilder;
                     builder.setLength(0);
                     outer:
                     while (true) {
-                        char character = buffer.next();
+                        char character = source.next();
                         switch (character) {
                             case '\\':
-                                switch (buffer.next()) {
+                                switch (source.next()) {
                                     case '"':
                                         builder.append('"');
                                         break;
@@ -176,12 +176,12 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
                         }
                     }
 
-                    if (buffer.nextIsNot(':')) {
+                    if (source.nextIsNot(':')) {
                         throw new ParseException();
                     }
-                    object.set(builder.toString(), unmarshal(buffer));
-                    if (buffer.peekIs(',')) {
-                        buffer.advance();
+                    object.set(builder.toString(), unmarshal(source));
+                    if (source.peekIs(',')) {
+                        source.advance();
                     }
                 }
             case '+':
@@ -198,11 +198,11 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
             case '9':
             case 'I':
             case 'N':
-                int start = buffer.position() - 1;
+                int start = source.position() - 1;
                 boolean isDecimal = false;
                 loop:
-                while (buffer.hasNext()) {
-                    switch (buffer.peek()) {
+                while (source.hasNext()) {
+                    switch (source.peek()) {
                         case ',':
                         case ']':
                         case '}':
@@ -210,14 +210,14 @@ public class CompactJsonMarshaller extends Marshaller implements GarbageCollecti
                         case '.':
                             isDecimal = true;
                         default:
-                            buffer.advance();
+                            source.advance();
                     }
                 }
 
                 if (isDecimal) {
-                    return Decimal.allocate(decimalConversion.parseDouble(buffer, start, buffer.position()));
+                    return Decimal.allocate(decimalConversion.parseDouble(source, start, source.position()));
                 }
-                return Integer.allocate(Long.parseLong(buffer, start, buffer.position(), 10));
+                return Integer.allocate(Long.parseLong(source, start, source.position(), 10));
             default:
                 throw new ParseException();
         }

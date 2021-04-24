@@ -22,9 +22,8 @@ public class OutputStreamWriter extends Writer {
             buffer = new byte[amount];
         }
         int j = 0;
-        len += off;
-        while (off < len) {
-            HeapBuffer.putChar(buffer, j += 2, cbuf[off++]);
+        for (len += off; off < len; j += 2) {
+            HeapBuffer.putChar(buffer, j, cbuf[off++]);
         }
         assert j == amount;
         stream.write(buffer, 0, amount);
@@ -38,15 +37,16 @@ public class OutputStreamWriter extends Writer {
 
     @Override
     public void write(char[] cbuf) throws IOException {
-        int amount = cbuf.length * 2;
+        int length = cbuf.length;
+        int amount = length * 2;
         if (buffer.length < amount) {
             buffer = new byte[amount];
         }
-        int i = 0;
-        for (char c : cbuf) {
-            HeapBuffer.putChar(buffer, i += 2, c);
+        int j = 0;
+        for (int i = 0; i < length; j += 2) {
+            HeapBuffer.putChar(buffer, j, cbuf[i++]);
         }
-        assert i == amount;
+        assert j == amount;
         stream.write(buffer, 0, amount);
     }
 
@@ -68,8 +68,8 @@ public class OutputStreamWriter extends Writer {
             buffer = new byte[amount];
         }
         int j = 0;
-        for (int i = 0; i < length; i++) {
-            HeapBuffer.putChar(buffer, j += 2, csq.charAt(i));
+        for (int i = 0; i < length; j += 2) {
+            HeapBuffer.putChar(buffer, j, csq.charAt(i++));
         }
         assert j == amount;
         stream.write(buffer, 0, amount);
@@ -82,11 +82,11 @@ public class OutputStreamWriter extends Writer {
         if (buffer.length < amount) {
             buffer = new byte[amount];
         }
-        int i = 0;
-        for (; start < end; start++) {
-            HeapBuffer.putChar(buffer, i += 2, csq.charAt(start));
+        int j = 0;
+        for (; start < end; j += 2) {
+            HeapBuffer.putChar(buffer, j, csq.charAt(start++));
         }
-        assert i == amount;
+        assert j == amount;
         stream.write(buffer, 0, amount);
         return this;
     }

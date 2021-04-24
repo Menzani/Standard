@@ -1,18 +1,25 @@
 package eu.menzani.io;
 
-import eu.menzani.lang.BuildableCharArray;
 import eu.menzani.lang.UncaughtException;
+import eu.menzani.lang.View;
+import eu.menzani.object.GarbageCollectionAware;
 import eu.menzani.struct.HeapBuffer;
+import eu.menzani.struct.Strings;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class OutputStreamBuffer extends BuildableCharArray {
+public class OutputStreamBuffer implements GarbageCollectionAware {
+    private static final int defaultInitialCapacity = 512;
+
     private final OutputStream stream;
-    private byte[] buffer = HeapBuffer.EMPTY;
+    private byte[] buffer;
+
+    @View
+    public StringBuilder builder;
 
     public static OutputStreamBuffer standardOutput() {
-        return standardOutput(DEFAULT_INITIAL_CAPACITY);
+        return standardOutput(defaultInitialCapacity);
     }
 
     public static OutputStreamBuffer standardOutput(int initialCapacity) {
@@ -20,7 +27,7 @@ public class OutputStreamBuffer extends BuildableCharArray {
     }
 
     public static OutputStreamBuffer standardError() {
-        return standardError(DEFAULT_INITIAL_CAPACITY);
+        return standardError(defaultInitialCapacity);
     }
 
     public static OutputStreamBuffer standardError(int initialCapacity) {
@@ -28,15 +35,20 @@ public class OutputStreamBuffer extends BuildableCharArray {
     }
 
     public OutputStreamBuffer(OutputStream stream) {
-        this(stream, DEFAULT_INITIAL_CAPACITY);
+        this(stream, defaultInitialCapacity);
     }
 
     public OutputStreamBuffer(OutputStream stream, int initialCapacity) {
-        super(initialCapacity, false);
         this.stream = stream;
+        builder = new StringBuilder(initialCapacity);
+        buffer = new byte[initialCapacity * 2];
     }
 
-    @Override
+    public void println() {
+        builder.append(Strings.LN);
+        flush();
+    }
+
     public void flush() {
         int capacity = builder.capacity() * 2;
         if (buffer.length != capacity) {
@@ -44,8 +56,8 @@ public class OutputStreamBuffer extends BuildableCharArray {
         }
 
         int j = 0;
-        for (int i = 0; i < builder.length(); i++) {
-            HeapBuffer.putChar(buffer, j += 2, builder.charAt(i));
+        for (int i = 0; i < builder.length(); j += 2) {
+            HeapBuffer.putChar(buffer, j, builder.charAt(i++));
         }
         assert j == capacity;
         builder.setLength(0);
@@ -58,7 +70,8 @@ public class OutputStreamBuffer extends BuildableCharArray {
     }
 
     @Override
-    protected void flush(char[] buffer, int end) {
-        throw new AssertionError();
+    public void gc() {
+        builder = new StringBuilder(builder);
+        buffer = new byte[builder.capacity() * 2];
     }
 }

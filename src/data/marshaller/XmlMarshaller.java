@@ -1,7 +1,7 @@
 package eu.menzani.data.marshaller;
 
 import eu.menzani.data.Element;
-import eu.menzani.data.ReadBuffer;
+import eu.menzani.data.Source;
 import eu.menzani.data.WriteBuffer;
 
 public class XmlMarshaller extends Marshaller {
@@ -11,7 +11,7 @@ public class XmlMarshaller extends Marshaller {
     }
 
     @Override
-    public Element unmarshal(ReadBuffer buffer) {
+    public Element unmarshal(Source source) {
         return null;
     }
 }

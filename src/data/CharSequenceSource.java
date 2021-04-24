@@ -1,6 +1,6 @@
 package eu.menzani.data;
 
-public class CharSequenceSource implements Source {
+public class CharSequenceSource extends Source {
     private final CharSequence charSequence;
     private final int to;
 
@@ -17,16 +17,32 @@ public class CharSequenceSource implements Source {
     }
 
     @Override
-    public int fill(char[] buffer) {
-        int position = this.position;
-        if (position == to) {
-            return -1;
-        }
-        int batchSize = Math.min(to - position, buffer.length);
-        for (int i = 0; i < batchSize; i++) {
-            buffer[i] = charSequence.charAt(position + i);
-        }
-        this.position += batchSize;
-        return batchSize;
+    public boolean hasNext() {
+        return position != to;
+    }
+
+    @Override
+    public char next() {
+        return charSequence.charAt(position++);
+    }
+
+    @Override
+    public char peek() {
+        return charSequence.charAt(position);
+    }
+
+    @Override
+    public void advance() {
+        position++;
+    }
+
+    @Override
+    public int position() {
+        return position;
+    }
+
+    @Override
+    public char charAt(int index) {
+        return charSequence.charAt(index);
     }
 }

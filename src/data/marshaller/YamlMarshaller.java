@@ -38,7 +38,7 @@ public class YamlMarshaller extends Marshaller implements GarbageCollectionAware
     public void marshal(Element element, WriteBuffer buffer) {
         requireObject(element);
         indent.reset();
-        marshal(element, buffer, buffer.builder, indent, false, true);
+        marshal(element, buffer, buffer.getBuilder(), indent, false, true);
         buffer.flush();
     }
 
@@ -129,7 +129,7 @@ public class YamlMarshaller extends Marshaller implements GarbageCollectionAware
     }
 
     @Override
-    public Element unmarshal(ReadBuffer buffer) {
+    public Element unmarshal(Source source) {
         return null;
     }
 

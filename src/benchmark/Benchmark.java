@@ -150,13 +150,13 @@ public abstract class Benchmark {
 
         init();
         int numIterations = getNumIterations();
-        logic(numIterations);
+        measure(numIterations);
 
         Runtime runtime = Runtime.getRuntime();
         long warmupMemoryCap = runtime.totalMemory() / 2L;
 
         long startMemory = runtime.freeMemory();
-        logic(numIterations);
+        measure(numIterations);
         long endMemory = runtime.freeMemory();
         long testMemoryCap = (startMemory - endMemory) * 2L;
 
@@ -193,14 +193,14 @@ public abstract class Benchmark {
             long start = System.nanoTime();
             do {
                 profiler.start();
-                logic(numIterations);
+                measure(numIterations);
                 profiler.stop();
-                onLogicEnd();
+                onMeasureEnd();
             } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > memoryCap);
         } else {
             long start = System.nanoTime();
             do {
-                logic(numIterations);
+                measure(numIterations);
             } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > memoryCap);
         }
     }
@@ -208,9 +208,9 @@ public abstract class Benchmark {
     protected void init() {
     }
 
-    protected abstract void logic(int i);
+    protected abstract void measure(int i);
 
-    protected void onLogicEnd() {
+    protected void onMeasureEnd() {
     }
 
     private class BenchmarkThreadFactory implements ObjectFactory<Thread> {
@@ -254,13 +254,13 @@ public abstract class Benchmark {
                 long start = System.nanoTime();
                 do {
                     profiler.start();
-                    benchmark.logic(numIterations);
+                    benchmark.measure(numIterations);
                     profiler.stop();
                 } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > memoryCap);
             } else {
                 long start = System.nanoTime();
                 do {
-                    benchmark.logic(numIterations);
+                    benchmark.measure(numIterations);
                 } while (System.nanoTime() - start < 3L * 1_000_000_000L && runtime.freeMemory() > memoryCap);
             }
         }

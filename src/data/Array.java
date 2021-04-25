@@ -3,7 +3,6 @@ package eu.menzani.data;
 import eu.menzani.collection.ArrayView;
 import eu.menzani.lang.Optional;
 import eu.menzani.object.Allocator;
-import eu.menzani.object.PoolObject;
 import eu.menzani.struct.Arrays;
 
 import java.util.List;

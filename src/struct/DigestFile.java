@@ -7,8 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
 import java.util.Arrays;
+import java.util.*;
 
 public class DigestFile {
     private final MessageDigest md5 = newMD5Digest();

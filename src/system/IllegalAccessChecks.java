@@ -1,6 +1,7 @@
 package eu.menzani.system;
 
 import eu.menzani.InternalUnsafe;
+import eu.menzani.lang.Idempotent;
 import eu.menzani.lang.Lang;
 import jdk.internal.module.IllegalAccessLogger;
 
@@ -12,6 +13,7 @@ public class IllegalAccessChecks {
         builder.complete();
     }
 
+    @Idempotent
     public static void turnOff() {
     }
 }

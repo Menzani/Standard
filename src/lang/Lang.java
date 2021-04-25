@@ -47,13 +47,9 @@ public class Lang {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T newInstanceCast(Class<?> clazz) {
-        return (T) newInstance(clazz);
-    }
-
-    public static <T> T newInstance(Class<T> clazz) {
+    public static <T> T newInstance(Class<?> clazz) {
         try {
-            return clazz.getConstructor(noParameterTypes).newInstance(NO_ARGS);
+            return (T) clazz.getConstructor(noParameterTypes).newInstance(NO_ARGS);
         } catch (ReflectiveOperationException e) {
             throw new UncaughtException(e);
         }

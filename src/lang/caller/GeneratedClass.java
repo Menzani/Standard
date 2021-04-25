@@ -56,6 +56,6 @@ class GeneratedClass<T> {
 
         GlobalStackTraceFilter.getInstance().addMethodToRemove(fullName, "call");
 
-        return Lang.newInstanceCast(generated);
+        return Lang.newInstance(generated);
     }
 }

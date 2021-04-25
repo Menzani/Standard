@@ -1,7 +1,9 @@
 package eu.menzani.data.marshaller;
 
+import eu.menzani.data.Destination;
+import eu.menzani.data.Element;
 import eu.menzani.data.Object;
-import eu.menzani.data.*;
+import eu.menzani.data.Source;
 
 public abstract class Marshaller {
     /**

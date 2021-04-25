@@ -1,13 +1,12 @@
 package eu.menzani.misc;
 
+import eu.menzani.Standard;
 import eu.menzani.build.CompileCppTask;
-import eu.menzani.build.IdeaProject;
-import eu.menzani.concurrent.Lazy;
 import eu.menzani.lang.Assert;
 import eu.menzani.lang.UncaughtException;
+import eu.menzani.struct.AppInfo;
 import eu.menzani.struct.FileExtension;
 import eu.menzani.struct.Paths;
-import eu.menzani.struct.Strings;
 import eu.menzani.system.ApplicationProperty;
 import eu.menzani.system.PlatformDependantValue;
 import eu.menzani.system.PlatformFamilyDependantValue;
@@ -18,25 +17,17 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 
 public class NativeLibrary {
     public static final String FOLDER_IN_ARTIFACT = "native";
-    private static final Lazy<Boolean> isNotLibrary = Lazy.of(() -> {
-        IdeaProject project = IdeaProject.current();
-        if (project == null) {
-            return false;
-        }
-        return project.isNotLibrary("Standard");
-    });
 
     private final long versionId;
     private final Module module;
-    private final String lowercaseModuleName;
 
-    public NativeLibrary(long versionId, Module module, String lowercaseModuleName) {
+    public NativeLibrary(long versionId, Module module) {
         this.versionId = versionId;
         this.module = module;
-        this.lowercaseModuleName = lowercaseModuleName;
     }
 
     public void load() {
@@ -48,11 +39,11 @@ public class NativeLibrary {
         URL resource = ClassLoader.getSystemResource(resourceName);
         boolean isIDEForSure = (resource == null);
         if (isIDEForSure) {
-            if (isNotLibrary.get()) {
+            if (Standard.isNotLibrary()) {
                 CompileCppTask.run(true);
                 resource = ClassLoader.getSystemResource(resourceName);
             } else {
-                throw new NativeLibraryException("Could not compile", module);
+                throw new NativeLibraryException(module);
             }
         }
         String protocol = resource.getProtocol();
@@ -60,7 +51,7 @@ public class NativeLibrary {
             extractFromJar(path, resource);
         } else {
             Assert.equal(protocol, "file");
-            if (!isIDEForSure && isNotLibrary.get()) {
+            if (!isIDEForSure && Standard.isNotLibrary()) {
                 CompileCppTask.run(false);
             }
             path = Paths.fromURL(resource);
@@ -82,22 +73,30 @@ public class NativeLibrary {
     private class LibraryName extends PlatformDependantValue<String> {
         @Override
         protected String onWindows32() {
-            return Strings.firstLetterToUppercase(lowercaseModuleName) + "_32";
+            return onWindows("_32");
         }
 
         @Override
         protected String onWindows64() {
-            return Strings.firstLetterToUppercase(lowercaseModuleName) + "_64";
+            return onWindows("_64");
+        }
+
+        private String onWindows(String suffix) {
+            return AppInfo.getModuleDisplayName(module) + suffix;
         }
 
         @Override
         protected String onLinux32() {
-            return "lib" + lowercaseModuleName + "_32";
+            return onLinux("_32");
         }
 
         @Override
         protected String onLinux64() {
-            return "lib" + lowercaseModuleName + "_64";
+            return onLinux("_64");
+        }
+
+        private String onLinux(String suffix) {
+            return "lib" + AppInfo.getModuleDisplayName(module).toLowerCase(Locale.ENGLISH) + suffix;
         }
     }
 

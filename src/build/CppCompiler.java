@@ -3,7 +3,6 @@ package eu.menzani.build;
 import eu.menzani.io.PrintToConsoleException;
 import eu.menzani.io.SimpleDirectoryStreamFilter;
 import eu.menzani.lang.UncaughtException;
-import eu.menzani.struct.AppInfo;
 import eu.menzani.struct.DigestFile;
 import eu.menzani.struct.FileExtension;
 import eu.menzani.system.Platform;
@@ -23,18 +22,17 @@ class CppCompiler {
             .orHasExtension(FileExtension.CPP)
             .orHasExtension(FileExtension.C);
 
-    private static final DigestFile sourcesDigest = new DigestFile(
-            SystemPaths.TEMP_FOLDER, "native-build_" + AppInfo.getName());
-
     private final Path sourcesFolder;
     private final Path outputFolder;
     private final Path outputFileWithoutExtension;
+    private final DigestFile sourcesDigest;
     private final boolean shouldRebuild;
 
-    CppCompiler(Path sourcesFolder, Path outputFolder, Path outputFileWithoutExtension, boolean shouldRebuild) {
+    CppCompiler(Path sourcesFolder, Path outputFolder, Path outputFileWithoutExtension, String moduleName, boolean shouldRebuild) {
         this.sourcesFolder = sourcesFolder;
         this.outputFolder = outputFolder;
         this.outputFileWithoutExtension = outputFileWithoutExtension;
+        sourcesDigest = new DigestFile(SystemPaths.TEMP_FOLDER, "native-build_" + moduleName);
         this.shouldRebuild = shouldRebuild;
     }
 

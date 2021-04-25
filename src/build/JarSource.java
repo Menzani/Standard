@@ -26,9 +26,9 @@ class JarSource {
         this.packagePrefix = packagePrefix;
     }
 
-    void computePathAndPackagePrefix(Path modulePath, String moduleName) {
+    void computePathAndPackagePrefix(Path moduleDirectory, String moduleName) {
         assert name != null;
-        path = modulePath.resolve(name);
+        path = moduleDirectory.resolve(name);
 
         if (packagePrefix == null) {
             System.out.println("Module source folder has no package prefix: " + moduleName + '/' + name);

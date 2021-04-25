@@ -2,26 +2,22 @@ package eu.menzani.test;
 
 import eu.menzani.benchmark.Stopwatch;
 import eu.menzani.build.IdeaModule;
+import eu.menzani.build.IdeaProject;
 import eu.menzani.collection.ArrayBuilder;
 import eu.menzani.lang.MethodHandles;
-import eu.menzani.struct.Paths;
-import eu.menzani.system.SystemPaths;
-import eu.menzani.system.SystemProperty;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Set;
 
 class Runner {
     public static void main(String[] args) throws Exception {
         Stopwatch stopwatch = new Stopwatch();
 
         Runner runner = new Runner();
-        runner.scan(SystemProperty.CLASS_PATH);
-        runner.scan(SystemProperty.MODULE_PATH);
+        runner.scan();
         runner.buildIndex();
         runner.loadFailedTests();
         runner.run(stopwatch);
@@ -29,8 +25,6 @@ class Runner {
 
         stopwatch.stop();
     }
-
-    private static final Path testOutputFolder = Path.of("test");
 
     private final Scanner scanner = new Scanner();
     private Index index;
@@ -40,21 +34,17 @@ class Runner {
     private Runner() {
     }
 
-    private void scan(Set<Path> paths) throws IOException {
-        for (Path path : paths) {
-            if (SystemPaths.isWorkingDirectory(path)) continue;
-            int indexOfProductionOutputFolder = Paths.indexOf(path, IdeaModule.PRODUCTION_OUTPUT_FOLDER);
-            if (indexOfProductionOutputFolder != -1) {
-                Path moduleTestOutputFolder = Paths.replace(path, indexOfProductionOutputFolder, testOutputFolder);
-                if (Files.exists(moduleTestOutputFolder)) {
-                    Files.walkFileTree(moduleTestOutputFolder, scanner);
-                }
+    private void scan() throws IOException {
+        for (IdeaModule module : IdeaProject.current().getModules()) {
+            Path testOutputDirectory = module.getTestOutputDirectory();
+            if (Files.exists(testOutputDirectory)) {
+                Files.walkFileTree(testOutputDirectory, scanner);
             }
         }
     }
 
     private void buildIndex() throws ReflectiveOperationException {
-        scanner.loadClasses(getClass());
+        scanner.loadClasses(Runner.class);
 
         var indexBuilder = new ArrayBuilder<>(scanner.getTestClasses(), TestClass.class);
         for (ParsedClassFile classFile : indexBuilder) {

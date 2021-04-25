@@ -33,7 +33,7 @@ class IdeaProjectScanner extends SimpleFileVisitor<Path> {
             case "res":
             case "test":
             case "unit-test":
-            case IdeaModule.NATIVE_OUTPUT_FOLDER_NAME:
+            case IdeaModule.NATIVE_FOLDER_NAME:
             case "lib":
             case IdeaProject.IDEA_FOLDER_NAME:
             case ".git":
@@ -46,7 +46,8 @@ class IdeaProjectScanner extends SimpleFileVisitor<Path> {
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         if (file.toString().endsWith(".iml")) {
             Path directory = file.getParent();
-            String name = directory.getFileName().toString();
+            Path nameAsFolder = directory.getFileName();
+            String name = nameAsFolder.toString();
 
             String artifactName;
             if (name.equals(projectName)) {
@@ -59,7 +60,7 @@ class IdeaProjectScanner extends SimpleFileVisitor<Path> {
             XmlParser.parse(file, moduleDescriptorScanner);
             List<JarSource> javaSourceFolders = moduleDescriptorScanner.getSourceFolders(directory, name);
 
-            modules.add(new IdeaModule(directory, name, artifactName, javaSourceFolders));
+            modules.add(new IdeaModule(directory, name, nameAsFolder, artifactName, javaSourceFolders));
         }
         return FileVisitResult.CONTINUE;
     }

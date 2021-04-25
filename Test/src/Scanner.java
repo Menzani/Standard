@@ -23,9 +23,9 @@ class Scanner extends SimpleFileVisitor<Path> {
         return FileVisitResult.CONTINUE;
     }
 
-    void loadClasses(Class<?> callerClass) {
-        ClassLoader classLoader = callerClass.getClassLoader();
-        ProtectionDomain protectionDomain = callerClass.getProtectionDomain();
+    void loadClasses(Class<?> environment) {
+        ClassLoader classLoader = environment.getClassLoader();
+        ProtectionDomain protectionDomain = environment.getProtectionDomain();
 
         Iterator<ParsedClassFile> iterator = classFiles.iterator();
         while (iterator.hasNext()) {

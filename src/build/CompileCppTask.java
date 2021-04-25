@@ -41,14 +41,22 @@ public class CompileCppTask {
     }
 
     private void compileCppInCurrentProject(boolean shouldRebuild) {
-        IdeaProject project = IdeaProject.current();
-        for (IdeaModule module : project.getModules()) {
+        for (IdeaModule module : IdeaProject.current().getModules()) {
             Path nativeSourceFolder = module.getNativeSourceFolder();
             if (Files.exists(nativeSourceFolder)) {
-                Path outputFileWithoutExtension = module.getProductionOutputDirectory()
-                        .resolve(NativeLibrary.FOLDER_IN_ARTIFACT).resolve(module.getName());
-                CppCompiler cppCompiler = new CppCompiler(nativeSourceFolder,
-                        module.getNativeOutputDirectory(), outputFileWithoutExtension, shouldRebuild);
+
+                Path outputFileWithoutExtension = module
+                        .getProductionOutputDirectory()
+                        .resolve(NativeLibrary.FOLDER_IN_ARTIFACT)
+                        .resolve(module.getNameAsFolder());
+
+                CppCompiler cppCompiler = new CppCompiler(
+                        nativeSourceFolder,
+                        module.getNativeOutputDirectory(),
+                        outputFileWithoutExtension,
+                        module.getName(),
+                        shouldRebuild
+                );
                 cppCompiler.compile();
             }
         }

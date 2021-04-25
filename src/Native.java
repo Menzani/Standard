@@ -9,8 +9,8 @@ public class Native {
     }
 
     static {
-        AppInfo.setName("Standard");
-        NativeLibrary nativeLibrary = new NativeLibrary(2278256207267942924L, Lang.EU_MENZANI_MODULE, "standard");
+        AppInfo.setModuleDisplayName(Lang.EU_MENZANI_MODULE, Standard.NAME);
+        NativeLibrary nativeLibrary = new NativeLibrary(2278256207267942924L, Lang.EU_MENZANI_MODULE);
         nativeLibrary.load();
     }
 }

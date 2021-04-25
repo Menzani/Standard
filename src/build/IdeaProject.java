@@ -1,6 +1,5 @@
 package eu.menzani.build;
 
-import eu.menzani.concurrent.Lazy;
 import eu.menzani.lang.Optional;
 import eu.menzani.lang.UncaughtException;
 import eu.menzani.misc.XmlParser;
@@ -12,10 +11,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class IdeaProject {
-    private static final Lazy<IdeaProject> current = Lazy.of(() -> IdeaProject.fromFolder(SystemPaths.WORKING_DIRECTORY));
-
     public static IdeaProject current() {
-        return current.get();
+        return Current.value;
     }
 
     static final String IDEA_FOLDER_NAME = ".idea";
@@ -62,11 +59,15 @@ public class IdeaProject {
         return name;
     }
 
-    List<IdeaModule> getModules() {
+    public List<IdeaModule> getModules() {
         return modules;
     }
 
     public boolean isNotLibrary(String fileProjectName) {
         return name.equals(fileProjectName);
+    }
+
+    private static class Current {
+        static final IdeaProject value = IdeaProject.fromFolder(SystemPaths.WORKING_DIRECTORY);
     }
 }

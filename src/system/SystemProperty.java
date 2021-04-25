@@ -47,19 +47,29 @@ public class SystemProperty extends RuntimeProperty {
     public static final String CLASS_PATH_STRING = new SystemProperty("java", "class", "path").get();
     public static final @Optional String MODULE_PATH_STRING = new SystemProperty("jdk", "module", "path").getOrNull();
 
-    public static final Set<Path> CLASS_PATH = mapToPath(CLASS_PATH_STRING);
-    public static final Set<Path> MODULE_PATH = mapToPath(MODULE_PATH_STRING);
+    public static Set<Path> getClassPath() {
+        return ClassAndModulePath.classPath;
+    }
+
+    public static Set<Path> getModulePath() {
+        return ClassAndModulePath.modulePath;
+    }
 
     public static final Path JAVA_HOME = new SystemProperty("java", "home").getAsPath();
 
-    private static Set<Path> mapToPath(@Optional String string) {
-        if (string == null) {
-            return Collections.emptySet();
+    private static class ClassAndModulePath {
+        static final Set<Path> classPath = mapToPath(CLASS_PATH_STRING);
+        static final Set<Path> modulePath = mapToPath(MODULE_PATH_STRING);
+
+        private static Set<Path> mapToPath(@Optional String string) {
+            if (string == null) {
+                return Collections.emptySet();
+            }
+            SetBuilder<String, Path> builder = new SetBuilder<>(string.split(";"));
+            for (String path : builder) {
+                builder.add(Path.of(path));
+            }
+            return builder.buildUnmodifiable();
         }
-        SetBuilder<String, Path> builder = new SetBuilder<>(string.split(";"));
-        for (String path : builder) {
-            builder.add(Path.of(path));
-        }
-        return builder.buildUnmodifiable();
     }
 }

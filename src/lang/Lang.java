@@ -46,6 +46,9 @@ public class Lang {
         return new StaticFieldOffset(InternalUnsafe.UNSAFE.staticFieldBase(field), InternalUnsafe.UNSAFE.staticFieldOffset(field));
     }
 
+    /**
+     * If invoked repeatedly for the same class, {@link java.lang.invoke.MethodHandle} should be preferred.
+     */
     @SuppressWarnings("unchecked")
     public static <T> T newInstance(Class<?> clazz) {
         try {

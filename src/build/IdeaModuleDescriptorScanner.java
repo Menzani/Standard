@@ -11,9 +11,9 @@ import java.util.List;
 class IdeaModuleDescriptorScanner extends DefaultHandler {
     private final List<JarSource> sourceFolders = new ArrayList<>();
 
-    List<JarSource> getSourceFolders(Path modulePath, String moduleName) {
+    List<JarSource> getSourceFolders(Path moduleDirectory, String moduleName) {
         for (JarSource sourceFolder : sourceFolders) {
-            sourceFolder.computePathAndPackagePrefix(modulePath, moduleName);
+            sourceFolder.computePathAndPackagePrefix(moduleDirectory, moduleName);
         }
         return Collections.unmodifiableList(sourceFolders);
     }

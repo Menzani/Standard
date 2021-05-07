@@ -16,6 +16,7 @@ public abstract class PlatformFamilyDependant {
             default:
                 throw new AssertionError();
         }
+        complete();
     }
 
     protected void init() {
@@ -31,5 +32,8 @@ public abstract class PlatformFamilyDependant {
 
     protected void onMac() {
         throw new PlatformNotSupportedException();
+    }
+
+    protected void complete() {
     }
 }

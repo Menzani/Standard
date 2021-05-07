@@ -27,7 +27,11 @@ public class DisableFocus {
     }
 
     public void apply(JFrame frame) {
-        Swing.forEachComponent(frame.getRootPane(), component -> {
+        apply(frame.getRootPane());
+    }
+
+    public void apply(Container container) {
+        Swing.forEachComponent(container, component -> {
             for (KeyListener globalKeyListener : globalKeyListeners) {
                 component.addKeyListener(globalKeyListener);
             }

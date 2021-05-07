@@ -25,6 +25,7 @@ public abstract class PlatformDependant {
             default:
                 throw new AssertionError();
         }
+        complete();
     }
 
     protected void init() {
@@ -52,5 +53,8 @@ public abstract class PlatformDependant {
 
     protected void onMac64() {
         throw new PlatformNotSupportedException();
+    }
+
+    protected void complete() {
     }
 }

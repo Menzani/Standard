@@ -1,8 +1,6 @@
 package eu.menzani.system;
 
 import eu.menzani.SunUnsafe;
-import eu.menzani.data.ParseException;
-import eu.menzani.io.ProcessLauncher;
 
 public enum Platform {
     LINUX_32(Family.LINUX, Architecture.BIT_32, false, true, false, true),
@@ -64,16 +62,8 @@ public enum Platform {
         return OopsCompressed.value;
     }
 
-    public static int getNumberOfCores() {
-        return CPUInfo.numberOfCores;
-    }
-
-    public static int getNumberOfHardwareThreads() {
-        return CPUInfo.numberOfHardwareThreads;
-    }
-
-    public static int getNumberOfHardwareThreadsPerCore() {
-        return CPUInfo.numberOfHardwareThreadsPerCore;
+    public static CPUInfo getCPUInfo() {
+        return CPUInfo.value;
     }
 
     static {
@@ -116,10 +106,10 @@ public enum Platform {
     private static class OopsCompressed {
         static final boolean value;
 
-        private int i;
+        private Object object;
 
         static {
-            long offset = SunUnsafe.objectFieldOffset(OopsCompressed.class, "i");
+            long offset = SunUnsafe.objectFieldOffset(OopsCompressed.class, "object");
             if (offset == 8L) {
                 assert current().is32Bit();
                 value = false;
@@ -130,52 +120,6 @@ public enum Platform {
             } else {
                 throw new AssertionError();
             }
-        }
-    }
-
-    private static class CPUInfo extends PlatformFamilyDependant {
-        static final int numberOfCores;
-        static final int numberOfHardwareThreads;
-        static final int numberOfHardwareThreadsPerCore;
-
-        static {
-            CPUInfo cpuInfo = new CPUInfo();
-            numberOfCores = cpuInfo._numberOfCores;
-            numberOfHardwareThreads = cpuInfo._numberOfHardwareThreads;
-            numberOfHardwareThreadsPerCore = numberOfHardwareThreads / numberOfCores;
-        }
-
-        private int _numberOfCores;
-        private int _numberOfHardwareThreads;
-
-        @Override
-        protected void init() {
-            _numberOfCores = -1;
-            _numberOfHardwareThreads = -1;
-        }
-
-        @Override
-        protected void onWindows() {
-            ProcessLauncher launcher = new ProcessLauncher("wmic");
-            launcher.addArguments("CPU", "Get", "NumberOfCores,NumberOfLogicalProcessors", "/Format:List");
-            for (String line : launcher.start().readOutputLines()) {
-                if (line.isEmpty()) continue;
-                int indexOfEquals = line.indexOf('=');
-                String key = line.substring(0, indexOfEquals);
-                int value = Integer.parseInt(line.substring(indexOfEquals + 1));
-                switch (key) {
-                    case "NumberOfCores":
-                        _numberOfCores = value;
-                        break;
-                    case "NumberOfLogicalProcessors":
-                        _numberOfHardwareThreads = value;
-                        break;
-                    default:
-                        throw new ParseException();
-                }
-            }
-            if (_numberOfCores == -1) throw new ParseException();
-            if (_numberOfHardwareThreads == -1) throw new ParseException();
         }
     }
 }

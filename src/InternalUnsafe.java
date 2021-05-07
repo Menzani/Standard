@@ -3,8 +3,6 @@ package eu.menzani;
 import eu.menzani.lang.Invokable;
 import eu.menzani.lang.Lang;
 import eu.menzani.lang.Method;
-import eu.menzani.system.Platform;
-import eu.menzani.system.Version;
 
 import java.lang.reflect.AccessibleObject;
 
@@ -19,15 +17,7 @@ public class InternalUnsafe {
     }
 
     static {
-        if (Version.current() == Version.JAVA_11) {
-            OVERRIDE = SunUnsafe.objectFieldOffset(AccessibleObject.class, "override");
-        } else if (Platform.current().is32Bit()) {
-            OVERRIDE = 8L;
-        } else if (Platform.areOopsCompressed()) {
-            OVERRIDE = 12L;
-        } else {
-            OVERRIDE = 16L;
-        }
+        OVERRIDE = SunUnsafe.objectFieldOffset(AccessibleObject_fields.class, "override");
 
         final Class<?> moduleClass = Module.class;
         final Class<?> stringClass = String.class;
@@ -60,5 +50,10 @@ public class InternalUnsafe {
                 implAddExports.call(packageName, to);
             }
         }
+    }
+
+    private static class AccessibleObject_fields {
+        boolean override;
+        volatile Object accessCheckCache;
     }
 }

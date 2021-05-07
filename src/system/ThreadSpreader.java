@@ -68,7 +68,7 @@ public class ThreadSpreader {
         }
 
         public Builder skipHyperthreads() {
-            increment(Platform.getNumberOfHardwareThreadsPerCore());
+            increment(Platform.getCPUInfo().getNumberOfHardwareThreadsPerCore());
             return this;
         }
 

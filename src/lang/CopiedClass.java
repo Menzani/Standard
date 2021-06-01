@@ -56,7 +56,7 @@ public class CopiedClass<T> {
 
     public Invokable<T> getConstructor(Class<?>... parameterTypes) {
         Invokable<T> constructor = Invokable.ofConstructor(copy, parameterTypes);
-        constructor.setAccessible();
+        constructor.forceAccessible();
         return constructor;
     }
 
@@ -72,7 +72,7 @@ public class CopiedClass<T> {
         if (returnType != copy && !original.isAssignableFrom(returnType)) {
             throw new IllegalArgumentException("Method must be a factory.");
         }
-        method.setAccessible();
+        method.forceAccessible();
         return method;
     }
 }
